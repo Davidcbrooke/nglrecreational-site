@@ -231,6 +231,50 @@
     #print-area{display:block;}
     #print-area .inv{min-width:0;padding:0;}
   }
+
+  /* ---------- Coach flow: big buttons ---------- */
+  .flow{max-width:760px;margin:0 auto;}
+  .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
+  .flow-hrow{display:flex;align-items:center;gap:12px;}.flow-hrow .btn{margin-left:auto;}
+  .flow-sub{color:var(--muted);margin:0 0 16px;font-size:15px;}
+  .flow-sub b{color:var(--white);}
+  .flow-l{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:22px 2px 10px;}
+  .backbar{background:none;border:0;color:var(--muted);font-weight:800;font-size:15px;padding:10px 0;cursor:pointer;}
+  .backbar:hover{color:var(--white);}
+  .bbgrid{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:600px){.bbgrid{grid-template-columns:1fr 1fr;}.bbgrid.three{grid-template-columns:1fr 1fr 1fr;}}
+  .bigbtn{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;width:100%;min-height:84px;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--navy-3);color:var(--white);text-align:left;cursor:pointer;transition:transform .12s ease,background .15s ease;}
+  .bigbtn:hover{background:var(--navy-4);}
+  .bigbtn:active{transform:scale(.98);}
+  .bigbtn:focus-visible{outline:3px solid var(--white);outline-offset:2px;}
+  .bigbtn .bb-t{font-size:20px;font-weight:900;line-height:1.2;}
+  .bigbtn .bb-k{font-size:14px;color:var(--muted);line-height:1.35;}
+  .bigbtn.now{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+  .bigbtn.now .bb-k{color:var(--rec-ink);opacity:.85;}
+  .bigbtn.wide{margin-top:4px;}
+  .bigbtn.warm{border-color:rgba(242,169,0,.55);}
+  .bigbtn.assess{border-style:dashed;}
+  .bigbtn.go{margin-top:18px;background:var(--rec);border-color:var(--rec);color:var(--rec-ink);align-items:center;text-align:center;}
+  .bigbtn.go .bb-k{color:var(--rec-ink);opacity:.85;}
+  .setgrid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:600px){.setgrid{grid-template-columns:1fr 1fr;}}
+  .setcard{position:relative;background:var(--navy-3);border:1px solid var(--line);border-radius:16px;padding:12px;}
+  .setn{position:absolute;top:18px;left:18px;z-index:2;width:38px;height:38px;border-radius:50%;background:var(--rec);color:var(--rec-ink);display:grid;place-items:center;font-weight:900;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.35);}
+  .setphoto{display:block;width:100%;aspect-ratio:4/3;border:0;padding:0;border-radius:12px;overflow:hidden;background:var(--navy-4);cursor:zoom-in;}
+  .setphoto img{width:100%;height:100%;object-fit:cover;display:block;}
+  .setphoto.empty{display:grid;place-items:center;color:var(--muted);font-weight:700;cursor:default;}
+  .setcard .thumbs{margin-top:8px;}
+  .ladder{background:var(--navy-3);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;}
+  .ladder-h{font-weight:900;font-size:18px;margin:2px 4px 10px;}
+  .rung{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;background:var(--navy-2);}
+  .rung:last-child{margin-bottom:0;}
+  .rung.starred{border-color:rgba(242,169,0,.6);}
+  .rung-n{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);margin-bottom:4px;}
+  .rung-n span{color:var(--muted);font-weight:700;letter-spacing:0;text-transform:none;margin-left:8px;}
+  .rung-t{font-size:16px;line-height:1.45;}
+  .stars{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .star{font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid var(--c);}
+  .star .sk{font-weight:600;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -624,7 +668,7 @@ async function withContent(fn){
   try{ S.content = await api.loadContent(); fn(); }
   catch(e){
     console.error(e);
-    render(`<div class="card locked-card"><h2>The programme isn’t available just now</h2><p class="muted">${S.isAdmin ? 'No content has been published yet. Upload rec-content.json from the NGL Admin tab.' : 'Please try again in a moment. If this keeps happening, email ' + esc(CONTACT_EMAIL) + '.'}</p></div>`);
+    render(`<div class="card locked-card"><h2>The programme isn’t available just now</h2><p class="muted">${S.isAdmin ? 'No content has been published yet. Press “Publish latest from website” in the NGL Admin tab.' : 'Please try again in a moment. If this keeps happening, email ' + esc(CONTACT_EMAIL) + '.'}</p></div>`);
   }
 }
 function modal(html){
@@ -1087,36 +1131,106 @@ function introHTML(p){
   if(p.intro.length === 1) return `<div class="intro"><b>Intro:</b> ${esc(p.intro[0])}</div>`;
   return `<div class="intro"><b>Intro by level:</b> ${p.intro.map((t, i) => `<span style="color:${LEVELS[i] ? LEVELS[i].color : 'inherit'};font-weight:800">${LEVELS[i] ? LEVELS[i].name : ''}</span> ${esc(t)}`).join(' · ')}</div>`;
 }
+/* ---------- Coach lesson plan: weeks -> apparatus -> set-up -> ladders ---------- */
+const RUNGS = [
+  {name:'Beginner', age:'Guide 4–5 yrs'},
+  {name:'Development', age:'Guide 5–7 yrs'},
+  {name:'Proficient', age:'Guide 7–9 yrs'},
+  {name:'Advanced', age:'Guide 10+'}
+];
+const WEEK_A = ['FF','VT','BM'], WEEK_B = ['BF','BA','FT'];
+const PLAN_STORE = {
+  get(){ try{ return JSON.parse(localStorage.getItem('nglrec-plan') || 'null'); }catch(e){ return null; } },
+  set(v){ try{ localStorage.setItem('nglrec-plan', JSON.stringify(v)); }catch(e){} }
+};
+Object.assign(UI, {pstep:'weeks', piece:''}, (PLAN_STORE.get() || {}));
+function planNow(){
+  const t = S.club && S.club.recTerm, blocks = S.content.plan.blocks;
+  if(!t || !t.start) return null;
+  const start = new Date(t.start + 'T00:00:00');
+  const wk = Math.floor((Date.now() - start) / (7 * 86400000)) + 1, W = t.weeks || 14, sb = t.startBlock || 1;
+  if(wk < 1 || wk > W) return null;
+  const week = (wk - 1) % 2 === 0 ? 'A' : 'B';
+  if(wk > W - 2) return {block: blocks.find(x => x.assessment).n, week: wk === W - 1 ? 'A' : 'B', wk, W};
+  return {block: ((sb - 1) + Math.floor((wk - 1) / 2)) % 6 + 1, week, wk, W};
+}
+function planGo(o){ Object.assign(UI, o); PLAN_STORE.set({pstep:UI.pstep, block:UI.block, piece:UI.piece}); show(); window.scrollTo(0,0); }
+function backBar(label, to){ return `<button class="backbar" data-ui="pstep" data-v="${to}">← ${esc(label)}</button>`; }
+function stationPhotos(s){ return [...new Set((s.img || []).flat().filter(Boolean))]; }
+function starsHTML(s, i){
+  const a = s.assess && s.assess[String(i)];
+  if(!a || !a.length) return '';
+  return `<div class="stars">${a.map(y => { const b = bookOf(y.L);
+    return `<span class="star" style="--c:${b.color}">★ ${b.name} L${y.L}<span class="sk"> · ${esc(y.s)}</span></span>`; }).join('')}</div>`;
+}
 function screenPlan(){
-  const blocks = S.content.plan.blocks;
+  const blocks = S.content.plan.blocks, now = planNow();
   const b = blocks.find(x => x.n === UI.block) || blocks[0];
-  const pieces = b.pieces.filter(p => UI.piece === 'all' || p.code === UI.piece);
-  render(`
-  <div class="blockhead"><h1>${esc(b.label)}</h1><span class="muted">${esc(b.weeks)}${b.assessment ? '' : ' in a 14-week term'}</span>
-    <button class="btn ghost small" data-act="print-plan" style="margin-left:auto">Print this view</button></div>
-  ${b.assessment ? `<div class="card" style="border-color:rgba(232,130,48,.5)"><p style="margin:0"><b>Assessment block:</b> always the last 2 weeks of term. Run these stations while gymnasts are assessed on their award-book level. Assessment sheets are in Award books.</p></div>` : ''}
-  <div class="toolbar">
-    <div class="chips"><span class="lbl">Block</span>${chips('block', blocks.map(x => [x.n, x.assessment ? 'Assessment' : String(x.n)]), UI.block)}</div>
-    <div class="chips"><span class="lbl">Piece</span>${chips('piece', [['all','All pieces'], ...b.pieces.map(p => [p.code, p.piece])], UI.piece)}</div>
-    <div class="chips"><span class="lbl">Level</span>${chips('level', LVL_CHIPS, UI.level)}</div>
-  </div>
-  <p class="note" style="margin:-6px 0 14px"><span class="apill" style="--c:var(--ruby)"><i></i>L4</span> marks a station that teaches an award-book skill. The colour is the book (Ruby, Pink, Teal, Indigo) and the number is the level it's assessed at. Tap or hover for the skill${UI.level === 'all' ? ', or pick one level to see the skill names' : ''}.</p>
-  ${pieces.map(p => `<article class="piece">
-    <div class="piece-h"><h2>${esc(p.piece)}</h2><span class="th">${esc(p.theme)}</span>${p.setup ? `<span class="su">${esc(p.setup)}</span>` : ''}</div>
-    ${introHTML(p)}
-    ${stationTable(p)}
-  </article>`).join('')}
-  <p class="note">Demonstrate the final skill at the start of each rotation and explain how the stations build to it. Choose the level that suits each child.</p>`);
+  const piece = b.pieces.find(p => p.code === UI.piece);
+  if(UI.pstep === 'setup' && piece) return planSetup(b, piece);
+  if(UI.pstep === 'ladder' && piece) return planLadder(b, piece);
+  if(UI.pstep === 'app') return planApparatus(b, now);
+  // Step 1: which fortnight
+  render(`<div class="flow">
+    <h1 class="flow-h">Lesson plan</h1>
+    ${now ? `<button class="bigbtn now" data-ui="pblock" data-v="${now.block}">
+        <span class="bb-k">This week · week ${now.wk} of ${now.W}</span>
+        <span class="bb-t">${esc(blocks.find(x => x.n === now.block).weeks)} · Week ${now.week}</span></button>` : ''}
+    <p class="flow-l">${now ? 'Or pick a fortnight' : 'Pick a fortnight'}</p>
+    <div class="bbgrid">${blocks.map(x => `<button class="bigbtn ${x.assessment ? 'assess' : ''}" data-ui="pblock" data-v="${x.n}">
+      <span class="bb-t">${esc(x.assessment ? 'Assessment' : x.weeks)}</span>
+      <span class="bb-k">${esc(x.assessment ? x.weeks : x.pieces.filter(p => WEEK_A.includes(p.code)).map(p => p.theme).join(' · '))}</span></button>`).join('')}</div>
+    ${now ? '' : `<p class="note" style="margin-top:14px">Set your term dates on the Dashboard and the Hub will open on this week.</p>`}
+  </div>`);
+}
+function planApparatus(b, now){
+  const tile = code => { const p = b.pieces.find(x => x.code === code); if(!p) return '';
+    const hot = now && now.block === b.n && (now.week === 'A' ? WEEK_A : WEEK_B).includes(code);
+    return `<button class="bigbtn ${hot ? 'now' : ''}" data-ui="pc" data-v="${code}"><span class="bb-t">${esc(p.piece)}</span><span class="bb-k">${esc(p.theme)}</span></button>`; };
+  render(`<div class="flow">
+    ${backBar('Fortnights', 'weeks')}
+    <h1 class="flow-h">${esc(b.assessment ? 'Assessment fortnight' : b.weeks)}</h1>
+    ${b.assessment ? `<p class="flow-sub">Last 2 weeks of term. Run these stations while gymnasts are assessed.</p>` : ''}
+    <button class="bigbtn wide warm" data-act="plan-warmup"><span class="bb-t">Warm-up</span><span class="bb-k">10 min · same both weeks</span></button>
+    <p class="flow-l">Week A</p><div class="bbgrid three">${WEEK_A.map(tile).join('')}</div>
+    <p class="flow-l">Week B</p><div class="bbgrid three">${WEEK_B.map(tile).join('')}</div>
+  </div>`);
+}
+function planSetup(b, p){
+  render(`<div class="flow">
+    ${backBar(b.assessment ? 'Assessment fortnight' : b.weeks, 'app')}
+    <h1 class="flow-h">${esc(p.piece)}</h1>
+    <p class="flow-sub"><b>${esc(p.theme)}</b>${p.setup ? ' · ' + esc(p.setup) : ''} · ${p.stations.length} stations</p>
+    <div class="setgrid">${p.stations.map(s => { const ph = stationPhotos(s);
+      return `<div class="setcard"><div class="setn">${s.n}</div>
+        ${ph.length ? `<button class="setphoto" data-act="photo" data-img-id="${ph[0]}" aria-label="Enlarge station ${s.n} photo"><img data-img="${ph[0]}" alt="Station ${s.n} set-up"></button>
+          ${ph.length > 1 ? `<div class="thumbs">${ph.slice(1).map(h => `<button class="thumb" data-act="photo" data-img-id="${h}" aria-label="Enlarge photo"><img data-img="${h}" alt="Station ${s.n} set-up"></button>`).join('')}</div>` : ''}`
+        : `<div class="setphoto empty">No photo yet</div>`}
+      </div>`; }).join('')}</div>
+    <button class="bigbtn wide go" data-ui="pstep" data-v="ladder"><span class="bb-t">Skills →</span><span class="bb-k">What each child does at each station</span></button>
+  </div>`);
   hydrateImages($view);
+}
+function planLadder(b, p){
+  render(`<div class="flow">
+    ${backBar(p.piece + ' set-up', 'setup')}
+    <div class="flow-hrow"><h1 class="flow-h">${esc(p.piece)} skills</h1><button class="btn ghost small" data-act="print-plan">Print</button></div>
+    <p class="flow-sub"><b>${esc(p.theme)}</b> · start each child on the rung that suits them</p>
+    ${p.stations.map(s => `<div class="ladder"><div class="ladder-h">Station ${s.n}</div>
+      ${[3,2,1,0].map(i => s.levels[i] ? `<div class="rung ${s.assess && s.assess[String(i)] && s.assess[String(i)].length ? 'starred' : ''}">
+        <div class="rung-n">${RUNGS[i].name}<span>${RUNGS[i].age}</span></div>
+        <div class="rung-t">${fmtStation(s.levels[i])}</div>${starsHTML(s, i)}</div>` : '').join('')}
+    </div>`).join('')}
+    <p class="note">★ marks a rung that prepares an award-book checkpoint: the book colour and level it is assessed at.</p>
+  </div>`);
 }
 function planPrintHTML(){
   const b = S.content.plan.blocks.find(x => x.n === UI.block);
-  const pieces = b.pieces.filter(p => UI.piece === 'all' || p.code === UI.piece);
-  const cols = UI.level === 'all' ? [0,1,2,3] : [+UI.level];
-  return `<div class="sheet">${pieces.map((p, k) => `<div style="${k ? 'page-break-before:always;' : ''}">
-    <h2>${esc(b.label)} · ${esc(p.piece)}: ${esc(p.theme)}</h2><p>${esc(b.weeks)} · ${esc(p.setup || '')}</p>
-    <table><thead><tr><th style="width:30px">Stn</th>${cols.map(i => `<th>${LEVELS[i].name}</th>`).join('')}</tr></thead>
-    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${cols.map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<br><b>● L${y.L}</b> ${esc(y.s)}`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table><p>● = award-book skill and the level it is assessed at.</p></div>`).join('')}</div>`;
+  const pieces = b.pieces.filter(p => p.code === UI.piece);
+  return `<div class="sheet">${pieces.map(p => `<div>
+    <h2>${esc(b.weeks)} · ${esc(p.piece)}: ${esc(p.theme)}</h2><p>${esc(p.setup || '')}</p>
+    <table><thead><tr><th style="width:30px">Stn</th>${RUNGS.map(r => `<th>${r.name}</th>`).join('')}</tr></thead>
+    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${[0,1,2,3].map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<br><b>★ ${bookOf(y.L).name} L${y.L}</b> ${esc(y.s)}`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table><p>★ = prepares an award-book checkpoint (book colour and level).</p></div>`).join('')}</div>`;
 }
 
 function screenWarmups(){
@@ -1124,6 +1238,7 @@ function screenWarmups(){
   const i = Math.min(UI.wblock, W.length) - 1, b = W[i];
   const parts = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
   render(`
+  ${UI.fromPlan ? `<button class="backbar" data-act="to-plan">← Back to the lesson plan</button>` : ''}
   <div class="blockhead"><h1>Warm-ups</h1><span class="muted">10 minutes · Physical Prep from the award books</span></div>
   <div class="toolbar"><div class="chips"><span class="lbl">Block</span>${chips('wblock', W.map((x, k) => [k + 1, x.assess ? 'Assessment' : String(k + 1)]), UI.wblock)}</div></div>
   <article class="piece">
@@ -1190,10 +1305,12 @@ async function screenAdmin(){
       <td>${on ? '<span class="tag ok">Active</span>' : c.rec ? '<span class="tag off">Off</span>' : '<span class="tag wait">Not started</span>'}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-status" data-club="${esc(c.id)}" data-to="${on ? 'inactive' : 'active'}">${on ? 'Switch off' : 'Switch on'}</button></td></tr>`; }).join('')}</tbody></table></div>` : '<p class="muted">No Recreational clubs yet.</p>'}</div>
   <div class="card"><h2>Publish programme content</h2>
-    <p class="muted">Upload <b>rec-content.json</b> to update the lesson plan, warm-ups, award books and competition for every licensed club. The file is stored in Firestore behind the licence check, never on the public website.</p>
-    <input type="file" id="contentFile" accept="application/json,.json" class="input">
+    <p class="muted">Publishes the copy of <b>rec-content.json</b> kept on the website (the <b>content</b> folder in GitHub) to every licensed club. When the programme changes, replace that file in GitHub, wait a minute, then press the button.</p>
     <p class="note" id="pubNote" style="margin-top:8px"></p>
-    <button class="btn" data-act="publish">Publish</button></div>`);
+    <button class="btn" data-act="publish-site">Publish latest from website</button>
+    <details style="margin-top:12px"><summary class="note">Or publish a file from this computer</summary>
+      <input type="file" id="contentFile" accept="application/json,.json" class="input" style="margin-top:8px">
+      <button class="btn ghost small" data-act="publish" style="margin-top:8px">Publish file</button></details></div>`);
 }
 
 /* =====================================================================
@@ -1206,10 +1323,13 @@ document.addEventListener('click', async e => {
     if(g === 'home'){ if(signedIn){ tab = 'dashboard'; show(); } else screenLanding(); }
     else if(g === 'login') screenLogin(); else if(g === 'register') screenRegister(); window.scrollTo(0,0); return; }
   const nt = t.closest('[data-tab]');
-  if(nt){ tab = nt.dataset.tab; show(); window.scrollTo(0,0); return; }
+  if(nt){ tab = nt.dataset.tab; UI.fromPlan = false; show(); window.scrollTo(0,0); return; }
   const ui = t.closest('[data-ui]');
   if(ui){
     const k = ui.dataset.ui, v = ui.dataset.v;
+    if(k === 'pblock'){ planGo({block: +v, pstep:'app'}); return; }
+    if(k === 'pc'){ planGo({piece: v, pstep:'setup'}); return; }
+    if(k === 'pstep'){ planGo({pstep: v}); return; }
     if(k === 'block'){ UI.block = +v; UI.piece = 'all'; }
     else if(k === 'wblock') UI.wblock = +v;
     else if(k === 'book') UI.book = +v;
@@ -1242,6 +1362,8 @@ document.addEventListener('click', async e => {
     act.disabled = false;
   }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(), true); }
+  else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
+  else if(a === 'plan-warmup'){ UI.wblock = UI.block; UI.fromPlan = true; tab = 'warmups'; show(); window.scrollTo(0,0); }
   else if(a === 'photo'){ const d = IMG.cache[act.dataset.imgId]; if(d){ const m = modal(`<img src="${d}" alt="Station set-up photo" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); m.querySelector('.modal').classList.add('modal-wide'); } }
   else if(a === 'family') familyModal();
   else if(a === 'copy-family'){ copyText(familyMessage(), 'Message copied. Paste it into your email, newsletter or WhatsApp.'); }
@@ -1260,11 +1382,13 @@ document.addEventListener('click', async e => {
     try{ await api.adminSetStatus(c, act.dataset.to); if(FIREBASE_CONFIG && c.id === S.uid) await loadClubData(S.uid); screenAdmin(); }
     catch(err){ console.error(err); act.disabled = false; act.textContent = 'Failed, retry'; }
   }
-  else if(a === 'publish'){
+  else if(a === 'publish' || a === 'publish-site'){
     const f = document.getElementById('contentFile'), n = document.getElementById('pubNote');
-    if(!f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
-    act.disabled = true; n.textContent = 'Publishing…';
-    try{ const c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
+    if(a === 'publish' && !f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
+    act.disabled = true; n.style.color = ''; n.textContent = a === 'publish-site' ? 'Fetching rec-content.json from the website…' : 'Publishing…';
+    try{ let c;
+      if(a === 'publish-site'){ const r = await fetch('content/rec-content.json?t=' + Date.now(), {cache:'no-store'}); if(!r.ok) throw new Error('content/rec-content.json not found on the website (' + r.status + '). Check it is uploaded to the content folder in GitHub.'); c = await r.json(); }
+      else c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
     catch(err){ console.error(err); n.style.color = ''; n.textContent = 'Couldn’t publish: ' + err.message; }
     act.disabled = false;
   }
