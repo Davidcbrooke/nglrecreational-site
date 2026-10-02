@@ -223,6 +223,11 @@
   .sheet table{border-collapse:collapse;width:100%;}
   .sheet th,.sheet td{border:1px solid #999;padding:5px 6px;font-size:11px;color:#111;vertical-align:top;}
   .sheet th{background:#eee;letter-spacing:0;text-transform:none;}
+  .sheet.compact .onepage{break-inside:avoid;}
+  .sheet.compact h2{font-size:15px;}
+  .sheet.compact td,.sheet.compact th{font-size:9.5px;padding:3px 5px;line-height:1.3;}
+  .sheet.compact .st{font-weight:700;margin-top:2px;}
+  .sheet .foot{font-size:9px;color:#555;margin-top:6px;}
   .sheet .pc{background:#f6e2d2;font-weight:800;}
   @media print{
     @page{size:A4 landscape;margin:10mm;}
@@ -1172,14 +1177,8 @@ function screenPlan(){
   if(UI.pstep === 'app') return planApparatus(b, now);
   // Step 1: which fortnight
   render(`<div class="flow">
-    <h1 class="flow-h">Lesson plan</h1>
-    ${now ? `<button class="bigbtn now" data-ui="pblock" data-v="${now.block}">
-        <span class="bb-k">This week · week ${now.wk} of ${now.W}</span>
-        <span class="bb-t">${esc(blocks.find(x => x.n === now.block).weeks)} · Week ${now.week}</span></button>` : ''}
-    <p class="flow-l">${now ? 'Or pick a fortnight' : 'Pick a fortnight'}</p>
-    <div class="bbgrid">${blocks.map(x => `<button class="bigbtn ${x.assessment ? 'assess' : ''}" data-ui="pblock" data-v="${x.n}">
-      <span class="bb-t">${esc(x.assessment ? 'Assessment' : x.weeks)}</span>
-      <span class="bb-k">${esc(x.assessment ? x.weeks : x.pieces.filter(p => WEEK_A.includes(p.code)).map(p => p.theme).join(' · '))}</span></button>`).join('')}</div>
+    <div class="flow-hrow"><h1 class="flow-h">Lesson plan</h1><button class="btn ghost small" data-act="print-plan" data-scope="term">Print whole term</button></div>
+    ${fortnightButtons('pblock', now)}
     ${now ? '' : `<p class="note" style="margin-top:14px">Set your term dates on the Dashboard and the Hub will open on this week.</p>`}
   </div>`);
 }
@@ -1189,7 +1188,7 @@ function planApparatus(b, now){
     return `<button class="bigbtn ${hot ? 'now' : ''}" data-ui="pc" data-v="${code}"><span class="bb-t">${esc(p.piece)}</span><span class="bb-k">${esc(p.theme)}</span></button>`; };
   render(`<div class="flow">
     ${backBar('Fortnights', 'weeks')}
-    <h1 class="flow-h">${esc(b.assessment ? 'Assessment fortnight' : b.weeks)}</h1>
+    <div class="flow-hrow"><h1 class="flow-h">${esc(b.assessment ? 'Assessment fortnight' : b.weeks)}</h1><button class="btn ghost small" data-act="print-plan" data-scope="fortnight">Print fortnight</button></div>
     ${b.assessment ? `<p class="flow-sub">Last 2 weeks of term. Run these stations while gymnasts are assessed.</p>` : ''}
     <button class="bigbtn wide warm" data-act="plan-warmup"><span class="bb-t">Warm-up</span><span class="bb-k">10 min · same both weeks</span></button>
     <p class="flow-l">Week A</p><div class="bbgrid three">${WEEK_A.map(tile).join('')}</div>
@@ -1215,40 +1214,64 @@ function planLadder(b, p){
   render(`<div class="flow">
     ${backBar(p.piece + ' set-up', 'setup')}
     <div class="flow-hrow"><h1 class="flow-h">${esc(p.piece)} skills</h1><button class="btn ghost small" data-act="print-plan">Print</button></div>
-    <p class="flow-sub"><b>${esc(p.theme)}</b> · start each child on the rung that suits them</p>
+    <p class="flow-sub"><b>${esc(p.theme)}</b> · start each child on the rung that suits them, from Beginner up</p>
     ${p.stations.map(s => `<div class="ladder"><div class="ladder-h">Station ${s.n}</div>
-      ${[3,2,1,0].map(i => s.levels[i] ? `<div class="rung ${s.assess && s.assess[String(i)] && s.assess[String(i)].length ? 'starred' : ''}">
+      ${[0,1,2,3].map(i => s.levels[i] ? `<div class="rung ${s.assess && s.assess[String(i)] && s.assess[String(i)].length ? 'starred' : ''}">
         <div class="rung-n">${RUNGS[i].name}<span>${RUNGS[i].age}</span></div>
         <div class="rung-t">${fmtStation(s.levels[i])}</div>${starsHTML(s, i)}</div>` : '').join('')}
     </div>`).join('')}
     <p class="note">★ marks a rung that prepares an award-book checkpoint: the book colour and level it is assessed at.</p>
   </div>`);
 }
-function planPrintHTML(){
-  const b = S.content.plan.blocks.find(x => x.n === UI.block);
-  const pieces = b.pieces.filter(p => p.code === UI.piece);
-  return `<div class="sheet">${pieces.map(p => `<div>
-    <h2>${esc(b.weeks)} · ${esc(p.piece)}: ${esc(p.theme)}</h2><p>${esc(p.setup || '')}</p>
-    <table><thead><tr><th style="width:30px">Stn</th>${RUNGS.map(r => `<th>${r.name}</th>`).join('')}</tr></thead>
-    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${[0,1,2,3].map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<br><b>★ ${bookOf(y.L).name} L${y.L}</b> ${esc(y.s)}`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table><p>★ = prepares an award-book checkpoint (book colour and level).</p></div>`).join('')}</div>`;
+function pieceSheetHTML(b, p, first){
+  return `<div class="onepage" style="${first ? '' : 'page-break-before:always;'}">
+    <h2>${esc(b.assessment ? 'Assessment fortnight' : b.weeks)} · ${esc(p.piece)}: ${esc(p.theme)}</h2>
+    <p>${esc(p.setup || '')}${p.setup ? ' · ' : ''}${p.stations.length} stations · ${esc(S.club ? S.club.name : '')}</p>
+    <table><thead><tr><th style="width:26px">Stn</th>${RUNGS.map(r => `<th>${r.name} <span style="font-weight:400">(${r.age.replace('Guide ','')})</span></th>`).join('')}</tr></thead>
+    <tbody>${p.stations.map(s => `<tr><td><b>${s.n}</b></td>${[0,1,2,3].map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<div class="st">★ ${bookOf(y.L).name} L${y.L}: ${esc(y.s)}</div>`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    <p class="foot">★ = this rung prepares an award-book checkpoint (book colour and level). NGL Recreational lesson plan.</p></div>`;
+}
+function planPrintHTML(scope){
+  const blocks = S.content.plan.blocks;
+  let list = [];
+  if(scope === 'term') blocks.forEach(b => b.pieces.forEach(p => list.push([b, p])));
+  else { const b = blocks.find(x => x.n === UI.block);
+    (scope === 'fortnight' ? [...WEEK_A, ...WEEK_B].map(c => b.pieces.find(p => p.code === c)).filter(Boolean) : b.pieces.filter(p => p.code === UI.piece)).forEach(p => list.push([b, p])); }
+  return `<div class="sheet compact">${list.map(([b, p], k) => pieceSheetHTML(b, p, k === 0)).join('')}</div>`;
 }
 
+function fortnightButtons(key, now){
+  const blocks = S.content.plan.blocks;
+  return `${now ? `<button class="bigbtn now" data-ui="${key}" data-v="${now.block}">
+      <span class="bb-k">This week · week ${now.wk} of ${now.W}</span>
+      <span class="bb-t">${esc(blocks.find(x => x.n === now.block).weeks)} · Week ${now.week}</span></button>` : ''}
+    <p class="flow-l">${now ? 'Or pick a fortnight' : 'Pick a fortnight'}</p>
+    <div class="bbgrid">${blocks.map(x => `<button class="bigbtn ${x.assessment ? 'assess' : ''}" data-ui="${key}" data-v="${x.n}">
+      <span class="bb-t">${esc(x.assessment ? 'Assessment' : x.weeks)}</span>
+      <span class="bb-k">${esc(x.assessment ? x.weeks : x.pieces.filter(p => WEEK_A.includes(p.code)).map(p => p.theme).join(' · '))}</span></button>`).join('')}</div>`;
+}
 function screenWarmups(){
-  const W = S.content.warmups;
+  const W = S.content.warmups, now = planNow();
+  if(!UI.fromPlan && UI.wstep !== 'show'){
+    render(`<div class="flow"><h1 class="flow-h">Warm-ups</h1><p class="flow-sub">10 minutes · the same warm-up both weeks of a fortnight</p>
+      ${fortnightButtons('wpick', now)}</div>`);
+    return;
+  }
   const i = Math.min(UI.wblock, W.length) - 1, b = W[i];
+  const blk = S.content.plan.blocks[i];
   const parts = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
-  render(`
-  ${UI.fromPlan ? `<button class="backbar" data-act="to-plan">← Back to the lesson plan</button>` : ''}
-  <div class="blockhead"><h1>Warm-ups</h1><span class="muted">10 minutes · Physical Prep from the award books</span></div>
-  <div class="toolbar"><div class="chips"><span class="lbl">Block</span>${chips('wblock', W.map((x, k) => [k + 1, x.assess ? 'Assessment' : String(k + 1)]), UI.wblock)}</div></div>
-  <article class="piece">
-    <div class="piece-h"><h2>${esc(b.assess ? 'Assessment block' : 'Block ' + (i + 1))}</h2><span class="th">${esc(b.weeks)}</span></div>
-    <div class="intro"><b>Focus:</b> ${esc(b.focus)}${b.themes ? ` · <b>Themes:</b> ${esc(b.themes)}` : ''}</div>
-    ${b.assess ? `<div style="padding:16px 18px"><p style="margin:0">Pulse raiser for everyone: stretch, tuck and star jumps in connection (3 min). Then each gymnast runs the four Physical Prep skills from their own award-book level while coaches check them off (7 min).</p></div>` :
-    `<div class="table-wrap"><table class="grid-st"><thead><tr><th class="n"></th>${LEVELS.map(l => `<th style="background:${l.color}">${l.name} · Book ${l.book}</th>`).join('')}</tr></thead>
-      <tbody>${parts.map(([k, n, t]) => `<tr><td style="font-weight:800;white-space:nowrap">${n}<div class="note">${t}</div></td>${[0,1,2,3].map(c => `<td>${b.parts[k][c].map(x => `${esc(x.txt)} <span class="tag info">L${x.L}</span>`).join('<br>')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
-  </article>
-  <p class="note">The L tag is the award-book level the skill comes from. A mixed class warms up together, each child in their level’s column.</p>`);
+  render(`<div class="flow">
+    ${UI.fromPlan ? `<button class="backbar" data-act="to-plan">← ${esc(blk.assessment ? 'Assessment fortnight' : blk.weeks)}</button>` : `<button class="backbar" data-ui="wstep" data-v="weeks">← Fortnights</button>`}
+    <h1 class="flow-h">Warm-up · ${esc(b.assess ? 'Assessment' : b.weeks)}</h1>
+    <p class="flow-sub">10 min · same both weeks · <b>Focus:</b> ${esc(b.focus)}</p>
+    ${b.assess ? `<div class="ladder"><div class="ladder-h">Assessment warm-up</div><div class="rung"><div class="rung-t">Pulse raiser for everyone: stretch, tuck and star jumps in connection (3 min). Then each gymnast runs the four Physical Prep skills from their own award-book level while coaches check them off (7 min).</div></div></div>` :
+    parts.map(([k, n, t]) => `<div class="ladder"><div class="ladder-h">${n} <span class="muted" style="font-weight:700;font-size:14px">· ${t}</span></div>
+      ${[0,1,2,3].map(c => (b.parts[k][c] || []).length ? `<div class="rung"><div class="rung-n">${RUNGS[c].name}<span>${RUNGS[c].age}</span></div>
+        <div class="rung-t">${b.parts[k][c].map(x => esc(x.txt)).join('<br>')}</div>
+        <div class="stars">${b.parts[k][c].map(x => { const bk = bookOf(x.L); return `<span class="star" style="--c:${bk.color}">★ ${bk.name} L${x.L}</span>`; }).join('')}</div></div>` : '').join('')}
+    </div>`).join('')}
+    <p class="note">The whole group warms up together, each child on the rung that suits them. ★ shows the award-book level each exercise comes from.</p>
+  </div>`);
 }
 
 const BOOK_PIECES = ['Floor','Vault','Beam','Bars','Rebound','Physical Prep'];
@@ -1323,13 +1346,15 @@ document.addEventListener('click', async e => {
     if(g === 'home'){ if(signedIn){ tab = 'dashboard'; show(); } else screenLanding(); }
     else if(g === 'login') screenLogin(); else if(g === 'register') screenRegister(); window.scrollTo(0,0); return; }
   const nt = t.closest('[data-tab]');
-  if(nt){ tab = nt.dataset.tab; UI.fromPlan = false; show(); window.scrollTo(0,0); return; }
+  if(nt){ tab = nt.dataset.tab; UI.fromPlan = false; if(tab === 'warmups') UI.wstep = 'weeks'; show(); window.scrollTo(0,0); return; }
   const ui = t.closest('[data-ui]');
   if(ui){
     const k = ui.dataset.ui, v = ui.dataset.v;
     if(k === 'pblock'){ planGo({block: +v, pstep:'app'}); return; }
     if(k === 'pc'){ planGo({piece: v, pstep:'setup'}); return; }
     if(k === 'pstep'){ planGo({pstep: v}); return; }
+    if(k === 'wpick'){ UI.wblock = +v; UI.wstep = 'show'; show(); window.scrollTo(0,0); return; }
+    if(k === 'wstep'){ UI.wstep = v; show(); window.scrollTo(0,0); return; }
     if(k === 'block'){ UI.block = +v; UI.piece = 'all'; }
     else if(k === 'wblock') UI.wblock = +v;
     else if(k === 'book') UI.book = +v;
@@ -1361,7 +1386,7 @@ document.addEventListener('click', async e => {
     catch(err){ console.error(err); if(n) n.textContent = 'Couldn’t send the email. Please try again later.'; }
     act.disabled = false;
   }
-  else if(a === 'print-plan'){ printHTML(planPrintHTML(), true); }
+  else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece'), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
   else if(a === 'plan-warmup'){ UI.wblock = UI.block; UI.fromPlan = true; tab = 'warmups'; show(); window.scrollTo(0,0); }
   else if(a === 'photo'){ const d = IMG.cache[act.dataset.imgId]; if(d){ const m = modal(`<img src="${d}" alt="Station set-up photo" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); m.querySelector('.modal').classList.add('modal-wide'); } }
@@ -1398,7 +1423,10 @@ document.addEventListener('click', async e => {
   let restored = false;
   try{ restored = await api.restore(); }catch(e){ console.error(e); }
   if(restored){ signedIn = true; tab = S.club ? 'dashboard' : 'admin'; show(); }
-  else screenLanding();
+  else{
+    const go = new URLSearchParams(location.search).get('go');
+    if(go === 'register') screenRegister(); else if(go === 'login') screenLogin(); else screenLanding();
+  }
 })();
 
 </script>
