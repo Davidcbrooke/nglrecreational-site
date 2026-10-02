@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E88230">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icons/favicon-64.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NGL Recreational">
+<title>NGL Recreational Families</title>
+<style>
+  :root{
+    --navy:#0a1440; --navy-2:#0d1a4f; --navy-3:#152463; --navy-4:#1d2f7a;
+    --line:rgba(255,255,255,0.14); --white:#fff; --muted:#b7c1e6;
+    --rec:#E88230; --rec-ink:#2a1405; --gold:#f2a900; --ok:#5fd38d; --warn:#ffb454; --bad:#ff8a95;
+    --ruby:#C8194A; --pink:#E0559C; --teal:#0FA3A8; --indigo:#5A55C8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--navy);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  button,input,select{font:inherit;color:inherit;}
+  a{color:var(--rec);}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+  .topbar{position:relative;z-index:30;background:var(--rec);width:100vw;margin-left:calc(50% - 50vw);}
+  .topbar-strap{text-align:center;color:var(--rec-ink);font-weight:800;font-size:13px;letter-spacing:.02em;padding:calc(7px + env(safe-area-inset-top,0px)) 16px 7px;}
+  .topbar-in{background:linear-gradient(180deg,#2a245f 0%,#2a245f 40%,var(--navy) 100%);border-top-right-radius:120px 38px;padding-bottom:18px;}
+  @media(min-width:700px){.topbar-in{border-top-right-radius:220px 46px;}}
+  .topbar-row{display:flex;align-items:center;gap:12px;min-height:66px;}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);}
+  .logo img{height:50px;width:auto;display:block;}
+  @media(min-width:700px){.logo img{height:58px;}}
+  .logo-mark{font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1;}
+  .logo-mark small{display:block;font-size:11px;letter-spacing:.22em;color:var(--rec);font-weight:800;margin-top:3px;}
+  .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+  @media(max-width:600px){.top-actions .pill{display:none;}}
+  .pill{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:var(--rec);color:var(--rec-ink);white-space:nowrap;}
+
+  .navtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0 12px;}
+  .navtabs::-webkit-scrollbar{display:none;}
+  .navtab{flex:0 0 auto;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--navy-3);font-weight:700;font-size:14px;cursor:pointer;}
+  .navtab.active{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+  .navtab.locked{opacity:.55;}
+
+  main{padding:18px 0 60px;}
+  .screen{animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){.screen{animation:none;}}
+
+  h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:0 0 12px;font-weight:900;letter-spacing:-.015em;text-wrap:balance;}
+  h2{font-size:22px;margin:0 0 10px;font-weight:850;text-wrap:balance;}
+  h3{font-size:16px;margin:0 0 6px;font-weight:800;}
+  p{line-height:1.55;margin:0 0 10px;}
+  .muted{color:var(--muted);}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rec);font-weight:800;margin:0 0 10px;}
+  .card{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:1fr;gap:16px;}
+  .grid3{display:grid;grid-template-columns:1fr;gap:14px;}
+  .grid4{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:760px){.grid2{grid-template-columns:1fr 1fr;}.grid3{grid-template-columns:repeat(3,1fr);}.grid4{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1000px){.grid4{grid-template-columns:repeat(4,1fr);}}
+  .grid2>*,.grid3>*,.grid4>*{min-width:0;}
+  .section{margin:30px 0 0;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;border:0;cursor:pointer;background:var(--rec);color:var(--rec-ink);font-weight:900;font-size:15px;text-decoration:none;}
+  .btn:active{transform:scale(.98);}
+  .btn:focus-visible,.navtab:focus-visible,.chip:focus-visible{outline:3px solid var(--white);outline-offset:2px;}
+  .btn.ghost{background:transparent;color:var(--white);border:1px solid var(--line);font-weight:700;}
+  .btn.small{padding:8px 12px;font-size:13px;border-radius:10px;}
+  .btn.block{width:100%;}
+  .btn[disabled]{opacity:.55;cursor:default;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .hero{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;padding:14px 0 6px;}
+  @media(min-width:820px){.hero{grid-template-columns:1.3fr .7fr;}}
+  .lead{font-size:18px;color:var(--muted);}
+  .levels-art{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .lvtile{border-radius:16px;padding:18px 14px;font-weight:900;font-size:20px;color:#fff;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;}
+  .lvtile small{font-size:12px;font-weight:700;opacity:.9;letter-spacing:.04em;}
+  .bg-ruby{background:var(--ruby);}.bg-pink{background:var(--pink);}.bg-teal{background:var(--teal);}.bg-indigo{background:var(--indigo);}
+  .steps{counter-reset:st;}
+  .step{position:relative;padding-left:48px;}
+  .step::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--rec);color:var(--rec-ink);display:grid;place-items:center;font-weight:900;}
+  .ticks{list-style:none;padding:0;margin:0;}
+  .ticks li{padding:7px 0 7px 28px;position:relative;line-height:1.45;}
+  .ticks li::before{content:"✓";position:absolute;left:4px;color:var(--rec);font-weight:900;}
+  .stat{font-size:34px;font-weight:900;color:var(--rec);line-height:1;}
+  .journey{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .jstep{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);}
+  .jstep.on{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+
+  table{width:100%;border-collapse:collapse;}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top;}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .table-wrap{overflow-x:auto;}
+  s.was{color:var(--muted);font-weight:600;margin-right:6px;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:0 0 6px;}
+  .input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--navy-2);color:var(--white);font-size:16px;outline:none;}
+  .input:focus{border-color:var(--rec);}
+  select.input{appearance:auto;}
+  .error{color:var(--bad);font-weight:700;font-size:14px;min-height:1em;margin:0 0 10px;}
+  .note{font-size:13px;color:var(--muted);}
+  .auth{max-width:440px;margin:10px auto 0;}
+  .demo-banner{font-size:13px;text-align:center;color:var(--rec-ink);background:var(--warn);border-radius:10px;padding:9px 12px;margin:0 0 16px;font-weight:700;}
+
+  .lic-card{background:linear-gradient(135deg,var(--navy-4),var(--navy-3));position:relative;overflow:hidden;}
+  .lic-card::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,130,48,.32),transparent 70%);pointer-events:none;}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;}
+  @media(min-width:760px){.kpis{grid-template-columns:repeat(4,1fr);}}
+  .kpi{background:var(--navy-2);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .kpi .v{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;}
+  .kpi .l{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px;}
+  .tag{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+  .tag.ok{background:rgba(95,211,141,.18);color:var(--ok);}
+  .tag.wait{background:rgba(255,180,84,.18);color:var(--warn);}
+  .tag.off{background:rgba(255,138,149,.16);color:var(--bad);}
+  .tag.info{background:rgba(232,130,48,.2);color:var(--rec);}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(3,8,30,.7);z-index:50;display:grid;place-items:center;padding:16px;}
+  .modal{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow:auto;}
+  .modal-wide{max-width:780px;}
+  .sum{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);}
+  .sum.total{font-weight:900;font-size:18px;border-bottom:0;}
+  .foot{text-align:center;font-size:12px;color:var(--muted);margin-top:40px;}
+  .mono{white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em;}
+
+  /* Content area */
+  .toolbar{display:flex;flex-direction:column;gap:10px;margin:0 0 18px;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chips .lbl{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;align-self:center;margin-right:4px;min-width:62px;}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--navy-2);font-weight:700;font-size:13px;cursor:pointer;}
+  .chip.on{background:var(--white);color:var(--navy);border-color:var(--white);}
+  .chip.lv-ruby.on{background:var(--ruby);border-color:var(--ruby);color:#fff;}
+  .chip.lv-pink.on{background:var(--pink);border-color:var(--pink);color:#fff;}
+  .chip.lv-teal.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .chip.lv-indigo.on{background:var(--indigo);border-color:var(--indigo);color:#fff;}
+  .piece{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;margin-bottom:16px;overflow:hidden;}
+  .piece-h{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .piece-h h2{margin:0;font-size:19px;}
+  .piece-h .th{color:var(--rec);font-weight:800;}
+  .piece-h .su{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700;}
+  .intro{padding:10px 18px;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line);}
+  .intro b{color:var(--white);}
+  .grid-st{width:100%;border-collapse:collapse;min-width:720px;}
+  .grid-st th{padding:9px 12px;font-size:12px;color:#fff;letter-spacing:.06em;}
+  .grid-st th.n{background:transparent;color:var(--muted);width:44px;}
+  .grid-st td{padding:11px 12px;font-size:14px;line-height:1.45;border-bottom:1px solid var(--line);}
+  .grid-st td.n{font-weight:900;color:var(--muted);text-align:center;}
+  .grid-st tr:last-child td{border-bottom:0;}
+  .grid-st.one{min-width:0;}
+  .grid-st.one td{font-size:16px;}
+  .chg{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--rec);}
+  .final{color:var(--rec);font-weight:800;}
+  .asm{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .apill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;padding:2px 7px 2px 5px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--c);color:var(--white);line-height:1.3;}
+  .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .thumb{padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:64px;height:64px;background:var(--navy-2);cursor:zoom-in;}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .grid-st.one .thumb{width:96px;height:96px;}
+  .apill i{width:8px;height:8px;border-radius:50%;background:var(--c);display:inline-block;flex:0 0 auto;}
+  .blockhead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin:0 0 12px;}
+  .blockhead h1{margin:0;font-size:clamp(24px,4vw,34px);}
+  .blockhead .muted{font-weight:700;}
+  .bookgrid{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:700px){.bookgrid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1000px){.bookgrid{grid-template-columns:repeat(3,1fr);}}
+  .bookgrid>*{min-width:0;}
+  .skill-list{list-style:none;padding:0;margin:0;}
+  .skill-list li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.4;}
+  .skill-list li:last-child{border-bottom:0;}
+  .lvl-band{display:flex;align-items:center;gap:10px;margin:22px 0 10px;}
+  .lvl-band .dot{width:12px;height:28px;border-radius:4px;}
+  .lvl-band h2{margin:0;font-size:20px;}
+  .locked-card{text-align:center;padding:34px 20px;}
+
+  /* Families */
+  .fhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-left:6px solid;padding:4px 0 4px 14px;}
+  .fstations{display:flex;flex-direction:column;}
+  .fstation{padding:12px 18px;border-bottom:1px solid var(--line);}
+  .fstation:last-child{border-bottom:0;}
+  .ftext{font-size:15px;line-height:1.45;}
+  .flinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .flink{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;line-height:1.35;}
+  .flink.fa{background:var(--c);color:#fff;}
+  .flink.fc{background:var(--gold);color:#2a1405;}
+  .flink.fb{border:1px solid var(--c);color:var(--white);}
+  .legend-f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .legend-f .flink{margin-left:6px;}
+  /* Invoice */
+  .inv-screen{background:#fff;border-radius:12px;padding:6px;overflow-x:auto;}
+  .inv{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;color:#1c1f3a;font-size:13px;line-height:1.45;padding:22px;min-width:560px;}
+  .inv-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #E88230;padding-bottom:14px;margin-bottom:16px;}
+  .inv-brand{font-weight:900;font-size:20px;color:#2a245f;}
+  .inv-brand small{display:block;font-size:10px;letter-spacing:.2em;color:#E88230;}
+  .inv-title{text-align:right;}
+  .inv-h{font-size:26px;font-weight:900;letter-spacing:.08em;color:#2a245f;}
+  .inv-no{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:15px;}
+  .inv-paid{display:inline-block;margin-top:6px;border:2px solid #1f9d55;color:#1f9d55;font-weight:900;padding:2px 10px;border-radius:6px;transform:rotate(-4deg);}
+  .inv-cols{display:grid;grid-template-columns:1.2fr 1.2fr 1fr;gap:16px;margin-bottom:18px;}
+  .inv-label{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b6f8f;margin-bottom:3px;}
+  .inv-table{width:100%;border-collapse:collapse;margin-bottom:18px;}
+  .inv-table th{background:#2a245f;color:#fff;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;text-align:left;border:0;}
+  .inv-table td{padding:10px;border-bottom:1px solid #e3e4ee;color:#1c1f3a;font-size:13px;}
+  .inv-table .num{text-align:right;}
+  .inv-total td{font-weight:900;font-size:16px;border-bottom:0;background:#fdebdc;}
+  .inv-pay{background:#f4f5fa;border-left:4px solid #E88230;padding:12px 14px;border-radius:6px;}
+  .inv-pay table{border-collapse:collapse;margin:6px 0 8px;width:auto;}
+  .inv-pay td{padding:3px 18px 3px 0;border:0;font-size:13px;color:#1c1f3a;}
+  .inv-pay p{margin:0;font-size:12px;color:#4a4e6d;}
+  .inv-foot{margin-top:18px;text-align:center;font-size:11px;color:#6b6f8f;}
+
+  /* Print sheets */
+  #print-area{display:none;}
+  .sheet{background:#fff;color:#111;font-size:12px;}
+  .sheet h2{color:#111;font-size:18px;margin:0 0 4px;}
+  .sheet p{color:#333;margin:0 0 10px;}
+  .sheet table{border-collapse:collapse;width:100%;}
+  .sheet th,.sheet td{border:1px solid #999;padding:5px 6px;font-size:11px;color:#111;vertical-align:top;}
+  .sheet th{background:#eee;letter-spacing:0;text-transform:none;}
+  .sheet .pc{background:#f6e2d2;font-weight:800;}
+  @media print{
+    @page{size:A4 landscape;margin:10mm;}
+    body{background:#fff !important;}
+    .app,.modal-bg{display:none !important;}
+    #print-area{display:block;}
+    #print-area .inv{min-width:0;padding:0;}
+  }
+</style>
+</head>
+<body>
+<div id="print-area"></div>
+<div class="app">
+  <header class="topbar"><div class="topbar-strap">Recreational Awards Scheme · Families</div><div class="topbar-in">
+    <div class="wrap topbar-row">
+      <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><img src="/icons/rec-logo.png" alt="NGL Recreational"></a>
+      <div class="top-actions" id="topActions"></div>
+    </div>
+  </div></header>
+  <div class="wrap">
+    <nav class="navtabs" id="navtabs" hidden></nav>
+    <main id="view"></main>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   NGL RECREATIONAL — FAMILIES
+   Parents enter their club's family code, choose their child's book and
+   level, and see this fortnight's stations, how they link to the award
+   book assessment and to the Recreational competition routine.
+   No child or parent details are stored (choices stay in this browser).
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBK8gNFh4lYv6829YRFm-7Ia0tzh_RwMKQ",
+  authDomain: "ngl-schools.firebaseapp.com",
+  projectId: "ngl-schools",
+  storageBucket: "ngl-schools.firebasestorage.app",
+  messagingSenderId: "202087533031",
+  appId: "1:202087533031:web:a905eaa461925256b71542"
+};
+const CONTACT_EMAIL = 'admin@nationalgymnasticsleague.co.uk';
+const LEVELS = [
+  {key:'ruby', name:'Ruby', book:1, color:'var(--ruby)'},
+  {key:'pink', name:'Pink', book:2, color:'var(--pink)'},
+  {key:'teal', name:'Teal', book:3, color:'var(--teal)'},
+  {key:'indigo', name:'Indigo', book:4, color:'var(--indigo)'}
+];
+const PIECE_ORDER = ['FF','BF','VT','BM','BA','FT'];
+const BOOK_PIECES = {FF:'Floor', BF:'Floor', VT:'Vault', BM:'Beam', BA:'Bars', FT:'Rebound'};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const strip = s => String(s).replace(/\s*-\s*(Floor|Medium|High|Low|Red Foam) [Bb]eam$/, '');
+const norm = s => String(s).toLowerCase().replace(/^or\s+/, '').trim();
+const toDate = c => !c ? new Date() : (typeof c.toDate === 'function' ? c.toDate() : (c.seconds ? new Date(c.seconds * 1000) : new Date(c)));
+const fmtDay = d => d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+const store = {
+  get(k){ try{ return localStorage.getItem('nglrec-' + k); }catch(e){ return null; } },
+  set(k, v){ try{ v == null ? localStorage.removeItem('nglrec-' + k) : localStorage.setItem('nglrec-' + k, v); }catch(e){} }
+};
+
+/* ---------- Data ---------- */
+let FB = null;
+async function fb(){
+  if(FB) return FB;
+  const v = '10.12.2';
+  const [app, fs] = await Promise.all([
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`),
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`)
+  ]);
+  const a = app.initializeApp(FIREBASE_CONFIG);
+  FB = {fs, D: fs.getFirestore(a)};
+  return FB;
+}
+const S = {code:null, club:null, content:null};
+const live = {
+  async openCode(code){
+    const {fs, D} = await fb();
+    const snap = await fs.getDoc(fs.doc(D, 'recCodes', code));
+    if(!snap.exists()) return {ok:false, reason:'We couldn’t find that code. Please check it with your club.'};
+    const c = snap.data();
+    if(c.status !== 'active' || toDate(c.expires) < new Date()) return {ok:false, reason:'This code isn’t active at the moment. Please ask your club.'};
+    return {ok:true, club:c};
+  },
+  async loadContent(key){
+    const {fs, D} = await fb();
+    const keys = ['plan','warmups','book','competition','imgIndex'];
+    const snaps = await Promise.all(keys.map(k => fs.getDoc(fs.doc(D, 'recShared', key, 'docs', k))));
+    const c = {};
+    snaps.forEach((s, i) => { if(s.exists()) c[keys[i]] = JSON.parse(s.data().json); });
+    if(!c.plan) throw new Error('No programme published');
+    return c;
+  },
+  async loadImgChunk(n){
+    const {fs, D} = await fb();
+    const s = await fs.getDoc(fs.doc(D, 'recShared', S.club.key, 'docs', 'img' + n));
+    return s.exists() ? JSON.parse(s.data().json) : {};
+  }
+};
+const demo = {
+  async openCode(code){
+    return {ok:true, club:{clubName:'SAADI Gymnastics', key:'demo', status:'active',
+      term:{start:new Date(Date.now() - 16 * 86400000).toISOString().slice(0,10), weeks:14, startBlock:1}}};
+  },
+  async loadContent(){
+    const c = window.DEMO_CONTENT, idx = {};
+    (c.images || []).forEach((ch, n) => Object.keys(ch).forEach(h => idx[h] = n));
+    return {...c, imgIndex: idx};
+  },
+  async loadImgChunk(n){ return (window.DEMO_CONTENT.images || [])[n] || {}; }
+};
+const api = FIREBASE_CONFIG ? live : demo;
+
+const IMG = {cache:{}, loaded:{}};
+async function hydrateImages(){
+  const els = [...document.querySelectorAll('img[data-img]:not([src])')];
+  if(!els.length || !S.content.imgIndex) return;
+  const need = [...new Set(els.map(e => S.content.imgIndex[e.dataset.img]).filter(n => n !== undefined && !IMG.loaded[n]))];
+  await Promise.all(need.map(async n => { IMG.loaded[n] = true; try{ Object.assign(IMG.cache, await api.loadImgChunk(n)); }catch(e){ IMG.loaded[n] = false; } }));
+  els.forEach(e => { const d = IMG.cache[e.dataset.img]; if(d) e.src = d; });
+}
+
+/* ---------- Term maths ---------- */
+function whereAreWe(term){
+  const blocks = S.content.plan.blocks;
+  const assessIdx = blocks.findIndex(b => b.assessment);
+  if(!term || !term.start) return {block: UI.block || 1, note:''};
+  const start = new Date(term.start + 'T00:00:00'), now = new Date();
+  const wk = Math.floor((now - start) / (7 * 86400000)) + 1;
+  const W = term.weeks || 14, sb = term.startBlock || 1;
+  if(wk < 1) return {block: sb, week: 0, note: `Term starts ${fmtDay(start)}. Here’s what the first fortnight will look like.`};
+  if(wk > W) return {block: blocks[assessIdx].n, week: W, note: 'This term has finished. Your club will update the dates for next term.'};
+  if(wk > W - 2) return {block: blocks[assessIdx].n, week: wk, note: `Week ${wk} of ${W}: assessment weeks.`};
+  const n = ((sb - 1) + Math.floor((wk - 1) / 2)) % 6 + 1;
+  return {block: n, week: wk, note: `Week ${wk} of ${W}.`};
+}
+
+/* ---------- UI ---------- */
+const UI = {book: +store.get('book') || 0, level: +store.get('level') || 0, block: 0};
+const $view = document.getElementById('view');
+function render(h){ $view.innerHTML = '<div class="screen">' + h + '</div>'; window.scrollTo(0,0); }
+
+function screenCode(msg){
+  const pre = new URLSearchParams(location.search).get('code') || store.get('code') || '';
+  render(`<div class="auth card">
+    ${FIREBASE_CONFIG ? '' : '<div class="demo-banner">Preview mode: any code opens SAADI Gymnastics</div>'}
+    <p class="eyebrow">For families</p>
+    <h2>What is my child learning?</h2>
+    <p class="muted">Enter the family code from your gymnastics club to see what your child is working on each week, the skills on their award-book assessment, and their competition routine.</p>
+    <form id="cform"><div class="field"><label for="cc">Club code</label><input class="input mono" id="cc" value="${esc(pre)}" placeholder="e.g. SAADI-7K4P" autocomplete="off" autocapitalize="characters" required></div>
+    <p class="error" id="err">${esc(msg || '')}</p><button class="btn block" type="submit">Continue</button></form>
+    <p class="note" style="margin-top:12px">We don’t ask for, or store, any details about you or your child.</p></div>`);
+  document.getElementById('cform').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = 'Checking…';
+    const code = document.getElementById('cc').value.trim().toUpperCase();
+    try{
+      const r = await api.openCode(code);
+      if(!r.ok){ btn.disabled = false; btn.textContent = 'Continue'; document.getElementById('err').textContent = r.reason; return; }
+      S.code = code; S.club = r.club; store.set('code', code);
+      S.content = await api.loadContent(r.club.key);
+      UI.block = 0;
+      UI.book && UI.level ? screenMain() : screenChoose();
+    }catch(err){ console.error(err); btn.disabled = false; btn.textContent = 'Continue'; document.getElementById('err').textContent = 'We couldn’t load the programme just now. Please try again.'; }
+  });
+}
+
+function screenChoose(){
+  render(`<p class="eyebrow">${esc(S.club.clubName)}</p><h1>Which book is your child on?</h1>
+  <p class="lead">It’s the colour on the front of their NGL Recreational award book.</p>
+  <div class="levels-art" style="max-width:520px">${LEVELS.map(l => `<button class="lvtile bg-${l.key}" data-book="${l.book}" style="border:${UI.book === l.book ? '3px solid #fff' : '0'};cursor:pointer;text-align:left"><small>Book ${l.book}</small>${l.name}</button>`).join('')}</div>
+  ${UI.book ? `<h2 style="margin-top:24px">Which level are they working on this term?</h2>
+  <div class="chips">${[0,1,2,3].map(k => { const L = (UI.book - 1) * 4 + 1 + k; return `<button class="chip ${UI.level === L ? 'on' : ''}" data-level="${L}" style="font-size:16px;padding:10px 16px">Level ${L}</button>`; }).join('')}</div>
+  <p class="note" style="margin-top:8px">One level a term, assessed in the last two weeks of term. Ask your coach if you’re not sure.</p>` : ''}`);
+}
+
+function stationBlock(p, col, L){
+  const lv = LEVELS[UI.book - 1];
+  return p.stations.map(s => {
+    const text = s.levels[col] || '';
+    if(!text || text === '—') return '';
+    const a = (s.assess && s.assess[String(col)]) || [];
+    const mine = a.filter(y => y.L === L);
+    const book = a.filter(y => y.L !== L && Math.ceil(y.L / 4) === UI.book);
+    const comp = [];
+    a.forEach(y => (y.c || []).forEach(([cl, el]) => { if(cl === lv.name && !comp.includes(el)) comp.push(el); }));
+    const imgs = (s.img && s.img[col]) || [];
+    return `<div class="fstation">
+      <div class="ftext">${esc(text).replace(/FINAL SKILL:?/g, '<b>Final skill:</b>').replace(/SUPPORTED/g, 'Supported')}</div>
+      ${mine.length || comp.length || book.length ? `<div class="flinks">
+        ${mine.map(y => `<span class="flink fa" style="--c:${lv.color}">Level ${L} assessment · ${esc(y.s)}</span>`).join('')}
+        ${comp.map(el => `<span class="flink fc">${lv.name} competition · ${esc(el)}</span>`).join('')}
+        ${book.map(y => `<span class="flink fb" style="--c:${lv.color}">Level ${y.L} skill · ${esc(y.s)}</span>`).join('')}
+      </div>` : ''}
+      ${imgs.length ? `<div class="thumbs">${imgs.map(h => `<button class="thumb" data-photo="${h}" aria-label="Enlarge photo"><img data-img="${h}" alt="How the station is set up"></button>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function screenMain(){
+  const lv = LEVELS[UI.book - 1], col = UI.book - 1, L = UI.level;
+  const pos = whereAreWe(S.club.term);
+  if(!UI.block) UI.block = pos.block;
+  const blocks = S.content.plan.blocks;
+  const b = blocks.find(x => x.n === UI.block) || blocks[0];
+  const current = UI.block === pos.block;
+  // what's practised this block
+  const practised = new Set(), compDone = new Set();
+  b.pieces.forEach(p => p.stations.forEach(s => Object.values(s.assess || {}).flat().forEach(y => {
+    practised.add(y.p + '|' + y.s); (y.c || []).forEach(([cl, el]) => { if(cl === lv.name) compDone.add(norm(el)); });
+  })));
+  const bk = S.content.book;
+  const pieces = ['Floor','Vault','Beam','Bars','Rebound','Physical Prep'];
+  const comp = S.content.competition.levels[col];
+  const wu = S.content.warmups[b.assessment ? S.content.warmups.length - 1 : b.n - 1];
+  render(`
+  <div class="fhead" style="border-color:${lv.color}">
+    <div><p class="eyebrow" style="color:${lv.color}">${esc(S.club.clubName)}</p>
+    <h1 style="margin:0">${lv.name} · Level ${L}</h1></div>
+    <button class="btn ghost small" data-go="choose">Change book or level</button>
+  </div>
+
+  <section class="section" style="margin-top:18px">
+    <p class="eyebrow">${current ? 'This fortnight' : 'Looking ahead'}</p>
+    <h2>${esc(b.label)}${b.assessment ? '' : ': ' + esc(b.pieces.map(p => p.theme).slice(0, 3).join(', ')) + '…'}</h2>
+    <p class="muted">${current ? esc(pos.note) : 'You’re looking at a different block. '}${b.assessment ? ' Your child is being assessed on their award-book level, so stations are a mix of everything they’ve practised.' : ''}</p>
+    <div class="chips" style="margin:8px 0 14px">${blocks.map(x => `<button class="chip ${x.n === UI.block ? 'on' : ''}" data-block="${x.n}">${x.n === pos.block ? '● ' : ''}${x.assessment ? 'Assessment' : 'Block ' + x.n}</button>`).join('')}</div>
+    <div class="legend-f">
+      <span class="flink fa" style="--c:${lv.color}">Level ${L} assessment</span> on your child’s Level ${L} assessment
+      <span class="flink fc">${lv.name} competition</span> in their competition routine
+      <span class="flink fb" style="--c:${lv.color}">Level skill</span> another level in their book
+    </div>
+    ${PIECE_ORDER.map(code => b.pieces.find(p => p.code === code)).filter(Boolean).map(p => `
+      <article class="piece">
+        <div class="piece-h"><h2>${esc(p.piece)}</h2><span class="th">${esc(p.theme)}</span></div>
+        <div class="fstations">${stationBlock(p, col, L)}</div>
+      </article>`).join('')}
+    ${wu && !wu.assess ? `<article class="piece"><div class="piece-h"><h2>Warm-up</h2><span class="th">Physical prep to try at home</span></div>
+      <div class="fstations">${['pulse','mob','str'].map(k => (wu.parts[k][col] || []).map(x => `<div class="fstation"><div class="ftext">${esc(x.txt)}</div><div class="flinks">${x.L === L ? `<span class="flink fa" style="--c:${lv.color}">Level ${L} assessment</span>` : `<span class="flink fb" style="--c:${lv.color}">Level ${x.L} skill</span>`}</div></div>`).join('')).join('')}</div></article>` : ''}
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">Award book</p><h2>Level ${L} assessment</h2>
+    <p class="muted">Your child passes Level ${L} when they can do every skill below. Assessment is in the last two weeks of term. Skills marked “this fortnight” are practised at the stations above.</p>
+    <div class="bookgrid">${pieces.map(pc => `<div class="card" style="margin:0"><h3>${pc}</h3><ul class="skill-list">${(bk[pc][String(L)] || []).map(x => {
+      const on = practised.has(pc + '|' + strip(x.skill));
+      return `<li>${esc(strip(x.skill))}${on ? ' <span class="tag info">This fortnight</span>' : ''}${(x.comp || []).some(([cl]) => cl === lv.name) ? ` <span class="tag" style="background:rgba(242,169,0,.18);color:var(--gold)">In ${lv.name} routine</span>` : ''}</li>`; }).join('')}</ul></div>`).join('')}</div>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">Competition</p><h2>${lv.name} routine</h2>
+    <p class="muted">The NGL Recreational competition routine for ${lv.name}. Every skill in it is in your child’s award book, so what they practise in class is what they compete.</p>
+    <div class="grid4">${[['Floor', comp.floor], ['Vault', comp.vault], ['Beam', comp.beam], ['Bars', comp.bars]].map(([t, xs]) => `<div class="card" style="margin:0;border-top:6px solid ${lv.color}"><h3>${t}</h3><ol style="margin:0;padding-left:20px">${xs.map(x => `<li style="padding:3px 0">${esc(x)}${compDone.has(norm(x)) ? ' <span class="tag info">This fortnight</span>' : ''}</li>`).join('')}</ol></div>`).join('')}</div>
+  </section>
+  <div class="foot">${esc(S.club.clubName)} · NGL Recreational · Questions about your child’s progress? Please ask their coach.<br><a href="#" data-go="logout">Use a different club code</a></div>`);
+  hydrateImages();
+}
+
+function modal(html){
+  const m = document.createElement('div'); m.className = 'modal-bg';
+  m.innerHTML = `<div class="modal modal-wide" role="dialog" aria-modal="true">${html}</div>`;
+  m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) m.remove(); });
+  document.body.appendChild(m);
+}
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  const bk = t.closest('[data-book]'); if(bk){ UI.book = +bk.dataset.book; UI.level = 0; store.set('book', UI.book); screenChoose(); return; }
+  const lvl = t.closest('[data-level]'); if(lvl){ UI.level = +lvl.dataset.level; store.set('level', UI.level); UI.block = 0; screenMain(); return; }
+  const bl = t.closest('[data-block]'); if(bl){ UI.block = +bl.dataset.block; screenMain(); return; }
+  const ph = t.closest('[data-photo]'); if(ph){ const d = IMG.cache[ph.dataset.photo]; if(d) modal(`<img src="${d}" alt="How the station is set up" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); return; }
+  const go = t.closest('[data-go]');
+  if(go){ e.preventDefault();
+    if(go.dataset.go === 'choose') screenChoose();
+    else if(go.dataset.go === 'logout'){ store.set('code', null); S.club = null; screenCode(); }
+    else if(go.dataset.go === 'home'){ S.club ? screenMain() : screenCode(); }
+  }
+});
+
+(async () => {
+  const code = new URLSearchParams(location.search).get('code') || store.get('code');
+  if(code){
+    try{
+      const r = await api.openCode(code.toUpperCase());
+      if(r.ok){ S.code = code; S.club = r.club; store.set('code', code.toUpperCase()); S.content = await api.loadContent(r.club.key); return UI.book && UI.level ? screenMain() : screenChoose(); }
+      return screenCode(r.reason);
+    }catch(e){ console.error(e); }
+  }
+  screenCode();
+})();
+
+</script>
+</body>
+</html>

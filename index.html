@@ -14,7 +14,7 @@
   :root{
     --navy:#0a1440; --navy-2:#0d1a4f; --navy-3:#152463; --navy-4:#1d2f7a;
     --line:rgba(255,255,255,0.14); --white:#fff; --muted:#b7c1e6;
-    --rec:#E88230; --rec-ink:#2a1405; --ok:#5fd38d; --warn:#ffb454; --bad:#ff8a95;
+    --rec:#E88230; --rec-ink:#2a1405; --gold:#f2a900; --ok:#5fd38d; --warn:#ffb454; --bad:#ff8a95;
     --ruby:#C8194A; --pink:#E0559C; --teal:#0FA3A8; --indigo:#5A55C8;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -30,7 +30,8 @@
   @media(min-width:700px){.topbar-in{border-top-right-radius:220px 46px;}}
   .topbar-row{display:flex;align-items:center;gap:12px;min-height:66px;}
   .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);}
-  .logo img{height:46px;width:auto;display:block;}
+  .logo img{height:50px;width:auto;display:block;}
+  @media(min-width:700px){.logo img{height:58px;}}
   .logo-mark{font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1;}
   .logo-mark small{display:block;font-size:11px;letter-spacing:.22em;color:var(--rec);font-weight:800;margin-top:3px;}
   .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
@@ -156,6 +157,13 @@
   .grid-st.one td{font-size:16px;}
   .chg{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--rec);}
   .final{color:var(--rec);font-weight:800;}
+  .asm{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .apill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;padding:2px 7px 2px 5px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--c);color:var(--white);line-height:1.3;}
+  .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .thumb{padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:64px;height:64px;background:var(--navy-2);cursor:zoom-in;}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .grid-st.one .thumb{width:96px;height:96px;}
+  .apill i{width:8px;height:8px;border-radius:50%;background:var(--c);display:inline-block;flex:0 0 auto;}
   .blockhead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin:0 0 12px;}
   .blockhead h1{margin:0;font-size:clamp(24px,4vw,34px);}
   .blockhead .muted{font-weight:700;}
@@ -171,6 +179,19 @@
   .lvl-band h2{margin:0;font-size:20px;}
   .locked-card{text-align:center;padding:34px 20px;}
 
+  /* Families */
+  .fhead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-left:6px solid;padding:4px 0 4px 14px;}
+  .fstations{display:flex;flex-direction:column;}
+  .fstation{padding:12px 18px;border-bottom:1px solid var(--line);}
+  .fstation:last-child{border-bottom:0;}
+  .ftext{font-size:15px;line-height:1.45;}
+  .flinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .flink{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;line-height:1.35;}
+  .flink.fa{background:var(--c);color:#fff;}
+  .flink.fc{background:var(--gold);color:#2a1405;}
+  .flink.fb{border:1px solid var(--c);color:var(--white);}
+  .legend-f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .legend-f .flink{margin-left:6px;}
   /* Invoice */
   .inv-screen{background:#fff;border-radius:12px;padding:6px;overflow-x:auto;}
   .inv{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;color:#1c1f3a;font-size:13px;line-height:1.45;padding:22px;min-width:560px;}
@@ -217,7 +238,7 @@
 <div class="app">
   <header class="topbar"><div class="topbar-strap">Recreational Awards Scheme · Club Hub</div><div class="topbar-in">
     <div class="wrap topbar-row">
-      <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><span class="logo-mark">NGL<small>RECREATIONAL</small></span></a>
+      <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><img src="/icons/rec-logo.png" alt="NGL Recreational"></a>
       <div class="top-actions" id="topActions"></div>
     </div>
   </div></header>
@@ -241,9 +262,12 @@
                                Only NGL admins can write this field.
      recOrders/{ORD-XXXXX}    clubId, clubName, kind, season, term, lines[],
                                total, status, createdAt, paidAt
-     recContent/{plan|warmups|book|competition}
-                               {json, version, updatedAt}  readable only by
-                               clubs with an active, unexpired licence.
+     recContent/meta          {key, version} readable only by clubs with an
+                               active, unexpired licence (and NGL admins).
+     recShared/{key}/docs/{plan|warmups|book|competition|imgIndex|img0..}
+                               the programme, readable only with the key.
+     recCodes/{CODE}          family code: clubId, clubName, status, key,
+                               term{start,weeks,startBlock}, expires.
    The lesson plan, warm-ups and books are NOT in this file. NGL Admin
    uploads rec-content.json from the Admin tab and it is stored in
    Firestore behind the security rules (see firestore.rules).
@@ -436,12 +460,45 @@ const liveApi = {
   },
   async loadContent(){
     const {fs, D} = await fb();
-    const keys = ['plan','warmups','book','competition'];
-    const snaps = await Promise.all(keys.map(k => fs.getDoc(fs.doc(D, 'recContent', k))));
+    const meta = await fs.getDoc(fs.doc(D, 'recContent', 'meta'));
+    if(!meta.exists()) throw new Error('No content published yet');
+    const key = meta.data().key; S.contentKey = key;
+    const keys = ['plan','warmups','book','competition','imgIndex'];
+    const snaps = await Promise.all(keys.map(k => fs.getDoc(fs.doc(D, 'recShared', key, 'docs', k))));
     const c = {};
     snaps.forEach((s, i) => { if(s.exists()) c[keys[i]] = JSON.parse(s.data().json); });
     if(!c.plan) throw new Error('No content published yet');
     return c;
+  },
+  async loadImgChunk(n){
+    const {fs, D} = await fb();
+    const s = await fs.getDoc(fs.doc(D, 'recShared', S.contentKey, 'docs', 'img' + n));
+    return s.exists() ? JSON.parse(s.data().json) : {};
+  },
+  async syncFamily(){
+    const {fs, D} = await fb();
+    const meta = await fs.getDoc(fs.doc(D, 'recContent', 'meta'));
+    const upd = {clubName:S.club.name, expires:S.club.rec.expires};
+    if(meta.exists()) upd.key = meta.data().key;
+    await fs.updateDoc(fs.doc(D, 'recCodes', S.club.recCode), upd);
+  },
+  async saveFamily(term){
+    const {fs, D} = await fb();
+    let code = S.club.recCode;
+    const data = {clubId:S.uid, clubName:S.club.name, status:'active', key:S.contentKey || '', term, expires:S.club.rec.expires};
+    if(!code){
+      for(let i = 0; i < 6; i++){
+        const c = newAccessCode(S.club.name);
+        const ref = fs.doc(D, 'recCodes', c);
+        if((await fs.getDoc(ref)).exists()) continue;
+        await fs.setDoc(ref, {...data, createdAt:fs.serverTimestamp()}); code = c; break;
+      }
+      if(!code) throw new Error('Could not create a family code');
+    }else{
+      await fs.updateDoc(fs.doc(D, 'recCodes', code), {clubName:S.club.name, key:data.key, term, expires:data.expires});
+    }
+    await fs.updateDoc(fs.doc(D, 'clubs', S.uid), {recCode:code, recTerm:term});
+    S.club.recCode = code; S.club.recTerm = term; return code;
   },
   // ----- NGL admin -----
   async adminLoad(){
@@ -469,20 +526,29 @@ const liveApi = {
     await fs.updateDoc(fs.doc(D, 'clubs', club.id), {rec});
     club.rec = rec;
   },
-  async adminPublish(content){
+  async adminPublish(content, progress){
     const {fs, D} = await fb();
-    const batch = fs.writeBatch(D);
-    for(const k of ['plan','warmups','book','competition']){
-      if(!content[k]) throw new Error('rec-content.json is missing “' + k + '”');
-      batch.set(fs.doc(D, 'recContent', k), {json: JSON.stringify(content[k]), version: content.version || '', updatedAt: fs.serverTimestamp()});
-    }
-    await batch.commit();
+    for(const k of ['plan','warmups','book','competition']) if(!content[k]) throw new Error('rec-content.json is missing “' + k + '”');
+    const r = new Uint32Array(6); crypto.getRandomValues(r);
+    const key = Array.from(r, x => x.toString(36)).join('');
+    const imgs = content.images || [], idx = {};
+    imgs.forEach((ch, n) => Object.keys(ch).forEach(h => idx[h] = n));
+    const put = (name, obj) => fs.setDoc(fs.doc(D, 'recShared', key, 'docs', name), {json: JSON.stringify(obj), version: content.version || '', updatedAt: fs.serverTimestamp()});
+    for(const k of ['plan','warmups','book','competition']){ progress && progress('Uploading ' + k + '…'); await put(k, content[k]); }
+    await put('imgIndex', idx);
+    for(let n = 0; n < imgs.length; n++){ progress && progress(`Uploading photos ${n + 1} of ${imgs.length}…`); await put('img' + n, imgs[n]); }
+    await fs.setDoc(fs.doc(D, 'recContent', 'meta'), {key, version: content.version || '', updatedAt: fs.serverTimestamp()});
+    progress && progress('Updating family codes…');
+    const codes = await fs.getDocs(fs.collection(D, 'recCodes'));
+    for(const c of codes.docs) await fs.updateDoc(c.ref, {key});
+    S.content = null; IMG.cache = {}; IMG.loaded = {};
   }
 };
 
 /* ---------- Preview (demo) implementation ---------- */
 const DEMO_CLUB = () => ({name:'SAADI Gymnastics', contact:'Dave Brooke', email:CONTACT_EMAIL, bgNumber:'',
-  rec:{status:'active', band:'m', season:S.season, expires:seasonExpiry(S.season)}});
+  rec:{status:'active', band:'m', season:S.season, expires:seasonExpiry(S.season)}, recCode:'SAADI-7K4P',
+  recTerm:{start: new Date(Date.now() - 16 * 86400000).toISOString().slice(0,10), weeks:14, startBlock:1}});
 const demoApi = {
   async restore(){ return false; },
   async signIn(){
@@ -498,7 +564,15 @@ const demoApi = {
   async register(d){ S.club = {name:d.name, contact:d.contact, email:d.email, bgNumber:d.bgNumber}; S.isAdmin = true; S.orders = []; return {ok:true}; },
   async signOut(){},
   async placeOrder(o){ const x = {id:orderRef(), ...o, clubId:'demo', clubName:S.club.name, status:'awaiting-payment', createdAt:new Date()}; S.orders.push(x); return x; },
-  async loadContent(){ if(window.DEMO_CONTENT) return window.DEMO_CONTENT; throw new Error('No preview content in this build'); },
+  async loadContent(){
+    if(!window.DEMO_CONTENT) throw new Error('No preview content in this build');
+    const c = window.DEMO_CONTENT, idx = {};
+    (c.images || []).forEach((ch, n) => Object.keys(ch).forEach(h => idx[h] = n));
+    return {...c, imgIndex: idx};
+  },
+  async loadImgChunk(n){ return (window.DEMO_CONTENT.images || [])[n] || {}; },
+  async syncFamily(){},
+  async saveFamily(term){ S.club.recCode = S.club.recCode || newAccessCode(S.club.name); S.club.recTerm = term; return S.club.recCode; },
   async adminLoad(){ return {clubs:[{id:'demo', ...S.club}], orders:S.orders.slice().reverse()}; },
   async adminMarkPaid(order, club){
     const o = S.orders.find(x => x.id === order.id); if(o) o.status = 'paid';
@@ -725,7 +799,8 @@ function screenDashboard(){
       <button class="card" data-tab="warmups" style="text-align:left;cursor:pointer"><h3>Warm-ups</h3><p class="muted" style="margin:0">10-minute physical prep for each block.</p></button>
       <button class="card" data-tab="books" style="text-align:left;cursor:pointer"><h3>Award books</h3><p class="muted" style="margin:0">Skills by level and assessment sheets.</p></button>
       <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
-    </div>`;
+    </div>
+    ${familyCard()}`;
   }else if(waiting.some(o => o.band)){
     const o = waiting.find(x => x.band);
     lic = `<div class="card lic-card">
@@ -743,9 +818,51 @@ function screenDashboard(){
       <div class="btn-row"><button class="btn" data-act="start">Start my licence</button><button class="btn ghost" data-tab="licence">See pricing</button></div>
     </div>`;
   }
+  if(active && S.club.recCode && !S.familySynced){ S.familySynced = true; api.syncFamily().catch(e => console.error(e)); }
   render(`<p class="eyebrow">Club Hub</p><h1>Welcome${S.club.contact ? ', ' + esc(S.club.contact.split(' ')[0]) : ''}</h1>${lic}`);
 }
 
+const FAMILY_URL = SITE_URL + '/families/';
+function familyMessage(){
+  return `Your child is working through the NGL Recreational award books at ${S.club.name}.\n\n`
+    + `See what they're learning each week, which skills are on their assessment, and their competition routine:\n${FAMILY_URL}?code=${S.club.recCode}\n\n`
+    + `Or go to ${FAMILY_URL} and enter our club code: ${S.club.recCode}`;
+}
+async function copyText(text, note){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} ta.remove(); }
+  const n = document.getElementById('copyNote'); if(n) n.textContent = note;
+}
+function familyCard(){
+  const t = S.club.recTerm;
+  if(!S.club.recCode) return `<div class="card"><p class="eyebrow">Families</p><h2>Share the programme with parents</h2>
+    <p class="muted">Parents see what their child is learning each week, which skills are on their assessment, and their competition routine. Set your term dates and we'll create your club's family code. No child details are stored.</p>
+    <button class="btn" data-act="family">Set up family access</button></div>`;
+  return `<div class="card"><p class="eyebrow">Families</p><h2>Your family code: <span class="mono" style="color:var(--rec)">${esc(S.club.recCode)}</span></h2>
+    <p class="muted">${t ? `Term started ${fmtDate(new Date(t.start))} · ${t.weeks} weeks · starting at Block ${t.startBlock}. ` : ''}Parents go to <b>${esc(FAMILY_URL)}</b> and enter this code.</p>
+    <div class="btn-row"><button class="btn" data-act="copy-family">Copy message for parents</button><button class="btn ghost" data-act="family">Update term dates</button></div>
+    <p class="note" id="copyNote" style="margin-top:8px"></p></div>`;
+}
+function familyModal(){
+  const t = S.club.recTerm || {start: new Date().toISOString().slice(0,10), weeks:14, startBlock:1};
+  const m = modal(`<h2>Term dates for families</h2>
+    <p class="muted">We use these to show parents this week's block. Update them at the start of each term.</p>
+    <form id="fform">
+      <div class="field"><label for="fs">First day of term</label><input class="input" id="fs" type="date" value="${esc(t.start)}" required></div>
+      <div class="field"><label for="fw">Term length (weeks)</label><input class="input" id="fw" type="number" min="4" max="16" value="${t.weeks}" required></div>
+      <div class="field"><label for="fb">Teaching block you start this term on</label><select class="input" id="fb">${[1,2,3,4,5,6].map(n => `<option value="${n}" ${n === +t.startBlock ? 'selected' : ''}>Block ${n}</option>`).join('')}</select></div>
+      <p class="note">Each block runs for two weeks. The last two weeks of term are always the assessment block. In a shorter term, start the next term on the block after the one you finished.</p>
+      <p class="error" id="ferr"></p>
+      <div class="btn-row"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
+    </form>`);
+  m.querySelector('#fform').addEventListener('submit', async e => {
+    e.preventDefault();
+    const term = {start: m.querySelector('#fs').value, weeks: +m.querySelector('#fw').value, startBlock: +m.querySelector('#fb').value};
+    const sb = e.target.querySelector('button[type=submit]'); sb.disabled = true; sb.textContent = 'Saving…';
+    try{ if(!S.content) S.content = await api.loadContent(); await api.saveFamily(term); m.remove(); show(); }
+    catch(err){ console.error(err); sb.disabled = false; sb.textContent = 'Save'; m.querySelector('#ferr').textContent = 'Couldn’t save. Please try again.'; }
+  });
+}
 function screenLocked(){
   render(`<div class="card locked-card">
     <p class="eyebrow">Recreational licence needed</p>
@@ -935,14 +1052,34 @@ function chips(name, items, cur){
   return items.map(([v, l, cls]) => `<button class="chip ${cls || ''} ${String(cur) === String(v) ? 'on' : ''}" data-ui="${name}" data-v="${esc(v)}" aria-pressed="${String(cur) === String(v)}">${l}</button>`).join('');
 }
 const LVL_CHIPS = [['all','All levels'], ...LEVELS.map((l, i) => [String(i), l.name, 'lv-' + l.key])];
+const bookOf = L => LEVELS[Math.ceil(L / 4) - 1];
+function marks(s, i, full){
+  const a = s.assess && s.assess[String(i)];
+  if(!a || !a.length) return '';
+  return `<div class="asm">${a.map(y => { const b = bookOf(y.L);
+    return `<span class="apill" style="--c:${b.color}" title="Award book ${b.name}, Level ${y.L} (${esc(y.p)}): ${esc(y.s)}"><i></i>L${y.L}${full ? ' · ' + esc(y.s) : ''}</span>`; }).join('')}</div>`;
+}
 function stationTable(p){
   const lv = UI.level;
   if(lv !== 'all'){
     const i = +lv;
-    return `<table class="grid-st one"><tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td><td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}</td></tr>`).join('')}</tbody></table>`;
+    return `<table class="grid-st one"><tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td><td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}${marks(s, i, true)}${thumbs(s, i)}</td></tr>`).join('')}</tbody></table>`;
   }
   return `<div class="table-wrap"><table class="grid-st"><thead><tr><th class="n">Stn</th>${LEVELS.map(l => `<th style="background:${l.color}">${l.name}</th>`).join('')}</tr></thead>
-    <tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td>${[0,1,2,3].map(i => `<td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    <tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td>${[0,1,2,3].map(i => `<td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}${marks(s, i, false)}${thumbs(s, i)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+const IMG = {cache:{}, loaded:{}};
+async function hydrateImages(root){
+  const els = [...(root || document).querySelectorAll('img[data-img]:not([src])')];
+  if(!els.length || !S.content || !S.content.imgIndex) return;
+  const need = [...new Set(els.map(e => S.content.imgIndex[e.dataset.img]).filter(n => n !== undefined && !IMG.loaded[n]))];
+  await Promise.all(need.map(async n => { IMG.loaded[n] = true; try{ Object.assign(IMG.cache, await api.loadImgChunk(n)); }catch(e){ IMG.loaded[n] = false; } }));
+  els.forEach(e => { const d = IMG.cache[e.dataset.img]; if(d) e.src = d; });
+}
+function thumbs(s, i){
+  const ids = s.img && s.img[i];
+  if(!ids || !ids.length) return '';
+  return `<div class="thumbs">${ids.map(h => `<button class="thumb" data-act="photo" data-img-id="${h}" aria-label="Enlarge photo"><img data-img="${h}" alt="Station set-up photo"></button>`).join('')}</div>`;
 }
 const fmtStation = t => esc(t).replace(/FINAL SKILL:?/g, '<span class="final">Final skill:</span>').replace(/SUPPORTED/g, 'Supported');
 function introHTML(p){
@@ -963,12 +1100,14 @@ function screenPlan(){
     <div class="chips"><span class="lbl">Piece</span>${chips('piece', [['all','All pieces'], ...b.pieces.map(p => [p.code, p.piece])], UI.piece)}</div>
     <div class="chips"><span class="lbl">Level</span>${chips('level', LVL_CHIPS, UI.level)}</div>
   </div>
+  <p class="note" style="margin:-6px 0 14px"><span class="apill" style="--c:var(--ruby)"><i></i>L4</span> marks a station that teaches an award-book skill. The colour is the book (Ruby, Pink, Teal, Indigo) and the number is the level it's assessed at. Tap or hover for the skill${UI.level === 'all' ? ', or pick one level to see the skill names' : ''}.</p>
   ${pieces.map(p => `<article class="piece">
     <div class="piece-h"><h2>${esc(p.piece)}</h2><span class="th">${esc(p.theme)}</span>${p.setup ? `<span class="su">${esc(p.setup)}</span>` : ''}</div>
     ${introHTML(p)}
     ${stationTable(p)}
   </article>`).join('')}
   <p class="note">Demonstrate the final skill at the start of each rotation and explain how the stations build to it. Choose the level that suits each child.</p>`);
+  hydrateImages($view);
 }
 function planPrintHTML(){
   const b = S.content.plan.blocks.find(x => x.n === UI.block);
@@ -977,7 +1116,7 @@ function planPrintHTML(){
   return `<div class="sheet">${pieces.map((p, k) => `<div style="${k ? 'page-break-before:always;' : ''}">
     <h2>${esc(b.label)} · ${esc(p.piece)}: ${esc(p.theme)}</h2><p>${esc(b.weeks)} · ${esc(p.setup || '')}</p>
     <table><thead><tr><th style="width:30px">Stn</th>${cols.map(i => `<th>${LEVELS[i].name}</th>`).join('')}</tr></thead>
-    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${cols.map(i => `<td>${esc(s.levels[i] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</div>`;
+    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${cols.map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<br><b>● L${y.L}</b> ${esc(y.s)}`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table><p>● = award-book skill and the level it is assessed at.</p></div>`).join('')}</div>`;
 }
 
 function screenWarmups(){
@@ -1103,6 +1242,9 @@ document.addEventListener('click', async e => {
     act.disabled = false;
   }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(), true); }
+  else if(a === 'photo'){ const d = IMG.cache[act.dataset.imgId]; if(d){ const m = modal(`<img src="${d}" alt="Station set-up photo" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); m.querySelector('.modal').classList.add('modal-wide'); } }
+  else if(a === 'family') familyModal();
+  else if(a === 'copy-family'){ copyText(familyMessage(), 'Message copied. Paste it into your email, newsletter or WhatsApp.'); }
   else if(a === 'sheet'){ printHTML(sheetHTML(+act.dataset.level), true); }
   else if(a === 'adm-paid'){
     const o = ADM.orders.find(x => x.id === act.dataset.order); if(!o) return;
@@ -1122,7 +1264,7 @@ document.addEventListener('click', async e => {
     const f = document.getElementById('contentFile'), n = document.getElementById('pubNote');
     if(!f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
     act.disabled = true; n.textContent = 'Publishing…';
-    try{ const c = JSON.parse(await f.files[0].text()); await api.adminPublish(c); S.content = null; n.style.color = 'var(--ok)'; n.textContent = '✓ Published version ' + (c.version || '') + '.'; }
+    try{ const c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
     catch(err){ console.error(err); n.style.color = ''; n.textContent = 'Couldn’t publish: ' + err.message; }
     act.disabled = false;
   }
