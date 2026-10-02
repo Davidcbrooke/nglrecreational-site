@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E88230">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icons/favicon-64.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NGL Recreational">
+<title>NGL Recreational Hub</title>
+<style>
+  :root{
+    --navy:#0a1440; --navy-2:#0d1a4f; --navy-3:#152463; --navy-4:#1d2f7a;
+    --line:rgba(255,255,255,0.14); --white:#fff; --muted:#b7c1e6;
+    --rec:#E88230; --rec-ink:#2a1405; --ok:#5fd38d; --warn:#ffb454; --bad:#ff8a95;
+    --ruby:#C8194A; --pink:#E0559C; --teal:#0FA3A8; --indigo:#5A55C8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--navy);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  button,input,select{font:inherit;color:inherit;}
+  a{color:var(--rec);}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+  .topbar{position:relative;z-index:30;background:var(--rec);width:100vw;margin-left:calc(50% - 50vw);}
+  .topbar-strap{text-align:center;color:var(--rec-ink);font-weight:800;font-size:13px;letter-spacing:.02em;padding:calc(7px + env(safe-area-inset-top,0px)) 16px 7px;}
+  .topbar-in{background:linear-gradient(180deg,#2a245f 0%,#2a245f 40%,var(--navy) 100%);border-top-right-radius:120px 38px;padding-bottom:18px;}
+  @media(min-width:700px){.topbar-in{border-top-right-radius:220px 46px;}}
+  .topbar-row{display:flex;align-items:center;gap:12px;min-height:66px;}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);}
+  .logo img{height:46px;width:auto;display:block;}
+  .logo-mark{font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1;}
+  .logo-mark small{display:block;font-size:11px;letter-spacing:.22em;color:var(--rec);font-weight:800;margin-top:3px;}
+  .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+  @media(max-width:600px){.top-actions .pill{display:none;}}
+  .pill{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:var(--rec);color:var(--rec-ink);white-space:nowrap;}
+
+  .navtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0 12px;}
+  .navtabs::-webkit-scrollbar{display:none;}
+  .navtab{flex:0 0 auto;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--navy-3);font-weight:700;font-size:14px;cursor:pointer;}
+  .navtab.active{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+  .navtab.locked{opacity:.55;}
+
+  main{padding:18px 0 60px;}
+  .screen{animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){.screen{animation:none;}}
+
+  h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:0 0 12px;font-weight:900;letter-spacing:-.015em;text-wrap:balance;}
+  h2{font-size:22px;margin:0 0 10px;font-weight:850;text-wrap:balance;}
+  h3{font-size:16px;margin:0 0 6px;font-weight:800;}
+  p{line-height:1.55;margin:0 0 10px;}
+  .muted{color:var(--muted);}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rec);font-weight:800;margin:0 0 10px;}
+  .card{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:1fr;gap:16px;}
+  .grid3{display:grid;grid-template-columns:1fr;gap:14px;}
+  .grid4{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:760px){.grid2{grid-template-columns:1fr 1fr;}.grid3{grid-template-columns:repeat(3,1fr);}.grid4{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1000px){.grid4{grid-template-columns:repeat(4,1fr);}}
+  .grid2>*,.grid3>*,.grid4>*{min-width:0;}
+  .section{margin:30px 0 0;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;border:0;cursor:pointer;background:var(--rec);color:var(--rec-ink);font-weight:900;font-size:15px;text-decoration:none;}
+  .btn:active{transform:scale(.98);}
+  .btn:focus-visible,.navtab:focus-visible,.chip:focus-visible{outline:3px solid var(--white);outline-offset:2px;}
+  .btn.ghost{background:transparent;color:var(--white);border:1px solid var(--line);font-weight:700;}
+  .btn.small{padding:8px 12px;font-size:13px;border-radius:10px;}
+  .btn.block{width:100%;}
+  .btn[disabled]{opacity:.55;cursor:default;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .hero{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;padding:14px 0 6px;}
+  @media(min-width:820px){.hero{grid-template-columns:1.3fr .7fr;}}
+  .lead{font-size:18px;color:var(--muted);}
+  .levels-art{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .lvtile{border-radius:16px;padding:18px 14px;font-weight:900;font-size:20px;color:#fff;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;}
+  .lvtile small{font-size:12px;font-weight:700;opacity:.9;letter-spacing:.04em;}
+  .bg-ruby{background:var(--ruby);}.bg-pink{background:var(--pink);}.bg-teal{background:var(--teal);}.bg-indigo{background:var(--indigo);}
+  .steps{counter-reset:st;}
+  .step{position:relative;padding-left:48px;}
+  .step::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--rec);color:var(--rec-ink);display:grid;place-items:center;font-weight:900;}
+  .ticks{list-style:none;padding:0;margin:0;}
+  .ticks li{padding:7px 0 7px 28px;position:relative;line-height:1.45;}
+  .ticks li::before{content:"✓";position:absolute;left:4px;color:var(--rec);font-weight:900;}
+  .stat{font-size:34px;font-weight:900;color:var(--rec);line-height:1;}
+  .journey{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .jstep{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);}
+  .jstep.on{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+
+  table{width:100%;border-collapse:collapse;}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top;}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .table-wrap{overflow-x:auto;}
+  s.was{color:var(--muted);font-weight:600;margin-right:6px;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:0 0 6px;}
+  .input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--navy-2);color:var(--white);font-size:16px;outline:none;}
+  .input:focus{border-color:var(--rec);}
+  select.input{appearance:auto;}
+  .error{color:var(--bad);font-weight:700;font-size:14px;min-height:1em;margin:0 0 10px;}
+  .note{font-size:13px;color:var(--muted);}
+  .auth{max-width:440px;margin:10px auto 0;}
+  .demo-banner{font-size:13px;text-align:center;color:var(--rec-ink);background:var(--warn);border-radius:10px;padding:9px 12px;margin:0 0 16px;font-weight:700;}
+
+  .lic-card{background:linear-gradient(135deg,var(--navy-4),var(--navy-3));position:relative;overflow:hidden;}
+  .lic-card::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,130,48,.32),transparent 70%);pointer-events:none;}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;}
+  @media(min-width:760px){.kpis{grid-template-columns:repeat(4,1fr);}}
+  .kpi{background:var(--navy-2);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .kpi .v{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;}
+  .kpi .l{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px;}
+  .tag{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+  .tag.ok{background:rgba(95,211,141,.18);color:var(--ok);}
+  .tag.wait{background:rgba(255,180,84,.18);color:var(--warn);}
+  .tag.off{background:rgba(255,138,149,.16);color:var(--bad);}
+  .tag.info{background:rgba(232,130,48,.2);color:var(--rec);}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(3,8,30,.7);z-index:50;display:grid;place-items:center;padding:16px;}
+  .modal{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow:auto;}
+  .modal-wide{max-width:780px;}
+  .sum{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);}
+  .sum.total{font-weight:900;font-size:18px;border-bottom:0;}
+  .foot{text-align:center;font-size:12px;color:var(--muted);margin-top:40px;}
+  .mono{white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em;}
+
+  /* Content area */
+  .toolbar{display:flex;flex-direction:column;gap:10px;margin:0 0 18px;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chips .lbl{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;align-self:center;margin-right:4px;min-width:62px;}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--navy-2);font-weight:700;font-size:13px;cursor:pointer;}
+  .chip.on{background:var(--white);color:var(--navy);border-color:var(--white);}
+  .chip.lv-ruby.on{background:var(--ruby);border-color:var(--ruby);color:#fff;}
+  .chip.lv-pink.on{background:var(--pink);border-color:var(--pink);color:#fff;}
+  .chip.lv-teal.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .chip.lv-indigo.on{background:var(--indigo);border-color:var(--indigo);color:#fff;}
+  .piece{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;margin-bottom:16px;overflow:hidden;}
+  .piece-h{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .piece-h h2{margin:0;font-size:19px;}
+  .piece-h .th{color:var(--rec);font-weight:800;}
+  .piece-h .su{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700;}
+  .intro{padding:10px 18px;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line);}
+  .intro b{color:var(--white);}
+  .grid-st{width:100%;border-collapse:collapse;min-width:720px;}
+  .grid-st th{padding:9px 12px;font-size:12px;color:#fff;letter-spacing:.06em;}
+  .grid-st th.n{background:transparent;color:var(--muted);width:44px;}
+  .grid-st td{padding:11px 12px;font-size:14px;line-height:1.45;border-bottom:1px solid var(--line);}
+  .grid-st td.n{font-weight:900;color:var(--muted);text-align:center;}
+  .grid-st tr:last-child td{border-bottom:0;}
+  .grid-st.one{min-width:0;}
+  .grid-st.one td{font-size:16px;}
+  .chg{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--rec);}
+  .final{color:var(--rec);font-weight:800;}
+  .blockhead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin:0 0 12px;}
+  .blockhead h1{margin:0;font-size:clamp(24px,4vw,34px);}
+  .blockhead .muted{font-weight:700;}
+  .bookgrid{display:grid;grid-template-columns:1fr;gap:12px;}
+  @media(min-width:700px){.bookgrid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1000px){.bookgrid{grid-template-columns:repeat(3,1fr);}}
+  .bookgrid>*{min-width:0;}
+  .skill-list{list-style:none;padding:0;margin:0;}
+  .skill-list li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.4;}
+  .skill-list li:last-child{border-bottom:0;}
+  .lvl-band{display:flex;align-items:center;gap:10px;margin:22px 0 10px;}
+  .lvl-band .dot{width:12px;height:28px;border-radius:4px;}
+  .lvl-band h2{margin:0;font-size:20px;}
+  .locked-card{text-align:center;padding:34px 20px;}
+
+  /* Invoice */
+  .inv-screen{background:#fff;border-radius:12px;padding:6px;overflow-x:auto;}
+  .inv{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;color:#1c1f3a;font-size:13px;line-height:1.45;padding:22px;min-width:560px;}
+  .inv-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #E88230;padding-bottom:14px;margin-bottom:16px;}
+  .inv-brand{font-weight:900;font-size:20px;color:#2a245f;}
+  .inv-brand small{display:block;font-size:10px;letter-spacing:.2em;color:#E88230;}
+  .inv-title{text-align:right;}
+  .inv-h{font-size:26px;font-weight:900;letter-spacing:.08em;color:#2a245f;}
+  .inv-no{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:15px;}
+  .inv-paid{display:inline-block;margin-top:6px;border:2px solid #1f9d55;color:#1f9d55;font-weight:900;padding:2px 10px;border-radius:6px;transform:rotate(-4deg);}
+  .inv-cols{display:grid;grid-template-columns:1.2fr 1.2fr 1fr;gap:16px;margin-bottom:18px;}
+  .inv-label{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b6f8f;margin-bottom:3px;}
+  .inv-table{width:100%;border-collapse:collapse;margin-bottom:18px;}
+  .inv-table th{background:#2a245f;color:#fff;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;text-align:left;border:0;}
+  .inv-table td{padding:10px;border-bottom:1px solid #e3e4ee;color:#1c1f3a;font-size:13px;}
+  .inv-table .num{text-align:right;}
+  .inv-total td{font-weight:900;font-size:16px;border-bottom:0;background:#fdebdc;}
+  .inv-pay{background:#f4f5fa;border-left:4px solid #E88230;padding:12px 14px;border-radius:6px;}
+  .inv-pay table{border-collapse:collapse;margin:6px 0 8px;width:auto;}
+  .inv-pay td{padding:3px 18px 3px 0;border:0;font-size:13px;color:#1c1f3a;}
+  .inv-pay p{margin:0;font-size:12px;color:#4a4e6d;}
+  .inv-foot{margin-top:18px;text-align:center;font-size:11px;color:#6b6f8f;}
+
+  /* Print sheets */
+  #print-area{display:none;}
+  .sheet{background:#fff;color:#111;font-size:12px;}
+  .sheet h2{color:#111;font-size:18px;margin:0 0 4px;}
+  .sheet p{color:#333;margin:0 0 10px;}
+  .sheet table{border-collapse:collapse;width:100%;}
+  .sheet th,.sheet td{border:1px solid #999;padding:5px 6px;font-size:11px;color:#111;vertical-align:top;}
+  .sheet th{background:#eee;letter-spacing:0;text-transform:none;}
+  .sheet .pc{background:#f6e2d2;font-weight:800;}
+  @media print{
+    @page{size:A4 landscape;margin:10mm;}
+    body{background:#fff !important;}
+    .app,.modal-bg{display:none !important;}
+    #print-area{display:block;}
+    #print-area .inv{min-width:0;padding:0;}
+  }
+</style>
+</head>
+<body>
+<div id="print-area"></div>
+<div class="app">
+  <header class="topbar"><div class="topbar-strap">Recreational Awards Scheme · Club Hub</div><div class="topbar-in">
+    <div class="wrap topbar-row">
+      <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><span class="logo-mark">NGL<small>RECREATIONAL</small></span></a>
+      <div class="top-actions" id="topActions"></div>
+    </div>
+  </div></header>
+  <div class="wrap">
+    <nav class="navtabs" id="navtabs" hidden></nav>
+    <main id="view"></main>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   NGL RECREATIONAL — CLUB HUB
+   ---------------------------------------------------------------------
+   Uses the same Firebase project and club accounts as NGL Schools, so a
+   club has one NGL login. Recreational is its own licence on that
+   account: a Schools licence does NOT open this Hub.
+
+   Firestore (Recreational additions):
+     clubs/{uid}.rec          {status:'active'|'inactive', band, season,
+                               expires (timestamp), activatedAt}
+                               Only NGL admins can write this field.
+     recOrders/{ORD-XXXXX}    clubId, clubName, kind, season, term, lines[],
+                               total, status, createdAt, paidAt
+     recContent/{plan|warmups|book|competition}
+                               {json, version, updatedAt}  readable only by
+                               clubs with an active, unexpired licence.
+   The lesson plan, warm-ups and books are NOT in this file. NGL Admin
+   uploads rec-content.json from the Admin tab and it is stored in
+   Firestore behind the security rules (see firestore.rules).
+
+   PREVIEW MODE: when FIREBASE_CONFIG is null the Hub runs on demo data
+   and window.DEMO_CONTENT (preview builds only). Nothing is saved.
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBK8gNFh4lYv6829YRFm-7Ia0tzh_RwMKQ",
+  authDomain: "ngl-schools.firebaseapp.com",
+  projectId: "ngl-schools",
+  storageBucket: "ngl-schools.firebasestorage.app",
+  messagingSenderId: "202087533031",
+  appId: "1:202087533031:web:a905eaa461925256b71542"
+};
+
+const SITE_URL = 'https://nglrecreational.co.uk';
+const CONTACT_EMAIL = 'admin@nationalgymnasticsleague.co.uk';
+const INVOICE = {
+  businessName: 'National Gymnastics League',
+  addressLines: ['66 Waveney Road', 'Harpenden', 'Hertfordshire', 'AL5 4QZ'],
+  email: CONTACT_EMAIL,
+  termsDays: 14,
+  vatNote: '',
+  bank: { accountName: 'National Gymnastics League', sortCode: '60-84-64', accountNumber: '93416867' }
+};
+/* Invoice emails use the same EmailJS service and template as NGL Schools
+   (the template takes subject + invoice_html). */
+const EMAILJS = { serviceId:'service_3qlufgh', templateId:'template_8i40iia', publicKey:'ZSjEpECoOMHkWNB1D' };
+
+/* ---------- Pricing (edit here) ---------- */
+const CLUB_BANDS = [
+  {key:'s', label:'Up to 199 recreational gymnasts', short:'Under 200', founding:500,  full:1000},
+  {key:'m', label:'200 to 499 recreational gymnasts', short:'200–499',   founding:1000, full:1500},
+  {key:'l', label:'500 or more recreational gymnasts', short:'500+',     founding:1500, full:2000}
+];
+const GYMNAST_FEE_PER_MONTH = 1;
+const TERMS = [
+  {key:'autumn', label:'Autumn term', months:4},
+  {key:'spring', label:'Spring term', months:4},
+  {key:'summer', label:'Summer term', months:4}
+];
+const MEDAL_PRICE = 2.5;     // one medal per licensed gymnast per term (clubs sell at £5)
+const BOOK_PRICE  = 5;       // new gymnasts only (families pay £10)
+const LEVELS = [
+  {key:'ruby', name:'Ruby', book:1, color:'var(--ruby)'},
+  {key:'pink', name:'Pink', book:2, color:'var(--pink)'},
+  {key:'teal', name:'Teal', book:3, color:'var(--teal)'},
+  {key:'indigo', name:'Indigo', book:4, color:'var(--indigo)'}
+];
+
+const gbp = n => '£' + Number(n).toLocaleString('en-GB', {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2});
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- Season / terms ---------- */
+function currentSeason(d = new Date()){
+  const y = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+  return y + '/' + String(y + 1).slice(2);
+}
+function currentTermKey(d = new Date()){
+  const m = d.getMonth();
+  return m >= 8 ? 'autumn' : (m <= 2 ? 'spring' : 'summer');
+}
+// Licence runs to 30 September after the season ends (a month's grace to renew)
+function seasonExpiry(season){ const y = +season.slice(0,4) + 1; return new Date(y, 9, 1); }
+// Months left in the season including this one, for the first-year pro-rata
+function monthsLeft(d = new Date()){ const m = d.getMonth(); return m >= 8 ? 12 - (m - 8) : 8 - m; }
+function clubFee(band, firstYear){
+  const b = CLUB_BANDS.find(x => x.key === band) || CLUB_BANDS[0];
+  return firstYear ? Math.round(b.founding * monthsLeft() / 12) : b.founding;
+}
+const termFee = key => (TERMS.find(t => t.key === key) || TERMS[0]).months * GYMNAST_FEE_PER_MONTH;
+
+const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+function orderRef(){
+  const r = new Uint32Array(5); crypto.getRandomValues(r);
+  return 'ORD-' + Array.from(r, x => CODE_ALPHABET[x % CODE_ALPHABET.length]).join('');
+}
+/* NGL Schools needs every club to hold a (switched-off) Schools code, so a
+   club that registers here can still open the Schools Club Hub later. */
+function codePrefix(name){
+  const words = String(name).toUpperCase().replace(/[^A-Z ]/g,'').split(/\s+/)
+    .filter(w => w && !['GYMNASTICS','GYMNASTIC','GYM','CLUB','THE','ACADEMY','OF','AND'].includes(w));
+  return (words[0] || 'NGL').slice(0, 10).padEnd(2, 'X');
+}
+function newAccessCode(clubName){
+  const r = new Uint32Array(4); crypto.getRandomValues(r);
+  return codePrefix(clubName) + '-' + Array.from(r, x => CODE_ALPHABET[x % CODE_ALPHABET.length]).join('');
+}
+function friendlyAuthError(e){
+  const c = (e && e.code) || '';
+  if(c.includes('invalid-credential') || c.includes('wrong-password') || c.includes('user-not-found')) return 'That email and password don’t match. Please try again.';
+  if(c.includes('email-already-in-use')) return 'There’s already an NGL club account with that email (perhaps from NGL Schools). Log in with it instead.';
+  if(c.includes('weak-password')) return 'Please choose a password of at least 8 characters.';
+  if(c.includes('invalid-email')) return 'Please check the email address.';
+  if(c.includes('too-many-requests')) return 'Too many attempts. Please wait a few minutes and try again.';
+  if(c.includes('network')) return 'We couldn’t connect. Please check your internet connection.';
+  return 'Something went wrong. Please try again.';
+}
+const toDate = c => !c ? new Date() : (typeof c.toDate === 'function' ? c.toDate() : (c.seconds ? new Date(c.seconds * 1000) : new Date(c)));
+const fmtDate = d => d.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+
+/* =====================================================================
+   STATE + DATA LAYER
+   ===================================================================== */
+const S = {season: currentSeason(), uid:null, isAdmin:false, club:null, orders:[], content:null, contentError:''};
+const hasAccess = () => !!(S.club && S.club.rec && S.club.rec.status === 'active' && toDate(S.club.rec.expires) > new Date());
+const orderTotal = o => (o.lines || []).reduce((a, l) => a + l.qty * l.unit, 0);
+
+let FB = null;
+async function fb(){
+  if(FB) return FB;
+  const v = '10.12.2';
+  const [app, auth, fs] = await Promise.all([
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`),
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`),
+    import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`)
+  ]);
+  const a = app.initializeApp(FIREBASE_CONFIG);
+  FB = {auth, fs, A: auth.getAuth(a), D: fs.getFirestore(a)};
+  return FB;
+}
+async function loadClubData(uid){
+  const {fs, D} = await fb();
+  S.uid = uid;
+  const [clubSnap, adminSnap, ordersSnap] = await Promise.all([
+    fs.getDoc(fs.doc(D, 'clubs', uid)),
+    fs.getDoc(fs.doc(D, 'admins', uid)).catch(() => null),
+    fs.getDocs(fs.query(fs.collection(D, 'recOrders'), fs.where('clubId', '==', uid))).catch(() => ({docs:[]}))
+  ]);
+  S.club = clubSnap.exists() ? clubSnap.data() : null;
+  S.isAdmin = !!(adminSnap && adminSnap.exists());
+  S.orders = ordersSnap.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => toDate(a.createdAt) - toDate(b.createdAt));
+  S.content = null;
+}
+async function claimSchoolsCode(clubName, clubId){
+  const {fs, D} = await fb();
+  for(let i = 0; i < 6; i++){
+    const code = newAccessCode(clubName);
+    const ref = fs.doc(D, 'accessCodes', code);
+    if((await fs.getDoc(ref)).exists()) continue;
+    await fs.setDoc(ref, {clubId, clubName, season:S.season, status:'inactive', createdAt: fs.serverTimestamp()});
+    return code;
+  }
+  return '';
+}
+
+const liveApi = {
+  async restore(){
+    const {auth, A} = await fb();
+    return new Promise(res => {
+      const off = auth.onAuthStateChanged(A, async user => {
+        off();
+        if(!user){ res(false); return; }
+        try{ await loadClubData(user.uid); res(!!S.club || S.isAdmin); }catch(e){ res(false); }
+      });
+    });
+  },
+  async signIn(email, password){
+    try{
+      const {auth, A} = await fb();
+      const cred = await auth.signInWithEmailAndPassword(A, email, password);
+      await loadClubData(cred.user.uid);
+      if(!S.club && !S.isAdmin) return {ok:false, reason:'This login isn’t linked to a club. Please register your club.'};
+      return {ok:true};
+    }catch(e){ return {ok:false, reason:friendlyAuthError(e)}; }
+  },
+  async resetPassword(email){
+    try{ const {auth, A} = await fb(); await auth.sendPasswordResetEmail(A, email); return {ok:true}; }
+    catch(e){ return {ok:false, reason:friendlyAuthError(e)}; }
+  },
+  async register(d){
+    try{
+      const {auth, fs, A, D} = await fb();
+      const cred = await auth.createUserWithEmailAndPassword(A, d.email, d.password);
+      S.uid = cred.user.uid;
+      const code = await claimSchoolsCode(d.name, S.uid).catch(() => '');
+      await fs.setDoc(fs.doc(D, 'clubs', S.uid), {name:d.name, bgNumber:d.bgNumber, contact:d.contact, email:d.email, accessCode:code, source:'recreational', createdAt:fs.serverTimestamp()});
+      await loadClubData(S.uid);
+      return {ok:true};
+    }catch(e){ return {ok:false, reason:friendlyAuthError(e)}; }
+  },
+  async signOut(){ const {auth, A} = await fb(); await auth.signOut(A); },
+  async placeOrder(o){
+    const {fs, D} = await fb();
+    const id = orderRef();
+    const data = {...o, clubId:S.uid, clubName:S.club.name, status:'awaiting-payment'};
+    await fs.setDoc(fs.doc(D, 'recOrders', id), {...data, createdAt:fs.serverTimestamp()});
+    const local = {id, ...data, createdAt:new Date()}; S.orders.push(local); return local;
+  },
+  async loadContent(){
+    const {fs, D} = await fb();
+    const keys = ['plan','warmups','book','competition'];
+    const snaps = await Promise.all(keys.map(k => fs.getDoc(fs.doc(D, 'recContent', k))));
+    const c = {};
+    snaps.forEach((s, i) => { if(s.exists()) c[keys[i]] = JSON.parse(s.data().json); });
+    if(!c.plan) throw new Error('No content published yet');
+    return c;
+  },
+  // ----- NGL admin -----
+  async adminLoad(){
+    const {fs, D} = await fb();
+    const [c, o] = await Promise.all([fs.getDocs(fs.collection(D, 'clubs')), fs.getDocs(fs.collection(D, 'recOrders'))]);
+    return {
+      clubs: c.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => String(a.name).localeCompare(String(b.name))),
+      orders: o.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => toDate(b.createdAt) - toDate(a.createdAt))
+    };
+  },
+  async adminMarkPaid(order, club){
+    const {fs, D} = await fb();
+    const batch = fs.writeBatch(D);
+    batch.update(fs.doc(D, 'recOrders', order.id), {status:'paid', paidAt:fs.serverTimestamp()});
+    if(order.band){
+      batch.update(fs.doc(D, 'clubs', club.id), {rec:{status:'active', band:order.band, season:order.season,
+        expires: fs.Timestamp.fromDate(seasonExpiry(order.season)), activatedAt: fs.serverTimestamp()}});
+    }
+    await batch.commit();
+  },
+  async adminSetStatus(club, status){
+    const {fs, D} = await fb();
+    const rec = {...(club.rec || {}), status};
+    if(status === 'active' && !rec.expires){ rec.season = S.season; rec.expires = fs.Timestamp.fromDate(seasonExpiry(S.season)); rec.band = rec.band || 's'; }
+    await fs.updateDoc(fs.doc(D, 'clubs', club.id), {rec});
+    club.rec = rec;
+  },
+  async adminPublish(content){
+    const {fs, D} = await fb();
+    const batch = fs.writeBatch(D);
+    for(const k of ['plan','warmups','book','competition']){
+      if(!content[k]) throw new Error('rec-content.json is missing “' + k + '”');
+      batch.set(fs.doc(D, 'recContent', k), {json: JSON.stringify(content[k]), version: content.version || '', updatedAt: fs.serverTimestamp()});
+    }
+    await batch.commit();
+  }
+};
+
+/* ---------- Preview (demo) implementation ---------- */
+const DEMO_CLUB = () => ({name:'SAADI Gymnastics', contact:'Dave Brooke', email:CONTACT_EMAIL, bgNumber:'',
+  rec:{status:'active', band:'m', season:S.season, expires:seasonExpiry(S.season)}});
+const demoApi = {
+  async restore(){ return false; },
+  async signIn(){
+    S.club = DEMO_CLUB(); S.isAdmin = true;
+    S.orders = [{id:'ORD-DEMO1', clubId:'demo', clubName:S.club.name, kind:'start', band:'m', season:S.season, term:'autumn', status:'paid', createdAt:new Date(),
+      lines:[{kind:'club', desc:'Recreational Club Licence ' + S.season + ' (founding price, pro-rata)', qty:1, unit:clubFee('m', true)},
+             {kind:'gymnast', desc:'Gymnast Licences, Autumn term ' + S.season, qty:240, unit:termFee('autumn')},
+             {kind:'medal', desc:'Recreational medals, Autumn term', qty:240, unit:MEDAL_PRICE},
+             {kind:'book', desc:'Recreational award books (new gymnasts)', qty:60, unit:BOOK_PRICE}]}];
+    return {ok:true};
+  },
+  async resetPassword(){ return {ok:true}; },
+  async register(d){ S.club = {name:d.name, contact:d.contact, email:d.email, bgNumber:d.bgNumber}; S.isAdmin = true; S.orders = []; return {ok:true}; },
+  async signOut(){},
+  async placeOrder(o){ const x = {id:orderRef(), ...o, clubId:'demo', clubName:S.club.name, status:'awaiting-payment', createdAt:new Date()}; S.orders.push(x); return x; },
+  async loadContent(){ if(window.DEMO_CONTENT) return window.DEMO_CONTENT; throw new Error('No preview content in this build'); },
+  async adminLoad(){ return {clubs:[{id:'demo', ...S.club}], orders:S.orders.slice().reverse()}; },
+  async adminMarkPaid(order, club){
+    const o = S.orders.find(x => x.id === order.id); if(o) o.status = 'paid';
+    if(order.band){ S.club.rec = {status:'active', band:order.band, season:order.season, expires:seasonExpiry(order.season)}; }
+  },
+  async adminSetStatus(club, status){ S.club.rec = {...(S.club.rec || {band:'s', season:S.season, expires:seasonExpiry(S.season)}), status}; club.rec = S.club.rec; },
+  async adminPublish(){ }
+};
+const api = FIREBASE_CONFIG ? liveApi : demoApi;
+
+/* =====================================================================
+   SHELL
+   ===================================================================== */
+let signedIn = false;
+let tab = 'dashboard';
+const UI = {block:1, piece:'all', level:'all', wblock:1, book:1};
+const $view = document.getElementById('view');
+function render(html){ $view.innerHTML = '<div class="screen">' + html + '</div>'; }
+const CONTENT_TABS = ['plan','warmups','books','competition'];
+function setTop(){
+  const ta = document.getElementById('topActions');
+  const nav = document.getElementById('navtabs');
+  if(signedIn){
+    ta.innerHTML = `${S.club ? `<span class="pill">${esc(S.club.name)}</span>` : ''}<button class="btn ghost small" data-act="signout">Sign out</button>`;
+    nav.hidden = false;
+    const lock = !hasAccess() && !S.isAdmin;
+    const tabs = S.club ? [['dashboard','Dashboard'],['plan','Lesson plan'],['warmups','Warm-ups'],['books','Award books'],['competition','Competition'],['orders','Orders'],['licence','Licence & pricing']] : [];
+    if(S.isAdmin) tabs.push(['admin','NGL Admin']);
+    nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
+  }else{
+    ta.innerHTML = `<button class="btn ghost small" data-go="login">Club login</button>`;
+    nav.hidden = true;
+  }
+}
+function show(){
+  setTop();
+  if(!signedIn){ screenLanding(); return; }
+  if(tab === 'admin' && S.isAdmin) return screenAdmin();
+  if(!S.club){ tab = 'admin'; return screenAdmin(); }
+  if(CONTENT_TABS.includes(tab)){
+    if(!hasAccess() && !S.isAdmin) return screenLocked();
+    return withContent(() => ({plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
+  }
+  ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence})[tab]();
+}
+async function withContent(fn){
+  if(S.content){ fn(); return; }
+  render(`<div class="card locked-card"><p class="muted">Loading the Recreational programme…</p></div>`);
+  try{ S.content = await api.loadContent(); fn(); }
+  catch(e){
+    console.error(e);
+    render(`<div class="card locked-card"><h2>The programme isn’t available just now</h2><p class="muted">${S.isAdmin ? 'No content has been published yet. Upload rec-content.json from the NGL Admin tab.' : 'Please try again in a moment. If this keeps happening, email ' + esc(CONTACT_EMAIL) + '.'}</p></div>`);
+  }
+}
+function modal(html){
+  const m = document.createElement('div'); m.className = 'modal-bg';
+  m.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}</div>`;
+  m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) m.remove(); });
+  document.body.appendChild(m); return m;
+}
+
+/* =====================================================================
+   PUBLIC PAGES
+   ===================================================================== */
+function pitchHTML(inside){
+  return `
+  ${inside ? '' : `
+  <section class="hero">
+    <div>
+      <p class="eyebrow">NGL Recreational · for British Gymnastics clubs</p>
+      <h1>A complete recreational programme, from first forward roll to Indigo.</h1>
+      <p class="lead">Lesson plans, warm-ups, award books and competitions that all line up. Your coaches know what to teach each week, every child works at their own level, and every skill is taught before it is assessed.</p>
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn" data-go="register">Register your club</button>
+        <button class="btn ghost" data-go="login">Club login</button>
+      </div>
+      <p class="note" style="margin-top:12px">Already have an NGL Schools club account? Log in with it. Recreational is a separate licence on the same account.</p>
+    </div>
+    <div class="levels-art" aria-hidden="true">
+      ${LEVELS.map(l => `<div class="lvtile bg-${l.key}"><small>Book ${l.book}</small>${l.name}</div>`).join('')}
+    </div>
+  </section>`}
+
+  <div class="section grid3">
+    <div class="card"><div class="stat">4</div><p class="muted" style="margin-top:8px">Award books, Ruby to Indigo, matching the four NGL Recreational competition levels.</p></div>
+    <div class="card"><div class="stat">16</div><p class="muted" style="margin-top:8px">Levels, one per term, assessed in the last two weeks of every term.</p></div>
+    <div class="card"><div class="stat">6</div><p class="muted" style="margin-top:8px">Pieces of apparatus, each with stations at four levels so mixed groups train together.</p></div>
+  </div>
+
+  <div class="section">
+    <h2>How it fits together</h2>
+    <div class="grid3 steps">
+      <div class="card step"><h3>Award book</h3><p class="muted">The master. Each level lists the skills a gymnast passes at the end of term.</p></div>
+      <div class="card step"><h3>Lesson plan and warm-up</h3><p class="muted">Two-week blocks of stations and warm-ups that teach those skills, with Ruby, Pink, Teal and Indigo versions of every station.</p></div>
+      <div class="card step"><h3>Competition</h3><p class="muted">NGL Recreational competitions use the same four levels, so gymnasts compete what they have been taught.</p></div>
+    </div>
+  </div>
+
+  <div class="section grid2">
+    <div class="card">
+      <h2>What your coaches get</h2>
+      <ul class="ticks">
+        <li>A full lesson plan: six teaching blocks plus an assessment block, with stations for Floor, Vault, Beam, Bars and Fast Track</li>
+        <li>A 10-minute warm-up for every block, built from the physical preparation in the books</li>
+        <li>Printable award-book assessment sheets for every level</li>
+        <li>The competition routines for Ruby, Pink, Teal and Indigo</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>What every gymnast gets</h2>
+      <ul class="ticks">
+        <li>An NGL Recreational award book for their level</li>
+        <li>A medal every term</li>
+        <li>Certificates as they pass each level</li>
+        <li>A clear route into NGL Recreational competitions</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section card">
+    <h2>From recreational to the leagues</h2>
+    <p class="muted">Gymnasts move through the four books and can compete at every level, then on into the NGL General and Performance Leagues.</p>
+    <div class="journey">
+      <span class="jstep">Pre-School</span><span class="jstep">Schools</span><span class="jstep on">Recreational</span><span class="jstep">General</span><span class="jstep">Performance</span><span class="jstep">University</span><span class="jstep">Masters</span>
+    </div>
+  </div>
+
+  ${inside ? '' : `
+  <div class="section card" style="text-align:center">
+    <h2>Licensed to BG clubs</h2>
+    <p class="muted">Clubs hold a yearly Club Licence and register their gymnasts each term. Full pricing is in the Club Hub once you register.</p>
+    <div class="btn-row" style="justify-content:center"><button class="btn" data-go="register">Register your club</button></div>
+  </div>`}
+  <div class="foot">Questions? <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></div>`;
+}
+function screenLanding(){ signedIn = false; setTop(); render(pitchHTML(false)); window.scrollTo(0,0); }
+
+function screenLogin(msg){
+  setTop();
+  render(`
+    <div class="auth card">
+      ${FIREBASE_CONFIG ? '' : '<div class="demo-banner">Preview mode: any email and password opens a demo club with an active licence and the NGL Admin tab</div>'}
+      <h2>Club login</h2>
+      <p class="muted">Use your NGL club account. If you already use NGL Schools, it’s the same login.</p>
+      <form id="loginForm">
+        <div class="field"><label for="em">Email</label><input class="input" id="em" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" autocomplete="current-password" required></div>
+        <p class="error" id="err">${esc(msg||'')}</p>
+        <button class="btn block" type="submit">Sign in</button>
+      </form>
+      <p class="note" style="margin-top:14px;text-align:center">New to NGL? <a href="#" data-go="register">Register your club</a><br><a href="#" data-act="reset">Forgotten your password?</a></p>
+    </div>`);
+  document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = 'Signing in…';
+    const r = await api.signIn(document.getElementById('em').value.trim(), document.getElementById('pw').value);
+    btn.disabled = false; btn.textContent = 'Sign in';
+    if(r.ok){ signedIn = true; tab = S.club ? 'dashboard' : 'admin'; show(); }
+    else document.getElementById('err').textContent = r.reason || 'Sign-in failed.';
+  });
+}
+function screenRegister(){
+  setTop();
+  render(`
+    <div class="auth card">
+      ${FIREBASE_CONFIG ? '' : '<div class="demo-banner">Preview mode: this shows a brand-new club. Start a licence, then use the NGL Admin tab to mark the invoice paid and watch the programme unlock. Nothing is saved.</div>'}
+      <h2>Register your club</h2>
+      <p class="muted">Creates your NGL club account. Already use NGL Schools? <a href="#" data-go="login">Log in instead</a>.</p>
+      <form id="regForm">
+        <div class="field"><label for="rn">Club name</label><input class="input" id="rn" required></div>
+        <div class="field"><label for="rb">British Gymnastics club number</label><input class="input" id="rb" required></div>
+        <div class="field"><label for="rc">Contact name</label><input class="input" id="rc" autocomplete="name" required></div>
+        <div class="field"><label for="re">Email</label><input class="input" id="re" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="rp">Password (8+ characters)</label><input class="input" id="rp" type="password" autocomplete="new-password" minlength="8" required></div>
+        <p class="error" id="err"></p>
+        <button class="btn block" type="submit">Create club account</button>
+      </form>
+    </div>`);
+  document.getElementById('regForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = 'Creating…';
+    const v = id => document.getElementById(id).value.trim();
+    const r = await api.register({name:v('rn'), bgNumber:v('rb'), contact:v('rc'), email:v('re'), password:document.getElementById('rp').value});
+    btn.disabled = false; btn.textContent = 'Create club account';
+    if(r.ok){ signedIn = true; tab = 'dashboard'; show(); }
+    else document.getElementById('err').textContent = r.reason;
+  });
+}
+
+/* =====================================================================
+   CLUB SCREENS
+   ===================================================================== */
+const pending = () => S.orders.filter(o => o.status !== 'paid');
+const bandOf = k => CLUB_BANDS.find(b => b.key === k) || CLUB_BANDS[0];
+function termGymnasts(season, term){
+  return S.orders.filter(o => o.season === season && o.term === term)
+    .reduce((a, o) => a + ((o.lines || []).find(l => l.kind === 'gymnast') || {qty:0}).qty, 0);
+}
+function screenDashboard(){
+  const rec = S.club.rec;
+  const active = hasAccess();
+  const waiting = pending();
+  const tKey = currentTermKey(), tLabel = TERMS.find(t => t.key === tKey).label;
+  const needsRenewal = rec && rec.status === 'active' && rec.season !== S.season;
+  let lic;
+  if(active){
+    lic = `<div class="card lic-card">
+      <p class="eyebrow">Recreational Club Licence</p>
+      <h2>${esc(S.club.name)} <span class="tag ok">Active</span></h2>
+      <p class="muted">${esc(rec.season)} · ${esc(bandOf(rec.band).label)} · valid to ${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</p>
+      <div class="kpis">
+        <div class="kpi"><div class="v">${termGymnasts(S.season, tKey)}</div><div class="l">Gymnasts registered, ${esc(tLabel)}</div></div>
+        <div class="kpi"><div class="v">${waiting.length}</div><div class="l">Invoices awaiting payment</div></div>
+        <div class="kpi"><div class="v">16</div><div class="l">Award-book levels</div></div>
+        <div class="kpi"><div class="v">7</div><div class="l">Lesson-plan blocks</div></div>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn" data-act="term-order">Register gymnasts for a term</button>
+        ${needsRenewal ? `<button class="btn ghost" data-act="renew">Renew for ${esc(S.season)}</button>` : ''}
+      </div>
+    </div>
+    <div class="grid4">
+      <button class="card" data-tab="plan" style="text-align:left;cursor:pointer"><h3>Lesson plan</h3><p class="muted" style="margin:0">Stations for every block, at four levels.</p></button>
+      <button class="card" data-tab="warmups" style="text-align:left;cursor:pointer"><h3>Warm-ups</h3><p class="muted" style="margin:0">10-minute physical prep for each block.</p></button>
+      <button class="card" data-tab="books" style="text-align:left;cursor:pointer"><h3>Award books</h3><p class="muted" style="margin:0">Skills by level and assessment sheets.</p></button>
+      <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
+    </div>`;
+  }else if(waiting.some(o => o.band)){
+    const o = waiting.find(x => x.band);
+    lic = `<div class="card lic-card">
+      <p class="eyebrow">Recreational Club Licence</p>
+      <h2>Almost there <span class="tag wait">Awaiting payment</span></h2>
+      <p class="muted">Your lesson plans, warm-ups and award books unlock as soon as we receive payment for invoice <b class="mono">${esc(o.id)}</b> (${gbp(orderTotal(o))}).</p>
+      <div class="btn-row"><button class="btn" data-act="invoice" data-order="${esc(o.id)}">View invoice</button></div>
+    </div>`;
+  }else{
+    lic = `<div class="card lic-card">
+      <p class="eyebrow">Recreational Club Licence</p>
+      <h2>Start your Recreational licence</h2>
+      <p class="muted">Choose your club size, tell us how many gymnasts you’re starting with this term, and we’ll send your invoice. Everything unlocks as soon as it’s paid.</p>
+      <p class="note">An NGL Schools licence doesn’t include Recreational.</p>
+      <div class="btn-row"><button class="btn" data-act="start">Start my licence</button><button class="btn ghost" data-tab="licence">See pricing</button></div>
+    </div>`;
+  }
+  render(`<p class="eyebrow">Club Hub</p><h1>Welcome${S.club.contact ? ', ' + esc(S.club.contact.split(' ')[0]) : ''}</h1>${lic}`);
+}
+
+function screenLocked(){
+  render(`<div class="card locked-card">
+    <p class="eyebrow">Recreational licence needed</p>
+    <h2>This part of the Hub opens with your Club Licence</h2>
+    <p class="muted">The lesson plans, warm-ups, award books and competition routines are for clubs with an active NGL Recreational licence.</p>
+    <div class="btn-row" style="justify-content:center"><button class="btn" data-tab="dashboard">Go to your dashboard</button></div>
+  </div>`);
+}
+
+function screenLicence(){
+  const first = !S.club.rec;
+  render(`
+  <p class="eyebrow">Licence &amp; pricing</p><h1>NGL Recreational licensing</h1>
+  <div class="card">
+    <h2>Club Licence, per year</h2>
+    <p class="muted">Gives your coaches the full programme in this Hub. Renews each September. Founding clubs keep their founding price at renewal.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Club size</th><th class="num">Founding price</th></tr></thead>
+      <tbody>${CLUB_BANDS.map(b => `<tr ${S.club.rec && S.club.rec.band === b.key ? 'style="background:rgba(232,130,48,.12)"' : ''}><td>${b.label}</td><td class="num"><s class="was">${gbp(b.full)}</s><b>${gbp(b.founding)}</b></td></tr>`).join('')}</tbody>
+    </table></div>
+    ${first ? `<p class="note" style="margin-top:10px">Joining part way through the year? Your first Club Licence is charged pro-rata to September, so every club renews at the same time. Joining now: ${monthsLeft()} of 12 months.</p>` : ''}
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Gymnast Licence, per term</h2>
+      <p class="muted">Register how many gymnasts you have at the start of each term. Numbers can be different every term.</p>
+      <table><tbody>
+        ${TERMS.map(t => `<tr><td>${t.label}</td><td class="num">${gbp(termFee(t.key))} per gymnast</td></tr>`).join('')}
+      </tbody></table>
+      <p class="note" style="margin-top:8px">${gbp(GYMNAST_FEE_PER_MONTH)} per gymnast per month.</p>
+    </div>
+    <div class="card">
+      <h2>Medals and books</h2>
+      <table><tbody>
+        <tr><td>Recreational medal, one per gymnast each term</td><td class="num">${gbp(MEDAL_PRICE)}</td></tr>
+        <tr><td>Award book, new gymnasts only</td><td class="num">${gbp(BOOK_PRICE)}</td></tr>
+      </tbody></table>
+      <p class="note" style="margin-top:8px">Most clubs charge families £5 a medal and £10 a book.</p>
+    </div>
+  </div>
+  ${pitchHTML(true)}`);
+}
+
+function screenOrders(){
+  const rows = S.orders.slice().reverse();
+  render(`<p class="eyebrow">Orders</p><h1>Orders and invoices</h1>
+  <div class="card">${rows.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Date</th><th>For</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${fmtDate(toDate(o.createdAt))}</td>
+      <td>${o.band ? 'Club Licence ' + esc(o.season) : ''}${o.term ? (o.band ? ' + ' : '') + esc((TERMS.find(t => t.key === o.term) || {}).label || '') : ''}</td>
+      <td class="num">${gbp(orderTotal(o))}</td>
+      <td>${o.status === 'paid' ? '<span class="tag ok">Paid</span>' : '<span class="tag wait">Awaiting payment</span>'}</td>
+      <td class="row-actions"><button class="btn ghost small" data-act="invoice" data-order="${esc(o.id)}">Invoice</button></td></tr>`).join('')}</tbody>
+  </table></div>` : `<p class="muted">No orders yet.</p><button class="btn" data-act="start">Start my licence</button>`}</div>`);
+}
+
+/* ---------- Order modals ---------- */
+function orderModal(kind){
+  const withLicence = kind === 'start' || kind === 'renew';
+  const firstYear = kind === 'start';
+  const tNow = currentTermKey();
+  const m = modal(`
+    <h2>${kind === 'start' ? 'Start your Recreational licence' : kind === 'renew' ? 'Renew your Club Licence' : 'Register gymnasts for a term'}</h2>
+    <form id="oform">
+      ${withLicence ? `<div class="field"><label for="ob">Club size (recreational gymnasts)</label><select class="input" id="ob">${CLUB_BANDS.map(b => `<option value="${b.key}" ${S.club.rec && S.club.rec.band === b.key ? 'selected' : ''}>${b.label}</option>`).join('')}</select></div>` : ''}
+      <div class="field"><label for="ot">Term</label><select class="input" id="ot">${TERMS.map(t => `<option value="${t.key}" ${t.key === tNow ? 'selected' : ''}>${t.label} ${S.season}</option>`).join('')}</select></div>
+      <div class="field"><label for="og">Gymnasts this term</label><input class="input" id="og" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="ok">New gymnasts needing a book</label><input class="input" id="ok" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+      <div id="osum"></div>
+      <div class="btn-row" style="margin-top:14px"><button class="btn" type="submit">Place order</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
+    </form>`);
+  const q = id => m.querySelector('#' + id);
+  function lines(){
+    const g = Math.max(0, parseInt(q('og').value) || 0), bk = Math.max(0, parseInt(q('ok').value) || 0), t = q('ot').value;
+    const tl = TERMS.find(x => x.key === t).label;
+    const L = [];
+    if(withLicence){ const b = q('ob').value; L.push({kind:'club', desc:`Recreational Club Licence ${S.season}${firstYear && monthsLeft() < 12 ? ' (founding price, ' + monthsLeft() + ' months pro-rata)' : ' (founding price)'}`, qty:1, unit:clubFee(b, firstYear)}); }
+    if(g) L.push({kind:'gymnast', desc:`Gymnast Licences, ${tl} ${S.season}`, qty:g, unit:termFee(t)});
+    if(g) L.push({kind:'medal', desc:`Recreational medals, ${tl}`, qty:g, unit:MEDAL_PRICE});
+    if(bk) L.push({kind:'book', desc:'Recreational award books (new gymnasts)', qty:bk, unit:BOOK_PRICE});
+    return L;
+  }
+  function sum(){
+    const L = lines(), tot = L.reduce((a, l) => a + l.qty * l.unit, 0);
+    q('osum').innerHTML = L.map(l => `<div class="sum"><span>${esc(l.desc)}${l.qty > 1 ? ` × ${l.qty}` : ''}</span><span>${gbp(l.qty * l.unit)}</span></div>`).join('')
+      + `<div class="sum total"><span>Total</span><span>${gbp(tot)}</span></div>`;
+  }
+  q('og').addEventListener('input', () => { if(!q('ok').dataset.touched) q('ok').value = kind === 'start' ? q('og').value : q('ok').value; sum(); });
+  q('ok').addEventListener('input', () => { q('ok').dataset.touched = '1'; sum(); });
+  m.querySelectorAll('select').forEach(s => s.addEventListener('change', sum));
+  sum();
+  q('oform').addEventListener('submit', async e => {
+    e.preventDefault();
+    const L = lines();
+    if(!L.length){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Add at least one gymnast.</p>'); return; }
+    const sb = e.target.querySelector('button[type=submit]'); sb.disabled = true; sb.textContent = 'Placing order…';
+    let o;
+    try{ o = await api.placeOrder({kind, season:S.season, term:q('ot').value, band: withLicence ? q('ob').value : null, lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0)}); }
+    catch(err){ console.error(err); sb.disabled = false; sb.textContent = 'Place order'; q('osum').insertAdjacentHTML('beforeend', '<p class="error">Couldn’t place the order. Please try again.</p>'); return; }
+    m.querySelector('.modal').innerHTML = `<h2>Order ${esc(o.id)} placed</h2>
+      <p class="muted">${gbp(orderTotal(o))}. Pay by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>.${withLicence ? ' Your programme unlocks as soon as payment is received.' : ''}</p>
+      <div class="btn-row"><button class="btn" data-act="invoice" data-order="${esc(o.id)}">View invoice</button><button class="btn ghost" data-close>Done</button></div>
+      <p class="note" id="mailNote" style="margin:12px 0 0">${FIREBASE_CONFIG ? 'Emailing your invoice to ' + esc(S.club.email || '') + '…' : 'Preview mode: no email sent.'}</p>`;
+    m.querySelector('[data-close]').addEventListener('click', () => show());
+    if(FIREBASE_CONFIG){
+      emailInvoice(o, S.club)
+        .then(() => { const n = document.getElementById('mailNote'); if(n){ n.style.color = 'var(--ok)'; n.textContent = '✓ Invoice emailed to ' + S.club.email + '.'; } })
+        .catch(err => { console.error(err); const n = document.getElementById('mailNote'); if(n) n.textContent = 'We couldn’t email the invoice just now, but you can view and download it from your Orders tab.'; });
+    }
+  });
+}
+
+/* ---------- Invoices ---------- */
+function invoiceHTML(o, club){
+  const issued = toDate(o.createdAt), due = new Date(issued.getTime() + INVOICE.termsDays * 86400000);
+  const total = orderTotal(o), paid = o.status === 'paid';
+  return `<div class="inv">
+    <div class="inv-top"><div class="inv-brand">National Gymnastics League<small>NGL RECREATIONAL</small></div>
+      <div class="inv-title"><div class="inv-h">INVOICE</div><div class="inv-no">${esc(o.id)}</div>${paid ? '<div class="inv-paid">PAID</div>' : ''}</div></div>
+    <div class="inv-cols">
+      <div><div class="inv-label">From</div><b>${esc(INVOICE.businessName)}</b><br>${INVOICE.addressLines.map(esc).join('<br>')}<br>${esc(INVOICE.email)}</div>
+      <div><div class="inv-label">Bill to</div><b>${esc(club.name || o.clubName || '')}</b><br>${club.contact ? esc(club.contact) + '<br>' : ''}${club.email ? esc(club.email) + '<br>' : ''}${club.bgNumber ? 'BG club no. ' + esc(club.bgNumber) : ''}</div>
+      <div><div class="inv-label">Invoice date</div>${fmtDate(issued)}<div class="inv-label" style="margin-top:10px">Payment due</div>${fmtDate(due)}</div>
+    </div>
+    <table class="inv-table"><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr></thead>
+      <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.desc)}</td><td class="num">${l.qty}</td><td class="num">${gbp(l.unit)}</td><td class="num">${gbp(l.qty * l.unit)}</td></tr>`).join('')}</tbody>
+      <tfoot>${INVOICE.vatNote ? `<tr><td colspan="3" class="num">${esc(INVOICE.vatNote)}</td><td></td></tr>` : ''}<tr class="inv-total"><td colspan="3" class="num">Total due</td><td class="num">${gbp(total)}</td></tr></tfoot></table>
+    <div class="inv-pay"><div class="inv-label">How to pay: bank transfer</div>
+      <table><tr><td>Account name</td><td><b>${esc(INVOICE.bank.accountName)}</b></td></tr><tr><td>Sort code</td><td><b>${esc(INVOICE.bank.sortCode)}</b></td></tr>
+      <tr><td>Account number</td><td><b>${esc(INVOICE.bank.accountNumber)}</b></td></tr><tr><td>Payment reference</td><td><b class="mono">${esc(o.id)}</b></td></tr></table>
+      <p>Please use the payment reference exactly as shown so we can match your payment.${o.band ? ' Your Recreational programme unlocks as soon as payment is received.' : ''}</p></div>
+    <div class="inv-foot">${esc(INVOICE.businessName)} · ${esc(INVOICE.email)} · nglrecreational.co.uk</div></div>`;
+}
+function invoiceEmailHTML(o, club){
+  const total = orderTotal(o);
+  const td = 'padding:8px 10px;border-bottom:1px solid #e3e4ee;font-size:14px;color:#1c1f3a;';
+  return `<div style="font-family:Arial,Helvetica,sans-serif;background:#f4f5fa;padding:20px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:10px;overflow:hidden;">
+<tr><td style="background:#E88230;padding:8px 24px;text-align:center;font-size:13px;font-weight:bold;color:#2a1405;">Recreational Awards Scheme · Club Hub</td></tr>
+<tr><td style="background:#2a245f;padding:16px 24px;color:#ffffff;font-size:20px;font-weight:bold;">NGL Recreational</td></tr>
+<tr><td style="padding:24px;">
+<p style="margin:0 0 14px;font-size:15px;color:#1c1f3a;">Hello${club.contact ? ' ' + esc(club.contact.split(' ')[0]) : ''},</p>
+<p style="margin:0 0 18px;font-size:15px;color:#1c1f3a;">Thank you for your NGL Recreational order. Invoice <b>${esc(o.id)}</b> is below.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:18px;">
+<tr style="background:#2a245f;color:#ffffff;font-size:11px;"><td style="padding:8px 10px;">DESCRIPTION</td><td align="right" style="padding:8px 10px;">QTY</td><td align="right" style="padding:8px 10px;">AMOUNT</td></tr>
+${(o.lines || []).map(l => `<tr><td style="${td}">${esc(l.desc)}</td><td align="right" style="${td}">${l.qty}</td><td align="right" style="${td}">${gbp(l.qty * l.unit)}</td></tr>`).join('')}
+<tr style="background:#fdebdc;font-size:16px;font-weight:bold;color:#1c1f3a;"><td colspan="2" align="right" style="padding:10px;">Total due</td><td align="right" style="padding:10px;">${gbp(total)}</td></tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5fa;border-left:4px solid #E88230;"><tr><td style="padding:12px 14px;font-size:14px;color:#1c1f3a;">
+<b>Pay by bank transfer within ${INVOICE.termsDays} days</b><br>Account name: ${esc(INVOICE.bank.accountName)}<br>Sort code: ${esc(INVOICE.bank.sortCode)}<br>Account number: ${esc(INVOICE.bank.accountNumber)}<br>Reference: <b style="font-family:Consolas,Menlo,monospace;">${esc(o.id)}</b>
+</td></tr></table>
+<p style="margin:18px 0 0;font-size:13px;color:#4a4e6d;">You can download a PDF copy at any time from the Orders tab of your <a href="${SITE_URL}/" style="color:#2a245f;font-weight:bold;">NGL Recreational Club Hub</a>.</p>
+</td></tr>
+<tr><td style="padding:14px 24px;background:#f4f5fa;text-align:center;font-size:11px;color:#6b6f8f;">${esc(INVOICE.businessName)} · ${esc(INVOICE.email)} · nglrecreational.co.uk</td></tr>
+</table></div>`;
+}
+async function emailInvoice(o, club){
+  if(!club || !club.email) throw new Error('No email address for this club');
+  const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({service_id:EMAILJS.serviceId, template_id:EMAILJS.templateId, user_id:EMAILJS.publicKey,
+      template_params:{to_email:club.email, to_name:club.contact || club.name || '', subject:`NGL Recreational invoice ${o.id} – ${gbp(orderTotal(o))}`, invoice_html:invoiceEmailHTML(o, club)}})
+  });
+  if(!res.ok) throw new Error('Email failed: ' + res.status);
+}
+let CURRENT_INVOICE = null;
+function showInvoice(o, club){
+  CURRENT_INVOICE = {o, club};
+  const m = modal(`<div class="inv-screen">${invoiceHTML(o, club)}</div>
+    <div class="btn-row" style="margin-top:14px"><button class="btn" data-act="print-invoice">Download / print PDF</button><button class="btn ghost" data-act="email-invoice">Email invoice</button><button class="btn ghost" data-close>Close</button></div>
+    <p class="note" id="invMailNote" style="margin:10px 0 0;min-height:1em"></p>`);
+  m.querySelector('.modal').classList.add('modal-wide');
+}
+function printHTML(html, landscape){
+  const pa = document.getElementById('print-area');
+  pa.innerHTML = html;
+  let st = document.getElementById('pageStyle');
+  if(!st){ st = document.createElement('style'); st.id = 'pageStyle'; document.head.appendChild(st); }
+  st.textContent = `@media print{@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:10mm;}}`;
+  window.print();
+}
+
+/* =====================================================================
+   PROGRAMME CONTENT
+   ===================================================================== */
+function chips(name, items, cur){
+  return items.map(([v, l, cls]) => `<button class="chip ${cls || ''} ${String(cur) === String(v) ? 'on' : ''}" data-ui="${name}" data-v="${esc(v)}" aria-pressed="${String(cur) === String(v)}">${l}</button>`).join('');
+}
+const LVL_CHIPS = [['all','All levels'], ...LEVELS.map((l, i) => [String(i), l.name, 'lv-' + l.key])];
+function stationTable(p){
+  const lv = UI.level;
+  if(lv !== 'all'){
+    const i = +lv;
+    return `<table class="grid-st one"><tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td><td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}</td></tr>`).join('')}</tbody></table>`;
+  }
+  return `<div class="table-wrap"><table class="grid-st"><thead><tr><th class="n">Stn</th>${LEVELS.map(l => `<th style="background:${l.color}">${l.name}</th>`).join('')}</tr></thead>
+    <tbody>${p.stations.map(s => `<tr><td class="n">${s.n}</td>${[0,1,2,3].map(i => `<td>${fmtStation(s.levels[i] || '—')}${s.changed && s.changed.includes(i) ? '<span class="chg">Updated</span>' : ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+const fmtStation = t => esc(t).replace(/FINAL SKILL:?/g, '<span class="final">Final skill:</span>').replace(/SUPPORTED/g, 'Supported');
+function introHTML(p){
+  if(!p.intro || !p.intro.length) return '';
+  if(p.intro.length === 1) return `<div class="intro"><b>Intro:</b> ${esc(p.intro[0])}</div>`;
+  return `<div class="intro"><b>Intro by level:</b> ${p.intro.map((t, i) => `<span style="color:${LEVELS[i] ? LEVELS[i].color : 'inherit'};font-weight:800">${LEVELS[i] ? LEVELS[i].name : ''}</span> ${esc(t)}`).join(' · ')}</div>`;
+}
+function screenPlan(){
+  const blocks = S.content.plan.blocks;
+  const b = blocks.find(x => x.n === UI.block) || blocks[0];
+  const pieces = b.pieces.filter(p => UI.piece === 'all' || p.code === UI.piece);
+  render(`
+  <div class="blockhead"><h1>${esc(b.label)}</h1><span class="muted">${esc(b.weeks)}${b.assessment ? '' : ' in a 14-week term'}</span>
+    <button class="btn ghost small" data-act="print-plan" style="margin-left:auto">Print this view</button></div>
+  ${b.assessment ? `<div class="card" style="border-color:rgba(232,130,48,.5)"><p style="margin:0"><b>Assessment block:</b> always the last 2 weeks of term. Run these stations while gymnasts are assessed on their award-book level. Assessment sheets are in Award books.</p></div>` : ''}
+  <div class="toolbar">
+    <div class="chips"><span class="lbl">Block</span>${chips('block', blocks.map(x => [x.n, x.assessment ? 'Assessment' : String(x.n)]), UI.block)}</div>
+    <div class="chips"><span class="lbl">Piece</span>${chips('piece', [['all','All pieces'], ...b.pieces.map(p => [p.code, p.piece])], UI.piece)}</div>
+    <div class="chips"><span class="lbl">Level</span>${chips('level', LVL_CHIPS, UI.level)}</div>
+  </div>
+  ${pieces.map(p => `<article class="piece">
+    <div class="piece-h"><h2>${esc(p.piece)}</h2><span class="th">${esc(p.theme)}</span>${p.setup ? `<span class="su">${esc(p.setup)}</span>` : ''}</div>
+    ${introHTML(p)}
+    ${stationTable(p)}
+  </article>`).join('')}
+  <p class="note">Demonstrate the final skill at the start of each rotation and explain how the stations build to it. Choose the level that suits each child.</p>`);
+}
+function planPrintHTML(){
+  const b = S.content.plan.blocks.find(x => x.n === UI.block);
+  const pieces = b.pieces.filter(p => UI.piece === 'all' || p.code === UI.piece);
+  const cols = UI.level === 'all' ? [0,1,2,3] : [+UI.level];
+  return `<div class="sheet">${pieces.map((p, k) => `<div style="${k ? 'page-break-before:always;' : ''}">
+    <h2>${esc(b.label)} · ${esc(p.piece)}: ${esc(p.theme)}</h2><p>${esc(b.weeks)} · ${esc(p.setup || '')}</p>
+    <table><thead><tr><th style="width:30px">Stn</th>${cols.map(i => `<th>${LEVELS[i].name}</th>`).join('')}</tr></thead>
+    <tbody>${p.stations.map(s => `<tr><td>${s.n}</td>${cols.map(i => `<td>${esc(s.levels[i] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`).join('')}</div>`;
+}
+
+function screenWarmups(){
+  const W = S.content.warmups;
+  const i = Math.min(UI.wblock, W.length) - 1, b = W[i];
+  const parts = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
+  render(`
+  <div class="blockhead"><h1>Warm-ups</h1><span class="muted">10 minutes · Physical Prep from the award books</span></div>
+  <div class="toolbar"><div class="chips"><span class="lbl">Block</span>${chips('wblock', W.map((x, k) => [k + 1, x.assess ? 'Assessment' : String(k + 1)]), UI.wblock)}</div></div>
+  <article class="piece">
+    <div class="piece-h"><h2>${esc(b.assess ? 'Assessment block' : 'Block ' + (i + 1))}</h2><span class="th">${esc(b.weeks)}</span></div>
+    <div class="intro"><b>Focus:</b> ${esc(b.focus)}${b.themes ? ` · <b>Themes:</b> ${esc(b.themes)}` : ''}</div>
+    ${b.assess ? `<div style="padding:16px 18px"><p style="margin:0">Pulse raiser for everyone: stretch, tuck and star jumps in connection (3 min). Then each gymnast runs the four Physical Prep skills from their own award-book level while coaches check them off (7 min).</p></div>` :
+    `<div class="table-wrap"><table class="grid-st"><thead><tr><th class="n"></th>${LEVELS.map(l => `<th style="background:${l.color}">${l.name} · Book ${l.book}</th>`).join('')}</tr></thead>
+      <tbody>${parts.map(([k, n, t]) => `<tr><td style="font-weight:800;white-space:nowrap">${n}<div class="note">${t}</div></td>${[0,1,2,3].map(c => `<td>${b.parts[k][c].map(x => `${esc(x.txt)} <span class="tag info">L${x.L}</span>`).join('<br>')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+  </article>
+  <p class="note">The L tag is the award-book level the skill comes from. A mixed class warms up together, each child in their level’s column.</p>`);
+}
+
+const BOOK_PIECES = ['Floor','Vault','Beam','Bars','Rebound','Physical Prep'];
+function screenBooks(){
+  const bk = S.content.book, n = UI.book, L0 = (n - 1) * 4 + 1, lv = LEVELS[n - 1];
+  render(`
+  <div class="blockhead"><h1>Award books</h1><span class="muted">Book ${n} · ${lv.name} · Levels ${L0}–${L0 + 3}</span></div>
+  <div class="toolbar"><div class="chips"><span class="lbl">Book</span>${chips('book', LEVELS.map(l => [l.book, l.name, 'lv-' + l.key]), UI.book)}</div></div>
+  ${[0,1,2,3].map(k => { const L = L0 + k; return `
+    <div class="lvl-band"><span class="dot" style="background:${lv.color}"></span><h2>Level ${L}</h2><button class="btn ghost small" data-act="sheet" data-level="${L}" style="margin-left:auto">Assessment sheet</button></div>
+    <div class="bookgrid">${BOOK_PIECES.map(p => `<div class="card" style="margin:0"><h3>${p}</h3><ul class="skill-list">${(bk[p][String(L)] || []).map(x => `<li>${esc(x.skill)}</li>`).join('')}</ul></div>`).join('')}</div>`; }).join('')}
+  <p class="note" style="margin-top:16px">Gymnasts pass a level when they can do every skill on it. Assessment is in the last 2 weeks of term.</p>`);
+}
+function sheetHTML(L){
+  const bk = S.content.book, n = 12;
+  const lv = LEVELS[Math.ceil(L / 4) - 1];
+  return `<div class="sheet"><h2>NGL Recreational · ${lv.name} · Level ${L} assessment</h2>
+    <p>Club: ${esc(S.club ? S.club.name : '')} &nbsp;·&nbsp; Group: ____________________ &nbsp;·&nbsp; Coach: ____________________ &nbsp;·&nbsp; Date: ____________</p>
+    <table><thead><tr><th style="width:26%">Skill</th>${Array.from({length:n}, () => '<th style="height:60px"></th>').join('')}</tr></thead>
+    <tbody>${BOOK_PIECES.map(p => `<tr><td class="pc" colspan="${n + 1}">${p}</td></tr>${(bk[p][String(L)] || []).map(x => `<tr><td>${esc(x.skill)}</td>${'<td></td>'.repeat(n)}</tr>`).join('')}`).join('')}
+    <tr><td><b>Passed level</b></td>${'<td></td>'.repeat(n)}</tr></tbody></table>
+    <p style="margin-top:8px">Write gymnast names across the top. Tick each skill achieved. A gymnast passes the level when every skill is ticked.</p></div>`;
+}
+
+function screenCompetition(){
+  const c = S.content.competition;
+  const row = (t, xs) => `<h3 style="margin-top:12px">${t}</h3><ol style="margin:0;padding-left:20px">${xs.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+  render(`
+  <div class="blockhead"><h1>Competition</h1><span class="muted">NGL Recreational club competitions</span></div>
+  <div class="grid4">${c.levels.map((l, i) => `<div class="card" style="border-top:6px solid ${LEVELS[i].color}">
+    <p class="eyebrow" style="color:${LEVELS[i].color}">Level ${l.n} · ${esc(l.tag)}</p><h2>${esc(l.name)}</h2>
+    ${row('Floor (strip)', l.floor)}${row('Vault', l.vault)}<p class="note">${esc(c.vaultNote[i])}</p>${row('Beam', l.beam)}${row('Bars', l.bars)}</div>`).join('')}</div>
+  <div class="card"><h2>Rules and format</h2><ul class="ticks">${c.rules.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>`);
+}
+
+/* =====================================================================
+   NGL ADMIN
+   ===================================================================== */
+let ADM = {clubs:[], orders:[]};
+async function screenAdmin(){
+  setTop();
+  render(`<p class="muted">Loading…</p>`);
+  try{ ADM = await api.adminLoad(); }catch(e){ console.error(e); render('<p class="error">Couldn’t load admin data.</p>'); return; }
+  const recClubs = ADM.clubs.filter(c => c.rec || ADM.orders.some(o => o.clubId === c.id));
+  const waiting = ADM.orders.filter(o => o.status !== 'paid');
+  render(`<p class="eyebrow">NGL Admin</p><h1>Recreational admin</h1>
+  <div class="card"><h2>Orders awaiting payment (${waiting.length})</h2>${waiting.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Club</th><th>For</th><th class="num">Total</th><th></th></tr></thead>
+    <tbody>${waiting.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${o.band ? 'Club Licence + ' : ''}${esc(o.term || '')}</td><td class="num">${gbp(orderTotal(o))}</td>
+      <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-paid" data-order="${esc(o.id)}">Mark paid</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing outstanding.</p>'}</div>
+  <div class="card"><h2>Recreational clubs (${recClubs.length})</h2>${recClubs.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Club</th><th>Size</th><th>Season</th><th>Status</th><th></th></tr></thead>
+    <tbody>${recClubs.map(c => { const on = c.rec && c.rec.status === 'active'; return `<tr><td>${esc(c.name)}<div class="note">${esc(c.email || '')}</div></td><td>${c.rec ? esc(bandOf(c.rec.band).short) : '—'}</td><td>${c.rec ? esc(c.rec.season || '') : '—'}</td>
+      <td>${on ? '<span class="tag ok">Active</span>' : c.rec ? '<span class="tag off">Off</span>' : '<span class="tag wait">Not started</span>'}</td>
+      <td class="row-actions"><button class="btn ghost small" data-act="adm-status" data-club="${esc(c.id)}" data-to="${on ? 'inactive' : 'active'}">${on ? 'Switch off' : 'Switch on'}</button></td></tr>`; }).join('')}</tbody></table></div>` : '<p class="muted">No Recreational clubs yet.</p>'}</div>
+  <div class="card"><h2>Publish programme content</h2>
+    <p class="muted">Upload <b>rec-content.json</b> to update the lesson plan, warm-ups, award books and competition for every licensed club. The file is stored in Firestore behind the licence check, never on the public website.</p>
+    <input type="file" id="contentFile" accept="application/json,.json" class="input">
+    <p class="note" id="pubNote" style="margin-top:8px"></p>
+    <button class="btn" data-act="publish">Publish</button></div>`);
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+document.addEventListener('click', async e => {
+  const t = e.target;
+  const go = t.closest('[data-go]');
+  if(go){ e.preventDefault(); const g = go.dataset.go;
+    if(g === 'home'){ if(signedIn){ tab = 'dashboard'; show(); } else screenLanding(); }
+    else if(g === 'login') screenLogin(); else if(g === 'register') screenRegister(); window.scrollTo(0,0); return; }
+  const nt = t.closest('[data-tab]');
+  if(nt){ tab = nt.dataset.tab; show(); window.scrollTo(0,0); return; }
+  const ui = t.closest('[data-ui]');
+  if(ui){
+    const k = ui.dataset.ui, v = ui.dataset.v;
+    if(k === 'block'){ UI.block = +v; UI.piece = 'all'; }
+    else if(k === 'wblock') UI.wblock = +v;
+    else if(k === 'book') UI.book = +v;
+    else UI[k] = v;
+    show(); return;
+  }
+  const act = t.closest('[data-act]');
+  if(!act) return;
+  const a = act.dataset.act;
+  if(a === 'signout'){ await api.signOut(); signedIn = false; S.club = null; S.isAdmin = false; S.content = null; screenLanding(); }
+  else if(a === 'start') orderModal('start');
+  else if(a === 'renew') orderModal('renew');
+  else if(a === 'term-order') orderModal('term');
+  else if(a === 'reset'){
+    const em = (document.getElementById('em') || {}).value || '';
+    const err = document.getElementById('err');
+    if(!em.trim()){ if(err) err.textContent = 'Type your email above, then tap “Forgotten your password?” again.'; return; }
+    const r = await api.resetPassword(em.trim());
+    if(err){ err.style.color = r.ok ? 'var(--ok)' : ''; err.textContent = r.ok ? 'If there’s a club account for that email, a reset link is on its way.' : r.reason; }
+  }
+  else if(a === 'invoice'){ const o = S.orders.find(x => x.id === act.dataset.order); document.querySelectorAll('.modal-bg').forEach(m => m.remove()); if(o) showInvoice(o, S.club || {}); }
+  else if(a === 'adm-invoice'){ const o = ADM.orders.find(x => x.id === act.dataset.order); if(o) showInvoice(o, ADM.clubs.find(x => x.id === o.clubId) || {name:o.clubName}); }
+  else if(a === 'print-invoice' && CURRENT_INVOICE){ printHTML(invoiceHTML(CURRENT_INVOICE.o, CURRENT_INVOICE.club), false); }
+  else if(a === 'email-invoice' && CURRENT_INVOICE){
+    const n = document.getElementById('invMailNote'); const to = CURRENT_INVOICE.club.email;
+    if(!FIREBASE_CONFIG){ if(n) n.textContent = 'Preview mode: no email sent.'; return; }
+    act.disabled = true; if(n) n.textContent = 'Sending to ' + (to || '') + '…';
+    try{ await emailInvoice(CURRENT_INVOICE.o, CURRENT_INVOICE.club); if(n){ n.style.color = 'var(--ok)'; n.textContent = '✓ Emailed to ' + to + '.'; } }
+    catch(err){ console.error(err); if(n) n.textContent = 'Couldn’t send the email. Please try again later.'; }
+    act.disabled = false;
+  }
+  else if(a === 'print-plan'){ printHTML(planPrintHTML(), true); }
+  else if(a === 'sheet'){ printHTML(sheetHTML(+act.dataset.level), true); }
+  else if(a === 'adm-paid'){
+    const o = ADM.orders.find(x => x.id === act.dataset.order); if(!o) return;
+    const c = ADM.clubs.find(x => x.id === o.clubId) || {id:o.clubId};
+    act.disabled = true; act.textContent = 'Saving…';
+    try{ await api.adminMarkPaid(o, c); if(FIREBASE_CONFIG && o.clubId === S.uid) await loadClubData(S.uid); screenAdmin(); }
+    catch(err){ console.error(err); act.disabled = false; act.textContent = 'Failed, tap to retry'; }
+  }
+  else if(a === 'adm-status'){
+    const c = ADM.clubs.find(x => x.id === act.dataset.club); if(!c) return;
+    if(!act.dataset.armed){ act.dataset.armed = '1'; act.textContent = 'Tap again to confirm'; return; }
+    act.disabled = true;
+    try{ await api.adminSetStatus(c, act.dataset.to); if(FIREBASE_CONFIG && c.id === S.uid) await loadClubData(S.uid); screenAdmin(); }
+    catch(err){ console.error(err); act.disabled = false; act.textContent = 'Failed, retry'; }
+  }
+  else if(a === 'publish'){
+    const f = document.getElementById('contentFile'), n = document.getElementById('pubNote');
+    if(!f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
+    act.disabled = true; n.textContent = 'Publishing…';
+    try{ const c = JSON.parse(await f.files[0].text()); await api.adminPublish(c); S.content = null; n.style.color = 'var(--ok)'; n.textContent = '✓ Published version ' + (c.version || '') + '.'; }
+    catch(err){ console.error(err); n.style.color = ''; n.textContent = 'Couldn’t publish: ' + err.message; }
+    act.disabled = false;
+  }
+});
+
+(async () => {
+  let restored = false;
+  try{ restored = await api.restore(); }catch(e){ console.error(e); }
+  if(restored){ signedIn = true; tab = S.club ? 'dashboard' : 'admin'; show(); }
+  else screenLanding();
+})();
+
+</script>
+</body>
+</html>
