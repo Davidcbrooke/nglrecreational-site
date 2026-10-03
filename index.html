@@ -765,21 +765,28 @@ const liveApi = {
   },
   async saveFamily(term){
     const {fs, D} = await fb();
+    // 1. The club plan itself: always saved on the club's own record.
+    await fs.updateDoc(fs.doc(D, 'clubs', S.uid), {recTerm:term});
+    S.club.recTerm = term;
+    // 2. The family code: only once the Recreational licence is active.
+    const rec = S.club.rec;
+    if(!rec || rec.status !== 'active' || !rec.expires) return S.club.recCode || null;
     let code = S.club.recCode;
-    const data = {clubId:S.uid, clubName:S.club.name, status:'active', key:S.contentKey || '', term, expires:S.club.rec.expires};
-    if(!code){
-      for(let i = 0; i < 6; i++){
-        const c = newAccessCode(S.club.name);
-        const ref = fs.doc(D, 'recCodes', c);
-        if((await fs.getDoc(ref)).exists()) continue;
-        await fs.setDoc(ref, {...data, createdAt:fs.serverTimestamp()}); code = c; break;
+    const data = {clubId:S.uid, clubName:S.club.name, status:'active', key:S.contentKey || '', term, expires:rec.expires};
+    try{
+      if(!code){
+        for(let i = 0; i < 6; i++){
+          const c = newAccessCode(S.club.name);
+          const ref = fs.doc(D, 'recCodes', c);
+          if((await fs.getDoc(ref)).exists()) continue;
+          await fs.setDoc(ref, {...data, createdAt:fs.serverTimestamp()}); code = c; break;
+        }
+      }else{
+        await fs.updateDoc(fs.doc(D, 'recCodes', code), {clubName:S.club.name, key:data.key, term, expires:data.expires});
       }
-      if(!code) throw new Error('Could not create a family code');
-    }else{
-      await fs.updateDoc(fs.doc(D, 'recCodes', code), {clubName:S.club.name, key:data.key, term, expires:data.expires});
-    }
-    await fs.updateDoc(fs.doc(D, 'clubs', S.uid), {recCode:code, recTerm:term});
-    S.club.recCode = code; S.club.recTerm = term; return code;
+      if(code){ await fs.updateDoc(fs.doc(D, 'clubs', S.uid), {recCode:code}); S.club.recCode = code; }
+    }catch(e){ console.warn('Family code not updated', e); S.familyWarn = true; }
+    return code;
   },
   // ----- NGL admin -----
   async adminLoad(){
@@ -1821,7 +1828,7 @@ document.addEventListener('click', async e => {
     UI.cstep = +act.dataset.n; show(); window.scrollTo(0,0); }
   else if(a === 'cp-save'){ const d = cpDraft(), n = document.getElementById('cpNote'); act.disabled = true; n.textContent = 'Saving…';
     try{ await api.saveFamily(Object.assign({}, d, {custom:true, startBlock:1})); PLAN_CACHE = null; UI.cstep = 0; UI.cdraft = null; UI.pstep = 'weeks'; show(); window.scrollTo(0,0); }
-    catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save. Please try again.'; } }
+    catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save: ' + (err && (err.code || err.message) || 'unknown error') + '. Please try again, or send this message to NGL.'; } }
   else if(a === 'grp'){ const i = +act.dataset.i; const g = inGroup(i) ? UI.group.filter(x => x !== i) : [...UI.group, i].sort(); if(!g.length) return; UI.group = g; GROUP_STORE.set(g); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
