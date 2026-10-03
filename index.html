@@ -350,6 +350,9 @@
   .skillvid-play::after{content:"";position:absolute;left:34px;top:26px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent var(--rec-ink);}
   .skillvid-soon{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:var(--muted);font-weight:700;font-size:14px;}
 
+  .lic-until{font-size:18px;margin:2px 0 4px;}
+  .lic-renew{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,180,84,.12);border:1px solid rgba(255,180,84,.45);}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
@@ -1078,12 +1081,16 @@ function screenDashboard(){
   const waiting = pending();
   const tKey = currentTermKey(), tLabel = TERMS.find(t => t.key === tKey).label;
   const needsRenewal = rec && rec.status === 'active' && rec.season !== S.season;
+  const daysLeft = rec && rec.expires ? Math.ceil((toDate(rec.expires) - new Date()) / 86400000) : 0;
+  const lapsed = !active && rec && rec.expires && (rec.status === 'active' || rec.status === 'inactive') && toDate(rec.expires) <= new Date();
   let lic;
   if(active){
     lic = `<div class="card lic-card">
       <p class="eyebrow">Recreational Club Licence</p>
-      <h2>${esc(S.club.name)} <span class="tag ok">Active</span></h2>
-      <p class="muted">${esc(rec.season)} · ${esc(bandOf(rec.band).label)} · valid to ${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</p>
+      <h2>${esc(S.club.name)} <span class="tag ok">✓ Licence paid</span></h2>
+      <p class="lic-until">Paid until <b>${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</b></p>
+      <p class="muted">${esc(rec.season)} · ${esc(bandOf(rec.band).label)}</p>
+      ${daysLeft <= 45 ? `<div class="lic-renew"><b>Your licence ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.</b> Renew now so your coaches and families keep access without a break.</div>` : ''}
       <div class="kpis">
         <div class="kpi"><div class="v">${termGymnasts(S.season, tKey)}</div><div class="l">Gymnasts registered, ${esc(tLabel)}</div></div>
         <div class="kpi"><div class="v">${waiting.length}</div><div class="l">Invoices awaiting payment</div></div>
@@ -1092,7 +1099,7 @@ function screenDashboard(){
       </div>
       <div class="btn-row" style="margin-top:16px">
         <button class="btn" data-act="term-order">Register gymnasts for a term</button>
-        ${needsRenewal ? `<button class="btn ghost" data-act="renew">Renew for ${esc(S.season)}</button>` : ''}
+        ${needsRenewal || daysLeft <= 45 ? `<button class="btn ${daysLeft <= 45 ? '' : 'ghost'}" data-act="renew">Renew my licence</button>` : ''}
       </div>
     </div>
     <button class="card cp-dash" data-tab="club"><p class="eyebrow">Step 1</p><h2>${S.club.recTerm && S.club.recTerm.custom ? 'Your club plan' : 'Build your club plan'}</h2>
@@ -1104,6 +1111,14 @@ function screenDashboard(){
       <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
     </div>
     ${familyCard()}`;
+  }else if(lapsed && !waiting.some(o => o.band)){
+    lic = `<div class="card lic-card">
+      <p class="eyebrow">Recreational Club Licence</p>
+      <h2>${esc(S.club.name)} <span class="tag off">Expired</span></h2>
+      <p class="lic-until">Your licence ended on <b>${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</b></p>
+      <p class="muted">Lesson plans, warm-ups and award books are locked until you renew. Your club plan and settings are kept.</p>
+      <div class="btn-row"><button class="btn" data-act="renew">Renew my licence</button><button class="btn ghost" data-tab="licence">See pricing</button></div>
+    </div>`;
   }else if(waiting.some(o => o.band)){
     const o = waiting.find(x => x.band);
     lic = `<div class="card lic-card">
