@@ -339,6 +339,17 @@
   .story-b li{font-size:15px;}
   .modal-wide .story-hero{margin-top:0;}
 
+
+  /* ---------- Show your class today's skill ---------- */
+  .skillvid{margin:0 0 16px;}
+  .skillvid-h{font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);margin:0 0 8px 2px;}
+  .skillvid-box{position:relative;display:block;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line);}
+  .skillvid-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .skillvid-box.empty{background:linear-gradient(135deg,#1d2f7a,#0d1a4f);cursor:pointer;padding:0;}
+  .skillvid-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;background:var(--rec);box-shadow:0 10px 30px rgba(0,0,0,.45);}
+  .skillvid-play::after{content:"";position:absolute;left:34px;top:26px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent var(--rec-ink);}
+  .skillvid-soon{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:var(--muted);font-weight:700;font-size:14px;}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
@@ -1605,11 +1616,23 @@ function planApparatus(b, now){
     ${WEEK_B.some(c => b.pieces.find(x => x.code === c)) ? `<p class="flow-l">Week B</p><div class="bbgrid three">${WEEK_B.map(tile).join('')}</div>` : ''}
   </div>`);
 }
+// "Show your class today's skill": one video per apparatus theme.
+// Videos live in the content file as videos["FF|Handstand Turns"] = YouTube id.
+function skillVideoHTML(p){
+  const vids = S.content.videos || {};
+  const themes = String(p.theme).split(' + ');
+  const id = themes.map(t => vids[p.code + '|' + t]).find(Boolean);
+  return `<div class="skillvid"><div class="skillvid-h">Show your class today’s skill</div>
+    ${id ? `<div class="skillvid-box"><iframe src="https://www.youtube-nocookie.com/embed/${esc(id)}?rel=0" title="${esc(p.theme)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+      : `<button class="skillvid-box empty" data-act="vid-soon" aria-label="Play the ${esc(p.theme)} video"><span class="skillvid-play"></span><span class="skillvid-soon">${esc(themes[0])} · video coming soon</span></button>`}
+  </div>`;
+}
 function planSetup(b, p){
   render(`<div class="flow">
     ${backBar(b.assessment ? 'Assessment fortnight' : b.weeks, 'app')}
     <h1 class="flow-h">${esc(p.piece)}</h1>
     <p class="flow-sub"><b>${esc(p.theme)}</b>${p.setup ? ' · ' + esc(p.setup) : ''} · ${p.stations.length} stations</p>
+    ${skillVideoHTML(p)}
     <div class="setgrid">${p.stations.map(s => { const ph = stationPhotos(s);
       return `<div class="setcard"><div class="setn">${s.n}</div>
         ${ph.length ? `<button class="setphoto" data-act="photo" data-img-id="${ph[0]}" aria-label="Enlarge station ${s.n} photo"><img data-img="${ph[0]}" alt="Station ${s.n} set-up"></button>
@@ -1829,6 +1852,7 @@ document.addEventListener('click', async e => {
   else if(a === 'cp-save'){ const d = cpDraft(), n = document.getElementById('cpNote'); act.disabled = true; n.textContent = 'Saving…';
     try{ await api.saveFamily(Object.assign({}, d, {custom:true, startBlock:1})); PLAN_CACHE = null; UI.cstep = 0; UI.cdraft = null; UI.pstep = 'weeks'; show(); window.scrollTo(0,0); }
     catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save: ' + (err && (err.code || err.message) || 'unknown error') + '. Please try again, or send this message to NGL.'; } }
+  else if(a === 'vid-soon'){ const t = act.querySelector('.skillvid-soon'); if(t){ t.textContent = 'This video is coming soon'; } }
   else if(a === 'grp'){ const i = +act.dataset.i; const g = inGroup(i) ? UI.group.filter(x => x !== i) : [...UI.group, i].sort(); if(!g.length) return; UI.group = g; GROUP_STORE.set(g); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
