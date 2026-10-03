@@ -237,6 +237,108 @@
     #print-area .inv{min-width:0;padding:0;}
   }
 
+
+  /* ---------- Branded print sheets ---------- */
+  .print-wait{position:fixed;left:50%;top:20px;transform:translateX(-50%);z-index:100;background:var(--rec);color:var(--rec-ink);font-weight:800;padding:10px 16px;border-radius:999px;}
+  .sheet .brand{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .sheet .ph-head{display:flex;align-items:center;gap:14px;background:#0a1440;color:#fff;border-radius:8px;padding:8px 14px;border-bottom:4px solid #E88230;margin-bottom:6px;}
+  .sheet .ph-logo{height:34px;width:auto;display:block;}
+  .sheet .ph-title{flex:1;min-width:0;}
+  .sheet .ph-wk{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#E88230;}
+  .sheet .ph-pc{font-size:17px;font-weight:900;color:#fff;line-height:1.2;}
+  .sheet .ph-meta{font-size:9.5px;color:#b7c1e6;text-align:right;line-height:1.35;}
+  .sheet .ph-strip{display:grid;gap:5px;margin-bottom:6px;}
+  .sheet .ph-shot{position:relative;height:40mm;border-radius:6px;overflow:hidden;background:#eef0f6;border:1px solid #d5d9e6;}
+  .sheet .ph-shot img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sheet .ph-none{display:grid;place-items:center;height:100%;color:#888;font-size:9px;}
+  .sheet .ph-n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#E88230;color:#2a1405;font-weight:900;font-size:10.5px;}
+  .sheet .ph-shot .ph-n{position:absolute;top:4px;left:4px;box-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .sheet.compact .brand th{color:#2a1405;font-size:10px;border-color:#d9b89c;}
+  .sheet.compact .brand th span{font-weight:400;}
+  .sheet.compact .brand td{border-color:#d5d9e6;font-size:10.5px;padding:4px 6px;}
+  .sheet .brand .ph-stn{width:24px;text-align:center;background:#0a1440 !important;color:#fff !important;}
+  .sheet.compact .brand .st{border-left:3px solid;border-radius:3px;padding:1px 4px;margin-top:3px;font-weight:700;}
+  .sheet .ph-foot{display:flex;justify-content:space-between;font-size:8.5px;color:#555;margin-top:5px;}
+
+
+  /* ---------- Your group picker ---------- */
+  .grpcard{background:var(--navy-3);border:1px solid var(--line);border-radius:16px;padding:16px;margin:8px 0 6px;}
+  .grpcard h2{font-size:19px;margin:0 0 4px;}
+  .grpcard .muted{margin:0 0 12px;font-size:14px;}
+  .grprow{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media(min-width:600px){.grprow{grid-template-columns:repeat(4,1fr);}}
+  .grpbox{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:64px;padding:12px 14px;border-radius:14px;border:2px solid var(--c);background:transparent;color:var(--white);cursor:pointer;text-align:left;}
+  .grpbox.on{background:var(--c);}
+  .grpbox .grp-name{font-size:18px;font-weight:900;}
+  .grpbox .grp-rung{font-size:14px;font-weight:800;}
+  .grpbox .grp-sub{font-size:11.5px;opacity:.8;}
+  .grpbox .grp-tick{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;font-size:13px;font-weight:900;}
+  .grprow.compact{grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 14px;}
+  .grprow.compact .grpbox{min-height:48px;padding:6px 10px;justify-content:center;gap:0;}
+  .grprow.compact .grp-name{font-size:14px;line-height:1.1;}
+  .grprow.compact .grp-rung{font-size:11.5px;}
+  .grprow.compact .grp-tick{display:none;}
+
+
+  /* ---------- Build your club plan ---------- */
+  .cp-prog{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 18px;}
+  .cp-step{font-size:12px;font-weight:800;color:var(--muted);display:flex;flex-direction:column;gap:6px;}
+  .cp-step span{height:6px;border-radius:3px;background:var(--navy-4);font-size:0;}
+  .cp-step.done span{background:var(--rec);opacity:.6;}.cp-step.on span{background:var(--rec);}.cp-step.on{color:var(--white);}
+  .cp-q{background:var(--navy-3);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;}
+  .cp-ql{font-size:18px;font-weight:900;margin:0 0 10px 2px;}
+  .cp-opts{display:grid;grid-template-columns:1fr;gap:8px;}
+  @media(min-width:600px){.cp-opts{grid-template-columns:repeat(3,1fr);}}
+  .optbtn{min-height:56px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--navy-2);color:var(--white);font-weight:800;font-size:15px;text-align:left;cursor:pointer;}
+  .optbtn.on{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
+  .bbgrid.five{grid-template-columns:repeat(5,1fr);}
+  .bbgrid.five .bigbtn{align-items:center;text-align:center;padding:16px 6px;}
+  .bbgrid.five .bb-t{font-size:28px;}
+  .cp-nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px;}
+  .cp-nav .btn{min-height:52px;padding:14px 22px;font-size:16px;}
+  .cp-date{margin:0 0 16px;}
+  .cp-date label{display:block;font-weight:800;margin:0 0 8px;}
+  .input.big{font-size:18px;padding:14px;min-height:54px;width:100%;max-width:340px;}
+  .cp-sum{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:700px){.cp-sum{grid-template-columns:repeat(3,1fr);}}
+  .cp-sum>div{background:var(--navy-3);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .cp-sum span{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+  .cp-sum b{display:block;font-size:16px;line-height:1.35;}
+  .cp-sum small{display:block;color:var(--muted);margin-top:4px;font-size:13px;}
+  .cp-h{font-size:22px;margin:28px 0 10px;}
+  .cp-res{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:700px){.cp-res{grid-template-columns:1fr 1fr;}}
+  .cp-book{display:flex;gap:12px;align-items:flex-start;background:var(--navy-3);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:12px 14px;}
+  .cp-bk{font-weight:900;font-size:17px;min-width:70px;}.cp-bk small{display:block;font-size:12.5px;color:var(--muted);font-weight:700;}
+  .cp-bt b{display:block;}.cp-book.ok .cp-bt b{color:var(--ok);}.cp-book.warn .cp-bt b{color:var(--warn);}
+  .cp-bt small{color:var(--muted);font-size:13px;}.cp-bt ul{margin:6px 0 0;padding-left:18px;font-size:13px;}
+  .cp-flag{margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,180,84,.12);border:1px solid rgba(255,180,84,.45);}
+  .cp-flag.soft{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--muted);}
+  .weekgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  @media(min-width:600px){.weekgrid{grid-template-columns:repeat(7,1fr);}}
+  .wkbtn{min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--navy-3);color:var(--white);font-weight:800;cursor:pointer;}
+  .wkbtn.assess{border-style:dashed;}
+  .cp-dash{display:block;width:100%;text-align:left;cursor:pointer;border-color:rgba(232,130,48,.6);color:var(--white);}
+  .cp-dash h2{margin:2px 0 6px;}
+
+
+  /* ---------- Club plan story ---------- */
+  .story-hero{background:linear-gradient(135deg,rgba(232,130,48,.18),rgba(232,130,48,.04));border:1px solid rgba(232,130,48,.45);border-radius:18px;padding:20px;margin:20px 0 6px;}
+  .story-hero h2{font-size:clamp(21px,3.4vw,27px);line-height:1.25;margin:4px 0 10px;}
+  .lead-s{font-size:16px;line-height:1.55;color:var(--white);margin:0;}
+  .story-h{font-size:20px;margin:26px 0 12px;}
+  .story-steps{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:760px){.story-steps{grid-template-columns:repeat(3,1fr);}}
+  .story-step{display:flex;gap:12px;background:var(--navy-3);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .story-step>span{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--rec);color:var(--rec-ink);display:grid;place-items:center;font-weight:900;font-size:17px;}
+  .story-step b,.story-f b{display:block;font-size:16px;margin-bottom:4px;}
+  .story-step p,.story-f p{margin:0;color:var(--muted);font-size:14px;line-height:1.5;}
+  .story-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:600px){.story-grid{grid-template-columns:1fr 1fr;}}
+  .story-f{background:var(--navy-3);border:1px solid var(--line);border-left:4px solid var(--rec);border-radius:12px;padding:12px 14px;}
+  .story-b li{font-size:15px;}
+  .modal-wide .story-hero{margin-top:0;}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
@@ -298,6 +400,136 @@
 </div>
 
 <script>
+/* =====================================================================
+   NGL Recreational: club plan generator (shared by the Hub and Families)
+   Input: NGL content + the club's term settings. Output: the club's own
+   fortnights, each with its apparatus and stations, plus a coverage report.
+   ===================================================================== */
+const PLAN_WEEK_A = ['FF','VT','BM'], PLAN_WEEK_B = ['BF','BA','FT'];
+const CLASS_RULES = {
+  45: {warm:8, cool:4, rot:11, cap:4, stretch:1},
+  60: {warm:10, cool:5, rot:15, cap:6, stretch:0},
+  75: {warm:10, cool:5, rot:20, cap:8, stretch:0}
+};
+const PIECE_OPTS = {
+  VT: [['table','Vault table'],['block','Block only'],['none','No vault']],
+  BM: [['beam','High, medium or low beam'],['floor','Floor beam or bench'],['none','No beam']],
+  BA: [['bars','Bars'],['none','No bars']],
+  FT: [['fasttrack','Fast track and trampette'],['tramp','Trampette only']]
+};
+function planDefaults(t){
+  t = t || {};
+  return {start: t.start || '', weeks: +t.weeks || 14, halfTerm: t.halfTerm || '', classLen: +t.classLen || 60,
+    pieces: Object.assign({VT:'table', BM:'beam', BA:'bars', FT:'fasttrack'}, t.pieces || {}), startBlock: 1, custom: !!t.custom};
+}
+function stationCps(s){
+  const out = [];
+  Object.keys(s.assess || {}).forEach(c => (s.assess[c] || []).forEach(y => out.push(y.p + '|' + y.L + '|' + y.s)));
+  return out;
+}
+function buildClubPlan(content, term){
+  const t = planDefaults(term), rule = CLASS_RULES[t.classLen] || CLASS_RULES[60];
+  const src = content.plan.blocks, teach = src.filter(b => !b.assessment), assessB = src.find(b => b.assessment);
+  const removed = Object.keys(t.pieces).filter(k => t.pieces[k] === 'none');
+  const has = c => !removed.includes(c);
+  const noBars = !has('BA');
+  // Week B with no bars: two longer rotations
+  const capFor = code => {
+    if(noBars && PLAN_WEEK_B.includes(code)){ const len = (t.classLen - rule.warm - rule.cool) / 2; return Math.max(4, Math.min(8, Math.round(len / 3))); }
+    return rule.cap;
+  };
+  const T = t.weeks - 2, F = Math.floor(T / 2), odd = T % 2 === 1;
+  // fortnight slots per piece; Week A pieces get the odd week too
+  const slotsFor = code => F + (odd && PLAN_WEEK_A.includes(code) ? 1 : 0);
+  // map NGL teaching blocks (1..6) onto this club's slots
+  const mapBlock = (bn, nSlots) => Math.min(nSlots - 1, Math.floor((bn - 1) * nSlots / teach.length));
+  const codes = [...PLAN_WEEK_A, ...PLAN_WEEK_B].filter(has);
+  // candidates per piece, each with a home slot
+  const cand = {};
+  codes.forEach(code => {
+    const n = slotsFor(code); cand[code] = [];
+    teach.forEach(b => { const p = b.pieces.find(x => x.code === code); if(!p) return;
+      p.stations.forEach(s => cand[code].push({b, p, s, home: mapBlock(b.n, n), cps: stationCps(s)})); });
+  });
+  // checkpoints the full NGL plan teaches on the apparatus this club has
+  const required = new Set();
+  codes.forEach(code => cand[code].forEach(x => x.cps.forEach(c => { if(!(noBars && c.startsWith('Bars|'))) required.add(c); })));
+  // greedy cover: a station goes in its home fortnight, or the one either side if that is full
+  const chosen = {}, used = {}, covered = new Set();
+  codes.forEach(code => { chosen[code] = Array.from({length: slotsFor(code)}, () => []); used[code] = new Set(); });
+  const room = (code, k, extra) => k >= 0 && k < slotsFor(code) && chosen[code][k].length < capFor(code) + extra;
+  for(;;){
+    let best = null, gain = 0;
+    codes.forEach(code => cand[code].forEach((x, i) => {
+      if(used[code].has(i)) return;
+      const g = x.cps.filter(c => required.has(c) && !covered.has(c)).length;
+      if(g <= gain) return;
+      const k = [x.home, x.home + 1, x.home - 1, x.home + 2, x.home - 2].find(k => room(code, k, rule.stretch));
+      if(k === undefined) return;
+      gain = g; best = [code, i, k];
+    }));
+    if(!best) break;
+    const [code, i, k] = best; used[code].add(i); chosen[code][k].push(i); cand[code][i].cps.forEach(c => covered.add(c));
+  }
+  // fill with progressions from each fortnight's own themes, in authored order
+  codes.forEach(code => chosen[code].forEach((list, k) => {
+    cand[code].forEach((x, i) => { if(x.home === k && !used[code].has(i) && list.length < capFor(code)){ used[code].add(i); list.push(i); } });
+  }));
+  // assemble fortnights
+  const blocks = [];
+  const nSlots = Math.max(F + (odd ? 1 : 0), 1);
+  for(let k = 0; k < nSlots; k++){
+    const isOdd = odd && k === F;
+    const w1 = 2 * k + 1;
+    const pieces = [];
+    codes.forEach(code => {
+      if(isOdd && !PLAN_WEEK_A.includes(code)) return;
+      const pick = (chosen[code][k] || []).slice().sort((a, b) => a - b).map(i => cand[code][i]);
+      if(!pick.length) return;
+      const own = pick.filter(x => x.home === k), themes = [...new Set((own.length ? own : pick).map(x => x.p.theme))];
+      const first = pick[0].p;
+      pieces.push({code, piece: first.piece, theme: themes.join(' + '), setup: first.setup, intro: first.intro,
+        stations: pick.map((x, j) => Object.assign({}, x.s, {n: j + 1, from: x.b.n}))});
+    });
+    const srcBlocks = [...new Set(teach.filter(b => codes.some(c => mapBlock(b.n, slotsFor(c)) === k)).map(b => b.n))];
+    blocks.push({n: k + 1, label: isOdd ? 'Week ' + w1 : 'Fortnight ' + (k + 1), weeks: isOdd ? 'Week ' + w1 : `Weeks ${w1} & ${w1 + 1}`,
+      assessment: false, odd: isOdd, warm: Math.max(0, (srcBlocks[0] || 1) - 1), pieces});
+  }
+  blocks.push({n: nSlots + 1, label: 'Assessment', weeks: `Weeks ${t.weeks - 1} & ${t.weeks}`, assessment: true, odd: false,
+    warm: content.warmups.length - 1,
+    pieces: assessB.pieces.filter(p => has(p.code)).map(p => Object.assign({}, p, {stations: p.stations.slice(0, capFor(p.code)).map((s, j) => Object.assign({}, s, {n: j + 1}))}))});
+  // coverage report by book
+  const byBook = [0,1,2,3].map(() => ({need:0, got:0, missing:[]}));
+  required.forEach(c => { const [p, L, s] = c.split('|'); const b = byBook[Math.ceil(+L / 4) - 1]; if(!b) return;
+    b.need++; if(covered.has(c)) b.got++; else b.missing.push({p, L:+L, s}); });
+  const adapted = [];
+  if(t.pieces.BM === 'floor') adapted.push('Beam skills are taught and assessed on a floor beam or bench, and marked adapted.');
+  if(t.pieces.VT === 'block') adapted.push('Vault skills are taught on a block instead of a vault table.');
+  if(t.pieces.FT === 'tramp') adapted.push('Fast Track stations run on the trampette with a run of panel mats.');
+  const key4 = ['VT','BM','BA'].filter(c => removed.includes(c));
+  return {settings: t, rule, blocks, coverage: byBook, removed, adapted,
+    twoPiece: key4.length > 0, noBars, F, odd};
+}
+// Which club week is it? Half-term week is skipped.
+function clubWeekNow(term, plan, today){
+  const t = planDefaults(term);
+  if(!t.start) return null;
+  const day = 86400000, start = new Date(t.start + 'T00:00:00'), now = today || new Date();
+  let wk = Math.floor((now - start) / (7 * day)) + 1;
+  let half = false;
+  if(t.halfTerm){
+    const hw = Math.floor((new Date(t.halfTerm + 'T00:00:00') - start) / (7 * day)) + 1;
+    if(wk === hw) half = true; else if(wk > hw) wk -= 1;
+  }
+  if(wk < 1 || wk > t.weeks) return {wk, W:t.weeks, outside:true};
+  if(half) return {wk, W:t.weeks, half:true};
+  const blocks = plan.blocks;
+  if(wk > t.weeks - 2) return {wk, W:t.weeks, block: blocks[blocks.length - 1].n, week: wk === t.weeks - 1 ? 'A' : 'B'};
+  const k = Math.floor((wk - 1) / 2);
+  const b = blocks[Math.min(k, blocks.length - 2)];
+  return {wk, W:t.weeks, block: b.n, week: b.odd ? 'A' : ((wk - 1) % 2 === 0 ? 'A' : 'B')};
+}
+
 /* =====================================================================
    NGL RECREATIONAL — CLUB HUB
    ---------------------------------------------------------------------
@@ -640,7 +872,7 @@ let tab = 'dashboard';
 const UI = {block:1, piece:'all', level:'all', wblock:1, book:1};
 const $view = document.getElementById('view');
 function render(html){ $view.innerHTML = '<div class="screen">' + html + '</div>'; }
-const CONTENT_TABS = ['plan','warmups','books','competition'];
+const CONTENT_TABS = ['club','plan','warmups','books','competition'];
 function setTop(){
   const ta = document.getElementById('topActions');
   const nav = document.getElementById('navtabs');
@@ -648,7 +880,7 @@ function setTop(){
     ta.innerHTML = `${S.club ? `<span class="pill">${esc(S.club.name)}</span>` : ''}<button class="btn ghost small" data-act="signout">Sign out</button>`;
     nav.hidden = false;
     const lock = !hasAccess() && !S.isAdmin;
-    const tabs = S.club ? [['dashboard','Dashboard'],['plan','Lesson plan'],['warmups','Warm-ups'],['books','Award books'],['competition','Competition'],['orders','Orders'],['licence','Licence & pricing']] : [];
+    const tabs = S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['orders','Orders'],['licence','Licence & pricing']] : [];
     if(S.isAdmin) tabs.push(['admin','NGL Admin']);
     nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
   }else{
@@ -663,7 +895,7 @@ function show(){
   if(!S.club){ tab = 'admin'; return screenAdmin(); }
   if(CONTENT_TABS.includes(tab)){
     if(!hasAccess() && !S.isAdmin) return screenLocked();
-    return withContent(() => ({plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
+    return withContent(() => ({club:screenClub, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
   ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence})[tab]();
 }
@@ -719,6 +951,8 @@ function pitchHTML(inside){
       <div class="card step"><h3>Competition</h3><p class="muted">NGL Recreational competitions use the same four levels, so gymnasts compete what they have been taught.</p></div>
     </div>
   </div>
+
+  ${inside ? '' : `<div class="section card">${planStoryHTML(false)}</div>`}
 
   <div class="section grid2">
     <div class="card">
@@ -843,6 +1077,8 @@ function screenDashboard(){
         ${needsRenewal ? `<button class="btn ghost" data-act="renew">Renew for ${esc(S.season)}</button>` : ''}
       </div>
     </div>
+    <button class="card cp-dash" data-tab="club"><p class="eyebrow">Step 1</p><h2>${S.club.recTerm && S.club.recTerm.custom ? 'Your club plan' : 'Build your club plan'}</h2>
+      <p class="muted" style="margin:0">${S.club.recTerm && S.club.recTerm.custom ? 'Change your apparatus, term dates or class length, and print your plan.' : 'Tell us your apparatus, term and class length, and we’ll build your lesson plan.'}</p></button>
     <div class="grid4">
       <button class="card" data-tab="plan" style="text-align:left;cursor:pointer"><h3>Lesson plan</h3><p class="muted" style="margin:0">Stations for every block, at four levels.</p></button>
       <button class="card" data-tab="warmups" style="text-align:left;cursor:pointer"><h3>Warm-ups</h3><p class="muted" style="margin:0">10-minute physical prep for each block.</p></button>
@@ -886,10 +1122,10 @@ function familyCard(){
   const t = S.club.recTerm;
   if(!S.club.recCode) return `<div class="card"><p class="eyebrow">Families</p><h2>Share the programme with parents</h2>
     <p class="muted">Parents see what their child is learning each week, which skills are on their assessment, and their competition routine. Set your term dates and we'll create your club's family code. No child details are stored.</p>
-    <button class="btn" data-act="family">Set up family access</button></div>`;
+    <button class="btn" data-tab="club">Build your club plan</button></div>`;
   return `<div class="card"><p class="eyebrow">Families</p><h2>Your family code: <span class="mono" style="color:var(--rec)">${esc(S.club.recCode)}</span></h2>
     <p class="muted">${t ? `Term started ${fmtDate(new Date(t.start))} · ${t.weeks} weeks · starting at Block ${t.startBlock}. ` : ''}Parents go to <b>${esc(FAMILY_URL)}</b> and enter this code.</p>
-    <div class="btn-row"><button class="btn" data-act="copy-family">Copy message for parents</button><button class="btn ghost" data-act="family">Update term dates</button></div>
+    <div class="btn-row"><button class="btn" data-act="copy-family">Copy message for parents</button><button class="btn ghost" data-tab="club">Update term dates</button></div>
     <p class="note" id="copyNote" style="margin-top:8px"></p></div>`;
 }
 function familyModal(){
@@ -1085,12 +1321,27 @@ function showInvoice(o, club){
     <p class="note" id="invMailNote" style="margin:10px 0 0;min-height:1em"></p>`);
   m.querySelector('.modal').classList.add('modal-wide');
 }
-function printHTML(html, landscape){
+// Shrink any sheet that would spill onto a second page (A4, 8mm margins).
+function fitPages(pa, landscape){
+  const pages = pa.querySelectorAll('.onepage');
+  if(!pages.length) return;
+  const mm = 96 / 25.4, W = (landscape ? 281 : 194) * mm, H = (landscape ? 192 : 279) * mm;
+  pa.style.cssText = `display:block;position:absolute;left:-10000px;top:0;width:${W}px;`;
+  pages.forEach(pg => { pg.style.zoom = ''; const h = pg.scrollHeight; if(h > H * 0.95) pg.style.zoom = (H * 0.95 / h).toFixed(3); });
+  pa.style.cssText = '';
+}
+async function printHTML(html, landscape){
   const pa = document.getElementById('print-area');
   pa.innerHTML = html;
   let st = document.getElementById('pageStyle');
   if(!st){ st = document.createElement('style'); st.id = 'pageStyle'; document.head.appendChild(st); }
-  st.textContent = `@media print{@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:10mm;}}`;
+  st.textContent = `@media print{@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:8mm;}}`;
+  if(pa.querySelector('img[data-img]')){
+    const n = document.createElement('div'); n.className = 'print-wait'; n.textContent = 'Preparing photos for printing…'; document.body.appendChild(n);
+    try{ await hydrateImages(pa); await Promise.all([...pa.querySelectorAll('img')].map(i => i.decode ? i.decode().catch(() => {}) : null)); }
+    finally{ n.remove(); }
+  }
+  fitPages(pa, landscape);
   window.print();
 }
 
@@ -1136,6 +1387,130 @@ function introHTML(p){
   if(p.intro.length === 1) return `<div class="intro"><b>Intro:</b> ${esc(p.intro[0])}</div>`;
   return `<div class="intro"><b>Intro by level:</b> ${p.intro.map((t, i) => `<span style="color:${LEVELS[i] ? LEVELS[i].color : 'inherit'};font-weight:800">${LEVELS[i] ? LEVELS[i].name : ''}</span> ${esc(t)}`).join(' · ')}</div>`;
 }
+/* ---------- The club plan story: process, features, benefits ---------- */
+function planStoryHTML(inHub){
+  return `<div class="story">
+    <div class="story-hero">
+      <p class="eyebrow">Your club plan</p>
+      <h2>A lesson plan built around your club, that still gets every gymnast ready for assessment</h2>
+      <p class="lead-s">Every club is different: the apparatus you have, how long your term runs, how long your classes are. Tell the Hub once, and it builds a term of lesson plans that fits, while making sure every tested skill in the award books is coached before the assessment weeks, whatever the term length.</p>
+    </div>
+    <h3 class="story-h">How it works</h3>
+    <div class="story-steps">
+      <div class="story-step"><span>1</span><div><b>Tell us your set-up</b><p>Your apparatus, the number of weeks in your term, when it starts (and half term), and how long your classes are. Four quick screens, about two minutes.</p></div></div>
+      <div class="story-step"><span>2</span><div><b>The Hub builds your term</b><p>It starts from the full NGL plan and fits it to you. Every skill that is tested is placed in a fortnight before the assessment weeks, and you see a tick for each award book before you save.</p></div></div>
+      <div class="story-step"><span>3</span><div><b>Coaches follow it</b><p>On an iPad or phone, coaches pick their group’s books, tap this week and the apparatus, see the set-up photos, then the skill ladder for each station.</p></div></div>
+    </div>
+    <h3 class="story-h">What the Hub does for you</h3>
+    <div class="story-grid">
+      <div class="story-f"><b>Fits every tested skill into your term</b><p>10 to 14 weeks. In a shorter term, themes are combined and stations are moved between fortnights so each tested skill is still coached before assessment.</p></div>
+      <div class="story-f"><b>Works with the apparatus you have</b><p>No bars? Bars come out of the plan and the assessment, and Week B becomes two longer rotations. A floor beam or a vault block is used instead, and those skills are marked adapted.</p></div>
+      <div class="story-f"><b>Fits your class length</b><p>45, 60 or 75 minutes. Shorter classes drop extra progression stations first. Stations that prepare a tested skill are always kept.</p></div>
+      <div class="story-f"><b>Knows what week it is</b><p>Half term is skipped, so “This week” is always right for coaches and parents.</p></div>
+      <div class="story-f"><b>Shows you it works</b><p>Before you save, a tick for each book shows that every apparatus skill is taught in time, plus any warnings and a 2-piece competition recommendation if you need one.</p></div>
+      <div class="story-f"><b>Prints in colour</b><p>One branded page per apparatus with numbered set-up photos and all four rungs: the whole term, one apparatus for the term, or a single week.</p></div>
+      <div class="story-f"><b>Coaches see only their group</b><p>Pick Book 1 to Book 4 and everything else is hidden. Stations are ladders from Beginner to Advanced, with a star where a rung prepares a tested skill.</p></div>
+      <div class="story-f"><b>Parents follow along</b><p>With your family code, parents see what their child is learning this fortnight and how it links to their award book and the Recreational Competition.</p></div>
+    </div>
+    <h3 class="story-h">Why it matters</h3>
+    <ul class="ticks story-b">
+      <li><b>No gymnast is assessed on a skill they haven’t been coached.</b> Every tested skill is placed before the assessment weeks, and the Hub tells you straight away if anything won’t fit.</li>
+      <li><b>No planning time.</b> A full term of lesson plans in two minutes, and next term is just new dates.</li>
+      <li><b>The same quality from every coach.</b> New and young coaches follow the same set-ups and progressions as your most experienced.</li>
+      <li><b>Mixed groups made simple.</b> Every child works on the right rung of the same station.</li>
+      <li><b>Any club, any hall.</b> From a full gym to a school hall with a bench and a trampette.</li>
+      <li><b>Happier families.</b> Parents can see progress, which keeps gymnasts coming back.</li>
+    </ul>
+    ${inHub ? '' : `<div class="btn-row" style="margin-top:18px"><button class="btn" data-go="register">Register your club</button><button class="btn ghost" data-go="login">Club login</button></div>`}
+  </div>`;
+}
+
+/* =====================================================================
+   BUILD YOUR CLUB PLAN
+   ===================================================================== */
+const PIECE_NAMES = {FF:'Forward Floor', BF:'Backward Floor', VT:'Vault', BM:'Beam', BA:'Bars', FT:'Fast Track'};
+const CP_STEPS = ['Apparatus','Weeks','Dates','Class length'];
+function cpDraft(){ if(!UI.cdraft) UI.cdraft = planDefaults(S.club.recTerm); return UI.cdraft; }
+function cpProgress(n){
+  return `<div class="cp-prog">${CP_STEPS.map((x, i) => `<div class="cp-step ${i + 1 < n ? 'done' : ''} ${i + 1 === n ? 'on' : ''}"><span>${i + 1}</span>${x}</div>`).join('')}</div>`;
+}
+function cpNav(n, canNext){
+  return `<div class="cp-nav">${n > 1 ? `<button class="btn ghost" data-act="cp-step" data-n="${n - 1}">← Back</button>` : `<button class="btn ghost" data-act="cp-cancel">Cancel</button>`}
+    <button class="btn" data-act="cp-step" data-n="${n + 1}" ${canNext ? '' : 'disabled'}>${n === 4 ? 'Build my plan →' : 'Next →'}</button></div>`;
+}
+function screenClub(){
+  const t = S.club.recTerm;
+  if(UI.cstep) return clubWizard(UI.cstep);
+  if(!t || !t.custom){
+    render(`<div class="flow"><h1 class="flow-h">Build your club plan</h1>
+      <p class="flow-sub">Four quick questions about your apparatus, your term and your classes. The Hub then builds a lesson plan for your club that still teaches every tested skill before assessment.</p>
+      <button class="bigbtn wide go" data-act="cp-start"><span class="bb-t">Start →</span><span class="bb-k">About 2 minutes</span></button>
+      <p class="note" style="margin-top:14px">Until you do this, coaches see the standard NGL plan (14 weeks, 60-minute classes, all apparatus).</p>
+      ${planStoryHTML(true)}
+      <button class="bigbtn wide go" data-act="cp-start" style="margin-top:22px"><span class="bb-t">Build your club plan →</span><span class="bb-k">About 2 minutes</span></button></div>`);
+    return;
+  }
+  const plan = clubPlan(), st = plan.settings, W = st.weeks;
+  const pcs = [...WEEK_A, ...WEEK_B].filter(c => !plan.removed.includes(c));
+  render(`<div class="flow">
+    <h1 class="flow-h">Your club plan</h1>
+    <div class="cp-sum">
+      <div><span>Term</span><b>${W} weeks from ${esc(fmtDate(new Date(st.start + 'T00:00:00')))}</b>${st.halfTerm ? `<small>Half term w/c ${esc(fmtDate(new Date(st.halfTerm + 'T00:00:00')))}</small>` : ''}</div>
+      <div><span>Classes</span><b>${st.classLen} minutes</b><small>${plan.rule.warm} min warm-up · 3 × ${plan.rule.rot} min · ${plan.rule.cool} min cool-down</small></div>
+      <div><span>Apparatus</span><b>${pcs.map(c => PIECE_NAMES[c]).join(', ')}</b>${plan.removed.length ? `<small>Not used: ${plan.removed.map(c => PIECE_NAMES[c]).join(', ')}</small>` : ''}</div>
+    </div>
+    <div class="btn-row" style="margin-top:10px"><button class="btn ghost" data-act="cp-start">Change set-up</button><button class="btn ghost" data-act="cp-story">How your plan is built</button></div>
+    ${cpResultsHTML(plan)}
+    <h2 class="cp-h">Print your plan</h2>
+    <p class="flow-sub">One page per apparatus, with numbered photos. Tick “Background graphics” when you print.</p>
+    <button class="bigbtn wide" data-act="print-plan" data-scope="term"><span class="bb-t">Whole term</span><span class="bb-k">Every fortnight, every apparatus</span></button>
+    <p class="flow-l">Whole term, one apparatus</p>
+    <div class="bbgrid three">${pcs.map(c => `<button class="bigbtn" data-act="print-plan" data-scope="termPiece" data-arg="${c}"><span class="bb-t">${PIECE_NAMES[c]}</span><span class="bb-k">All fortnights</span></button>`).join('')}</div>
+    <p class="flow-l">One week</p>
+    <div class="weekgrid">${Array.from({length: W}, (_, i) => `<button class="wkbtn ${i + 1 > W - 2 ? 'assess' : ''}" data-act="print-plan" data-scope="week" data-arg="${i + 1}">Week ${i + 1}</button>`).join('')}</div>
+  </div>`);
+}
+function cpResultsHTML(plan){
+  const cov = plan.coverage || [];
+  return `<h2 class="cp-h">What your plan covers</h2>
+    <div class="cp-res">${cov.map((c, i) => { const l = LEVELS[i], ok = c.got === c.need;
+      return `<div class="cp-book ${ok ? 'ok' : 'warn'}" style="--c:${l.color}"><div class="cp-bk">Book ${l.book}<small>${l.name}</small></div>
+        <div class="cp-bt"><b>${ok ? '✓ Every checkpoint taught' : `${c.need - c.got} checkpoint${c.need - c.got === 1 ? '' : 's'} won’t fit`}</b><small>${c.got} of ${c.need} apparatus skills taught before assessment</small>
+        ${ok ? '' : `<ul>${c.missing.map(m => `<li>${esc(m.p)} L${m.L}: ${esc(m.s)}</li>`).join('')}</ul>`}</div></div>`; }).join('')}</div>
+    <p class="note">Physical Prep skills are covered in the warm-ups.</p>
+    ${cov.some(c => c.got < c.need) ? `<p class="note">To fit everything, choose 60-minute classes or a longer term, or cover these in a catch-up session.</p>` : ''}
+    ${plan.removed.length ? `<div class="cp-flag"><b>${plan.removed.map(c => PIECE_NAMES[c]).join(' and ')} removed</b> from the plan and from assessment.${plan.twoPiece ? ' We recommend your gymnasts compete <b>2-piece (Floor and Vault)</b>.' : ''}</div>` : ''}
+    ${plan.adapted.map(a => `<div class="cp-flag soft">${esc(a)}</div>`).join('')}`;
+}
+function clubWizard(n){
+  const d = cpDraft();
+  if(n === 1){
+    const row = code => `<div class="cp-q"><div class="cp-ql">${PIECE_NAMES[code]}</div><div class="cp-opts">${PIECE_OPTS[code].map(([v, l]) => `<button class="optbtn ${d.pieces[code] === v ? 'on' : ''}" data-act="cp-set" data-k="${code}" data-v="${v}">${l}</button>`).join('')}</div></div>`;
+    render(`<div class="flow">${cpProgress(1)}<h1 class="flow-h">Which apparatus do you have?</h1>
+      <p class="flow-sub">Floor is always included. Pick the best you have for each.</p>
+      ${['VT','BM','BA','FT'].map(row).join('')}${cpNav(1, true)}</div>`);
+  }else if(n === 2){
+    render(`<div class="flow">${cpProgress(2)}<h1 class="flow-h">How many weeks in the term?</h1>
+      <p class="flow-sub">Including the 2 assessment weeks at the end. Leave out half term.</p>
+      <div class="bbgrid five">${[10,11,12,13,14].map(w => `<button class="bigbtn ${d.weeks === w ? 'now' : ''}" data-act="cp-set" data-k="weeks" data-v="${w}"><span class="bb-t">${w}</span><span class="bb-k">weeks</span></button>`).join('')}</div>${cpNav(2, true)}</div>`);
+  }else if(n === 3){
+    render(`<div class="flow">${cpProgress(3)}<h1 class="flow-h">When does term start?</h1>
+      <div class="cp-date"><label for="cpStart">First week of term</label><input class="input big" id="cpStart" type="date" value="${esc(d.start)}"></div>
+      <div class="cp-date"><label for="cpHalf">Half-term week starts <span class="muted">(optional)</span></label><input class="input big" id="cpHalf" type="date" value="${esc(d.halfTerm)}"></div>
+      <p class="note">The Hub skips half term, so “This week” stays right all term.</p>${cpNav(3, !!d.start)}</div>`);
+  }else if(n === 4){
+    render(`<div class="flow">${cpProgress(4)}<h1 class="flow-h">How long are your classes?</h1>
+      <div class="bbgrid three">${[45,60,75].map(m => { const r = CLASS_RULES[m]; return `<button class="bigbtn ${d.classLen === m ? 'now' : ''}" data-act="cp-set" data-k="classLen" data-v="${m}"><span class="bb-t">${m} minutes</span><span class="bb-k">${r.warm} min warm-up · 3 × ${r.rot} min rotations · ${r.cool} min cool-down</span></button>`; }).join('')}</div>${cpNav(4, true)}</div>`);
+  }else{
+    const plan = buildClubPlan(S.content, Object.assign({}, d, {custom:true}));
+    render(`<div class="flow"><h1 class="flow-h">Your plan is ready</h1>
+      <p class="flow-sub">${d.weeks} weeks · ${d.classLen}-minute classes · ${plan.F} teaching fortnights${plan.odd ? ' and 1 single week' : ''}, then 2 assessment weeks</p>
+      ${cpResultsHTML(plan)}
+      <div class="cp-nav"><button class="btn ghost" data-act="cp-step" data-n="4">← Back</button><button class="btn" data-act="cp-save">Save and share with coaches</button></div>
+      <p class="note" id="cpNote"></p></div>`);
+  }
+}
+
 /* ---------- Coach lesson plan: weeks -> apparatus -> set-up -> ladders ---------- */
 const RUNGS = [
   {name:'Beginner', age:'Guide 4–5 yrs'},
@@ -1149,9 +1524,20 @@ const PLAN_STORE = {
   set(v){ try{ localStorage.setItem('nglrec-plan', JSON.stringify(v)); }catch(e){} }
 };
 Object.assign(UI, {pstep:'weeks', piece:''}, (PLAN_STORE.get() || {}));
+let PLAN_CACHE = null;
+function clubPlan(){
+  const t = S.club && S.club.recTerm;
+  const key = JSON.stringify(t || null) + '|' + (S.content.version || '') + '|' + S.content.plan.blocks.length;
+  if(PLAN_CACHE && PLAN_CACHE.key === key) return PLAN_CACHE.plan;
+  const plan = t && t.custom ? buildClubPlan(S.content, t)
+    : {custom:false, settings: planDefaults(t), removed: [], adapted: [], coverage: null,
+       blocks: S.content.plan.blocks.map(b => Object.assign({}, b, {warm: b.assessment ? S.content.warmups.length - 1 : b.n - 1}))};
+  PLAN_CACHE = {key, plan}; return plan;
+}
 function planNow(){
-  const t = S.club && S.club.recTerm, blocks = S.content.plan.blocks;
+  const t = S.club && S.club.recTerm, plan = clubPlan(), blocks = plan.blocks;
   if(!t || !t.start) return null;
+  if(t.custom){ const n = clubWeekNow(t, plan); return n && !n.outside && !n.half ? n : null; }
   const start = new Date(t.start + 'T00:00:00');
   const wk = Math.floor((Date.now() - start) / (7 * 86400000)) + 1, W = t.weeks || 14, sb = t.startBlock || 1;
   if(wk < 1 || wk > W) return null;
@@ -1163,13 +1549,29 @@ function planGo(o){ Object.assign(UI, o); PLAN_STORE.set({pstep:UI.pstep, block:
 function backBar(label, to){ return `<button class="backbar" data-ui="pstep" data-v="${to}">← ${esc(label)}</button>`; }
 function stationPhotos(s){ return [...new Set((s.img || []).flat().filter(Boolean))]; }
 function starsHTML(s, i){
-  const a = s.assess && s.assess[String(i)];
-  if(!a || !a.length) return '';
+  const a = (s.assess && s.assess[String(i)] || []).filter(y => inGroup(Math.ceil(y.L / 4) - 1));
+  if(!a.length) return '';
   return `<div class="stars">${a.map(y => { const b = bookOf(y.L);
     return `<span class="star" style="--c:${b.color}">★ ${b.name} L${y.L}<span class="sk"> · ${esc(y.s)}</span></span>`; }).join('')}</div>`;
 }
+/* ---------- Your group: which books, which rungs to show ---------- */
+const GROUP_STORE = {
+  get(){ try{ const v = JSON.parse(localStorage.getItem('nglrec-group') || 'null'); return Array.isArray(v) && v.length ? v : [0,1,2,3]; }catch(e){ return [0,1,2,3]; } },
+  set(v){ try{ localStorage.setItem('nglrec-group', JSON.stringify(v)); }catch(e){} }
+};
+UI.group = GROUP_STORE.get();
+const inGroup = i => UI.group.includes(i);
+const groupName = () => UI.group.length === 4 ? 'All books' : UI.group.map(i => `Book ${LEVELS[i].book} (${LEVELS[i].name})`).join(' · ');
+function groupPicker(compact){
+  const boxes = LEVELS.map((l, i) => `<button class="grpbox ${inGroup(i) ? 'on' : ''}" style="--c:${l.color}" data-act="grp" data-i="${i}" aria-pressed="${inGroup(i)}">
+      <span class="grp-tick">${inGroup(i) ? '✓' : ''}</span><span class="grp-name">Book ${l.book}</span><span class="grp-rung">${l.name}</span>${compact ? '' : `<span class="grp-sub">${RUNGS[i].name} rung</span>`}</button>`).join('');
+  if(compact) return `<div class="grprow compact" aria-label="Your group">${boxes}</div>`;
+  return `<div class="grpcard"><h2>Build your lesson plan for your group</h2>
+    <p class="muted">Which books is your group on? Tap one or more. Everything else is hidden.</p>
+    <div class="grprow">${boxes}</div></div>`;
+}
 function screenPlan(){
-  const blocks = S.content.plan.blocks, now = planNow();
+  const blocks = clubPlan().blocks, now = planNow();
   const b = blocks.find(x => x.n === UI.block) || blocks[0];
   const piece = b.pieces.find(p => p.code === UI.piece);
   if(UI.pstep === 'setup' && piece) return planSetup(b, piece);
@@ -1178,6 +1580,7 @@ function screenPlan(){
   // Step 1: which fortnight
   render(`<div class="flow">
     <div class="flow-hrow"><h1 class="flow-h">Lesson plan</h1><button class="btn ghost small" data-act="print-plan" data-scope="term">Print whole term</button></div>
+    ${groupPicker(false)}
     ${fortnightButtons('pblock', now)}
     ${now ? '' : `<p class="note" style="margin-top:14px">Set your term dates on the Dashboard and the Hub will open on this week.</p>`}
   </div>`);
@@ -1192,7 +1595,7 @@ function planApparatus(b, now){
     ${b.assessment ? `<p class="flow-sub">Last 2 weeks of term. Run these stations while gymnasts are assessed.</p>` : ''}
     <button class="bigbtn wide warm" data-act="plan-warmup"><span class="bb-t">Warm-up</span><span class="bb-k">10 min · same both weeks</span></button>
     <p class="flow-l">Week A</p><div class="bbgrid three">${WEEK_A.map(tile).join('')}</div>
-    <p class="flow-l">Week B</p><div class="bbgrid three">${WEEK_B.map(tile).join('')}</div>
+    ${WEEK_B.some(c => b.pieces.find(x => x.code === c)) ? `<p class="flow-l">Week B</p><div class="bbgrid three">${WEEK_B.map(tile).join('')}</div>` : ''}
   </div>`);
 }
 function planSetup(b, p){
@@ -1215,33 +1618,49 @@ function planLadder(b, p){
     ${backBar(p.piece + ' set-up', 'setup')}
     <div class="flow-hrow"><h1 class="flow-h">${esc(p.piece)} skills</h1><button class="btn ghost small" data-act="print-plan">Print</button></div>
     <p class="flow-sub"><b>${esc(p.theme)}</b> · start each child on the rung that suits them, from Beginner up</p>
+    ${groupPicker(true)}
     ${p.stations.map(s => `<div class="ladder"><div class="ladder-h">Station ${s.n}</div>
-      ${[0,1,2,3].map(i => s.levels[i] ? `<div class="rung ${s.assess && s.assess[String(i)] && s.assess[String(i)].length ? 'starred' : ''}">
+      ${[0,1,2,3].filter(inGroup).map(i => s.levels[i] ? `<div class="rung ${starsHTML(s, i) ? 'starred' : ''}">
         <div class="rung-n">${RUNGS[i].name}<span>${RUNGS[i].age}</span></div>
         <div class="rung-t">${fmtStation(s.levels[i])}</div>${starsHTML(s, i)}</div>` : '').join('')}
     </div>`).join('')}
     <p class="note">★ marks a rung that prepares an award-book checkpoint: the book colour and level it is assessed at.</p>
   </div>`);
 }
+const RUNG_TINT = ['#FDEBDD','#F9D4B5','#F3B98C','#EC9C62'];
 function pieceSheetHTML(b, p, first){
-  return `<div class="onepage" style="${first ? '' : 'page-break-before:always;'}">
-    <h2>${esc(b.assessment ? 'Assessment fortnight' : b.weeks)} · ${esc(p.piece)}: ${esc(p.theme)}</h2>
-    <p>${esc(p.setup || '')}${p.setup ? ' · ' : ''}${p.stations.length} stations · ${esc(S.club ? S.club.name : '')}</p>
-    <table><thead><tr><th style="width:26px">Stn</th>${RUNGS.map(r => `<th>${r.name} <span style="font-weight:400">(${r.age.replace('Guide ','')})</span></th>`).join('')}</tr></thead>
-    <tbody>${p.stations.map(s => `<tr><td><b>${s.n}</b></td>${[0,1,2,3].map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).map(y => `<div class="st">★ ${bookOf(y.L).name} L${y.L}: ${esc(y.s)}</div>`).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table>
-    <p class="foot">★ = this rung prepares an award-book checkpoint (book colour and level). NGL Recreational lesson plan.</p></div>`;
+  const logo = (document.querySelector('.logo img') || {}).src || '';
+  const photos = p.stations.map(s => [s.n, stationPhotos(s)[0]]);
+  return `<div class="onepage brand" style="${first ? '' : 'page-break-before:always;'}">
+    <div class="ph-head">${logo ? `<img class="ph-logo" src="${logo}" alt="NGL Recreational">` : ''}
+      <div class="ph-title"><div class="ph-wk">${esc(b.assessment ? 'Assessment fortnight' : b.weeks)} · ${WEEK_A.includes(p.code) ? 'Week A' : 'Week B'}</div>
+        <div class="ph-pc">${esc(p.piece)}: ${esc(p.theme)}</div></div>
+      <div class="ph-meta">${esc(p.setup || '')}${p.setup ? '<br>' : ''}${p.stations.length} stations · ${esc(groupName())}${S.club ? '<br>' + esc(S.club.name) : ''}</div></div>
+    <div class="ph-strip" style="grid-template-columns:repeat(${photos.length},1fr)">${photos.map(([n, id]) => `<div class="ph-shot"><span class="ph-n">${n}</span>${id ? `<img data-img="${id}" alt="Station ${n}">` : '<div class="ph-none">No photo</div>'}</div>`).join('')}</div>
+    <table><thead><tr><th class="ph-stn">Stn</th>${RUNGS.map((r, i) => !inGroup(i) ? '' : `<th style="background:${RUNG_TINT[i]}">${r.name} <span>(${r.age.replace('Guide ','')})</span></th>`).join('')}</tr></thead>
+    <tbody>${p.stations.map(s => `<tr><td class="ph-stn"><span class="ph-n">${s.n}</span></td>${[0,1,2,3].filter(inGroup).map(i => `<td>${esc(s.levels[i] || '')}${(s.assess && s.assess[String(i)] || []).filter(y => inGroup(Math.ceil(y.L / 4) - 1)).map(y => { const bk = bookOf(y.L); return `<div class="st" style="border-color:var(--${bk.key});background:color-mix(in srgb, var(--${bk.key}) 14%, #fff)">★ ${bk.name} L${y.L}: ${esc(y.s)}</div>`; }).join('')}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    <div class="ph-foot"><span>★ This rung prepares an award-book checkpoint (book colour and level)</span><span>NGL Recreational · nglrecreational.co.uk</span></div></div>`;
 }
-function planPrintHTML(scope){
-  const blocks = S.content.plan.blocks;
+function weekToBlock(w){
+  const plan = clubPlan(), blocks = plan.blocks, W = plan.settings.weeks || 14;
+  if(w > W - 2) return [blocks[blocks.length - 1], w === W - 1 ? 'A' : 'B'];
+  const b = blocks[Math.min(Math.floor((w - 1) / 2), blocks.length - 2)];
+  return [b, b.odd ? 'A' : ((w - 1) % 2 === 0 ? 'A' : 'B')];
+}
+function planPrintHTML(scope, arg){
+  const blocks = clubPlan().blocks;
   let list = [];
-  if(scope === 'term') blocks.forEach(b => b.pieces.forEach(p => list.push([b, p])));
-  else { const b = blocks.find(x => x.n === UI.block);
-    (scope === 'fortnight' ? [...WEEK_A, ...WEEK_B].map(c => b.pieces.find(p => p.code === c)).filter(Boolean) : b.pieces.filter(p => p.code === UI.piece)).forEach(p => list.push([b, p])); }
+  const order = b => [...WEEK_A, ...WEEK_B].map(c => b.pieces.find(p => p.code === c)).filter(Boolean);
+  if(scope === 'term') blocks.forEach(b => order(b).forEach(p => list.push([b, p])));
+  else if(scope === 'termPiece') blocks.forEach(b => { const p = b.pieces.find(x => x.code === arg); if(p) list.push([b, p]); });
+  else if(scope === 'week'){ const [b, wk] = weekToBlock(+arg); (wk === 'A' ? WEEK_A : WEEK_B).forEach(c => { const p = b.pieces.find(x => x.code === c); if(p) list.push([b, p]); }); }
+  else { const b = blocks.find(x => x.n === UI.block) || blocks[0];
+    (scope === 'fortnight' ? order(b) : b.pieces.filter(p => p.code === UI.piece)).forEach(p => list.push([b, p])); }
   return `<div class="sheet compact">${list.map(([b, p], k) => pieceSheetHTML(b, p, k === 0)).join('')}</div>`;
 }
 
 function fortnightButtons(key, now){
-  const blocks = S.content.plan.blocks;
+  const blocks = clubPlan().blocks;
   return `${now ? `<button class="bigbtn now" data-ui="${key}" data-v="${now.block}">
       <span class="bb-k">This week · week ${now.wk} of ${now.W}</span>
       <span class="bb-t">${esc(blocks.find(x => x.n === now.block).weeks)} · Week ${now.week}</span></button>` : ''}
@@ -1254,19 +1673,21 @@ function screenWarmups(){
   const W = S.content.warmups, now = planNow();
   if(!UI.fromPlan && UI.wstep !== 'show'){
     render(`<div class="flow"><h1 class="flow-h">Warm-ups</h1><p class="flow-sub">10 minutes · the same warm-up both weeks of a fortnight</p>
+      ${groupPicker(false)}
       ${fortnightButtons('wpick', now)}</div>`);
     return;
   }
-  const i = Math.min(UI.wblock, W.length) - 1, b = W[i];
-  const blk = S.content.plan.blocks[i];
+  const pblocks = clubPlan().blocks, blk = pblocks.find(x => x.n === UI.wblock) || pblocks[0];
+  const b = W[blk.warm];
   const parts = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
   render(`<div class="flow">
     ${UI.fromPlan ? `<button class="backbar" data-act="to-plan">← ${esc(blk.assessment ? 'Assessment fortnight' : blk.weeks)}</button>` : `<button class="backbar" data-ui="wstep" data-v="weeks">← Fortnights</button>`}
-    <h1 class="flow-h">Warm-up · ${esc(b.assess ? 'Assessment' : b.weeks)}</h1>
+    <h1 class="flow-h">Warm-up · ${esc(blk.assessment ? 'Assessment' : blk.weeks)}</h1>
     <p class="flow-sub">10 min · same both weeks · <b>Focus:</b> ${esc(b.focus)}</p>
+    ${groupPicker(true)}
     ${b.assess ? `<div class="ladder"><div class="ladder-h">Assessment warm-up</div><div class="rung"><div class="rung-t">Pulse raiser for everyone: stretch, tuck and star jumps in connection (3 min). Then each gymnast runs the four Physical Prep skills from their own award-book level while coaches check them off (7 min).</div></div></div>` :
     parts.map(([k, n, t]) => `<div class="ladder"><div class="ladder-h">${n} <span class="muted" style="font-weight:700;font-size:14px">· ${t}</span></div>
-      ${[0,1,2,3].map(c => (b.parts[k][c] || []).length ? `<div class="rung"><div class="rung-n">${RUNGS[c].name}<span>${RUNGS[c].age}</span></div>
+      ${[0,1,2,3].filter(inGroup).map(c => (b.parts[k][c] || []).length ? `<div class="rung"><div class="rung-n">${RUNGS[c].name}<span>${RUNGS[c].age}</span></div>
         <div class="rung-t">${b.parts[k][c].map(x => esc(x.txt)).join('<br>')}</div>
         <div class="stars">${b.parts[k][c].map(x => { const bk = bookOf(x.L); return `<span class="star" style="--c:${bk.color}">★ ${bk.name} L${x.L}</span>`; }).join('')}</div></div>` : '').join('')}
     </div>`).join('')}
@@ -1339,6 +1760,10 @@ async function screenAdmin(){
 /* =====================================================================
    EVENTS
    ===================================================================== */
+document.addEventListener('input', e => {
+  if(e.target.id === 'cpStart' || e.target.id === 'cpHalf'){ const d = cpDraft(); d.start = document.getElementById('cpStart').value; d.halfTerm = document.getElementById('cpHalf').value;
+    const nx = document.querySelector('.cp-nav [data-n="4"]'); if(nx) nx.disabled = !d.start; }
+});
 document.addEventListener('click', async e => {
   const t = e.target;
   const go = t.closest('[data-go]');
@@ -1346,7 +1771,7 @@ document.addEventListener('click', async e => {
     if(g === 'home'){ if(signedIn){ tab = 'dashboard'; show(); } else screenLanding(); }
     else if(g === 'login') screenLogin(); else if(g === 'register') screenRegister(); window.scrollTo(0,0); return; }
   const nt = t.closest('[data-tab]');
-  if(nt){ tab = nt.dataset.tab; UI.fromPlan = false; if(tab === 'warmups') UI.wstep = 'weeks'; show(); window.scrollTo(0,0); return; }
+  if(nt){ tab = nt.dataset.tab; UI.fromPlan = false; UI.cstep = 0; if(tab === 'warmups') UI.wstep = 'weeks'; show(); window.scrollTo(0,0); return; }
   const ui = t.closest('[data-ui]');
   if(ui){
     const k = ui.dataset.ui, v = ui.dataset.v;
@@ -1386,7 +1811,19 @@ document.addEventListener('click', async e => {
     catch(err){ console.error(err); if(n) n.textContent = 'Couldn’t send the email. Please try again later.'; }
     act.disabled = false;
   }
-  else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece'), true); }
+  else if(a === 'cp-story'){ const m = modal(planStoryHTML(true) + '<div class="btn-row" style="margin-top:16px"><button class="btn" data-close>Close</button></div>'); m.querySelector('.modal').classList.add('modal-wide'); }
+  else if(a === 'cp-start'){ UI.cdraft = planDefaults(S.club.recTerm); UI.cstep = 1; show(); window.scrollTo(0,0); }
+  else if(a === 'cp-cancel'){ UI.cstep = 0; UI.cdraft = null; show(); window.scrollTo(0,0); }
+  else if(a === 'cp-set'){ const d = cpDraft(), k = act.dataset.k, v = act.dataset.v;
+    if(['VT','BM','BA','FT'].includes(k)) d.pieces[k] = v; else d[k] = +v; const y = window.scrollY; show(); window.scrollTo(0, y); }
+  else if(a === 'cp-step'){ const d = cpDraft();
+    if(UI.cstep === 3){ const sEl = document.getElementById('cpStart'), hEl = document.getElementById('cpHalf'); if(sEl) d.start = sEl.value; if(hEl) d.halfTerm = hEl.value; if(+act.dataset.n > 3 && !d.start) return; }
+    UI.cstep = +act.dataset.n; show(); window.scrollTo(0,0); }
+  else if(a === 'cp-save'){ const d = cpDraft(), n = document.getElementById('cpNote'); act.disabled = true; n.textContent = 'Saving…';
+    try{ await api.saveFamily(Object.assign({}, d, {custom:true, startBlock:1})); PLAN_CACHE = null; UI.cstep = 0; UI.cdraft = null; UI.pstep = 'weeks'; show(); window.scrollTo(0,0); }
+    catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save. Please try again.'; } }
+  else if(a === 'grp'){ const i = +act.dataset.i; const g = inGroup(i) ? UI.group.filter(x => x !== i) : [...UI.group, i].sort(); if(!g.length) return; UI.group = g; GROUP_STORE.set(g); const y = window.scrollY; show(); window.scrollTo(0, y); }
+  else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
   else if(a === 'plan-warmup'){ UI.wblock = UI.block; UI.fromPlan = true; tab = 'warmups'; show(); window.scrollTo(0,0); }
   else if(a === 'photo'){ const d = IMG.cache[act.dataset.imgId]; if(d){ const m = modal(`<img src="${d}" alt="Station set-up photo" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); m.querySelector('.modal').classList.add('modal-wide'); } }
