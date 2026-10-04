@@ -338,6 +338,34 @@
   .story-b li{font-size:15px;}
   .modal-wide .story-hero{margin-top:0;}
 
+
+  /* ---------- Show your class today's skill ---------- */
+  .skillvid{margin:0 0 16px;}
+  .skillvid-h{font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);margin:0 0 8px 2px;}
+  .skillvid-box{position:relative;display:block;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line);}
+  .skillvid-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .skillvid-box.empty{background:linear-gradient(135deg,#1d2f7a,#0d1a4f);cursor:pointer;padding:0;}
+  .skillvid-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;background:var(--rec);box-shadow:0 10px 30px rgba(0,0,0,.45);}
+  .skillvid-play::after{content:"";position:absolute;left:34px;top:26px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent var(--rec-ink);}
+  .skillvid-soon{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:var(--muted);font-weight:700;font-size:14px;}
+
+  .lic-until{font-size:18px;margin:2px 0 4px;}
+  .lic-renew{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,180,84,.12);border:1px solid rgba(255,180,84,.45);}
+
+  /* ---------- Coaching tips ---------- */
+  .tipbox{margin:0 0 10px;border:1px solid rgba(232,130,48,.45);border-radius:12px;background:rgba(232,130,48,.08);}
+  .tipbox summary{cursor:pointer;list-style:none;padding:10px 14px;font-weight:900;color:var(--rec);font-size:15px;}
+  .tipbox summary::-webkit-details-marker{display:none;}
+  .tipbox summary::before{content:"＋ ";}
+  .tipbox[open] summary::before{content:"－ ";}
+  .tipbox .tip-cues{margin:0;padding:0 14px 6px 32px;}
+  .tipbox .tip-cues li{margin:0 0 6px;font-size:15.5px;font-weight:700;}
+  .tipbox .tip-row{margin:0;padding:6px 14px 10px;font-size:14.5px;line-height:1.5;}
+  .tipbox .tip-row b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+  .tipbox .tip-safe b{color:var(--warn);}
+  .tipbox .tip-home{color:var(--muted);font-size:13px;}
+  .fstation .tipbox{margin-top:10px;}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
@@ -689,6 +717,16 @@ function screenChoose(){
   <p class="note" style="margin-top:8px">One level a term, assessed in the last two weeks of term. Ask your coach if you’re not sure.</p>` : ''}`);
 }
 
+// Coaching tips, worded for parents: what the coach will say and what to look for.
+// Safety notes are for coaches only, so they are left out here.
+function parentTips(s){
+  const t = s.tips; if(!t || !(t.cues || []).length) return '';
+  return `<details class="tipbox"><summary>Coaching tips</summary>
+    <p class="tip-row"><b>What the coach will say</b></p>
+    <ul class="tip-cues">${t.cues.map(c => `<li>“${esc(c)}”</li>`).join('')}</ul>
+    ${t.watch ? `<p class="tip-row"><b>What the coach is looking for</b> ${esc(t.watch)}</p>` : ''}
+    <p class="tip-row tip-home">Practise the shapes and cues at home, but leave anything that needs a coach’s support for the gym.</p></details>`;
+}
 function stationBlock(p, col, L){
   const lv = LEVELS[UI.book - 1];
   return p.stations.map(s => {
@@ -708,6 +746,7 @@ function stationBlock(p, col, L){
         ${book.map(y => `<span class="flink fb" style="--c:${lv.color}">Level ${y.L} skill · ${esc(y.s)}</span>`).join('')}
       </div>` : ''}
       ${imgs.length ? `<div class="thumbs">${imgs.map(h => `<button class="thumb" data-photo="${h}" aria-label="Enlarge photo"><img data-img="${h}" alt="How the station is set up"></button>`).join('')}</div>` : ''}
+      ${parentTips(s)}
     </div>`;
   }).join('');
 }
