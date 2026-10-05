@@ -3300,7 +3300,7 @@ function setTop(){
     ta.innerHTML = `${S.club ? `<span class="pill">${esc(S.club.name)}</span>` : ''}<button class="btn ghost small" data-act="signout">Sign out</button>`;
     nav.hidden = false;
     const lock = !hasAccess() && !S.isAdmin;
-    const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
+    const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['rotations','Class rotations'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
     nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
   }else{
     ta.innerHTML = `<button class="btn ghost small" data-go="login">Club login</button>`;
@@ -3316,6 +3316,7 @@ function show(){
     if(!hasAccess() && !S.isAdmin) return screenLocked();
     return withContent(() => ({club:screenClub, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
+  if(tab === 'rotations'){ tab = 'dashboard'; window.open('https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html', '_blank', 'noopener'); return show(); }
   if(tab === 'shop' && !hasAccess()) return screenLocked();
   ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab] ? ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab]() : screenDashboard();
 }
@@ -3504,6 +3505,8 @@ function screenDashboard(){
       <button class="card" data-tab="books" style="text-align:left;cursor:pointer"><h3>Award books</h3><p class="muted" style="margin:0">Skills by level and assessment sheets.</p></button>
       <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
     </div>
+    <a class="card cp-dash" href="https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit"><p class="eyebrow">Free for every club</p><h2>Class rotations</h2>
+      <p class="muted" style="margin:0">The NGL Rotation Planner, with your Recreational groups and rotations filled in from your club plan. Sign in with this same club login.</p></a>
     ${familyCard()}`;
   }else if(lapsed && !waiting.some(o => o.band)){
     lic = `<div class="card lic-card">
