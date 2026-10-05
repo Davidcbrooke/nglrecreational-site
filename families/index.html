@@ -393,6 +393,17 @@
   .codehelp{background:rgba(232,130,48,.1);border:1px solid rgba(232,130,48,.4);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:14px;line-height:1.5;}
   .codehelp b{color:var(--rec);}
 
+  /* ---------- Order supplies ---------- */
+  .shop-p{font-size:14px;font-weight:700;margin-left:8px;}
+  .shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media(min-width:700px){.shop-grid.four{grid-template-columns:repeat(4,1fr);}.shop-grid.six{grid-template-columns:repeat(6,1fr);}}
+  .shop-q{display:flex;flex-direction:column;gap:6px;background:var(--navy-2);border:1px solid var(--line);border-left:5px solid var(--c, var(--rec));border-radius:12px;padding:10px;}
+  .shop-l{font-weight:800;}.shop-l small{display:block;font-weight:600;color:var(--muted);font-size:12px;}
+  .shop-q .input{font-size:18px;padding:10px;text-align:center;}
+  .shop-book{margin:0 0 12px;}.shop-book>b{display:block;color:var(--c);margin:0 0 8px;}
+  .shop-sum{border-color:rgba(232,130,48,.6);}
+  textarea.input{width:100%;font:inherit;}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}

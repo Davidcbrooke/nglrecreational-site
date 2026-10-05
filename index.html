@@ -394,6 +394,17 @@
   .codehelp{background:rgba(232,130,48,.1);border:1px solid rgba(232,130,48,.4);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:14px;line-height:1.5;}
   .codehelp b{color:var(--rec);}
 
+  /* ---------- Order supplies ---------- */
+  .shop-p{font-size:14px;font-weight:700;margin-left:8px;}
+  .shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media(min-width:700px){.shop-grid.four{grid-template-columns:repeat(4,1fr);}.shop-grid.six{grid-template-columns:repeat(6,1fr);}}
+  .shop-q{display:flex;flex-direction:column;gap:6px;background:var(--navy-2);border:1px solid var(--line);border-left:5px solid var(--c, var(--rec));border-radius:12px;padding:10px;}
+  .shop-l{font-weight:800;}.shop-l small{display:block;font-weight:600;color:var(--muted);font-size:12px;}
+  .shop-q .input{font-size:18px;padding:10px;text-align:center;}
+  .shop-book{margin:0 0 12px;}.shop-book>b{display:block;color:var(--c);margin:0 0 8px;}
+  .shop-sum{border-color:rgba(232,130,48,.6);}
+  textarea.input{width:100%;font:inherit;}
+
   /* ---------- Coach flow: big buttons ---------- */
   .flow{max-width:760px;margin:0 auto;}
   .flow-h{font-size:clamp(26px,5vw,34px);margin:6px 0 6px;line-height:1.15;}
@@ -2925,34 +2936,33 @@ const INVOICE = {
   addressLines: ['66 Waveney Road', 'Harpenden', 'Hertfordshire', 'AL5 4QZ'],
   email: CONTACT_EMAIL,
   termsDays: 14,
-  vatNote: 'No VAT charged: National Gymnastics League is not VAT registered.',   // clear this when VAT_RATE is set
+  vatNote: '',
   bank: { accountName: 'National Gymnastics League', sortCode: '60-84-64', accountNumber: '93416867' }
 };
 /* Invoice emails use the same EmailJS service and template as NGL Schools
    (the template takes subject + invoice_html). */
 const EMAILJS = { serviceId:'service_3qlufgh', templateId:'template_8i40iia', publicKey:'ZSjEpECoOMHkWNB1D' };
 
-/* ---------- Pricing (edit here) ----------
-   One yearly Club Licence per club, banded by size. It runs 12 months from the day it is
-   activated. Books, medals and t-shirts are bought through the Hub while the licence is active.
-   Each band can buy books up to 10% above its top gymnast number in a licence year; past that
-   the club upgrades to the next band for the difference. */
+/* ---------- Pricing (edit here) ---------- */
 const CLUB_BANDS = [
-  {key:'s', label:'Up to 99 recreational gymnasts',  short:'Under 100', price:500,  books:110},
-  {key:'m', label:'100 to 399 recreational gymnasts', short:'100–399',  price:1000, books:440},
-  {key:'l', label:'400 or more recreational gymnasts', short:'400+',    price:1500, books:null}   // null = no limit
+  {key:'s', label:'Up to 199 recreational gymnasts', short:'Under 200', founding:500,  full:1000},
+  {key:'m', label:'200 to 499 recreational gymnasts', short:'200–499',   founding:1000, full:1500},
+  {key:'l', label:'500 or more recreational gymnasts', short:'500+',     founding:1500, full:2000}
 ];
-const SHOP = [
-  {kind:'book',   name:'Recreational award book',  price:5,  rrp:'£10',      note:'Lasts more than a year (4 levels)'},
-  {kind:'medal',  name:'Recreational medal',       price:3, rrp:'£5',       note:'One per gymnast each term'},
-  {kind:'tshirt', name:'NGL children’s t-shirt',   price:12, rrp:'£17 to £20', note:''}
-];
-const VAT_RATE = 0;   // NGL is not VAT registered yet. When it is, set 0.2 and VAT is added to every invoice.
+const GYMNAST_FEE_PER_MONTH = 1;
 const TERMS = [
-  {key:'autumn', label:'Autumn term'},
-  {key:'spring', label:'Spring term'},
-  {key:'summer', label:'Summer term'}
+  {key:'autumn', label:'Autumn term', months:4},
+  {key:'spring', label:'Spring term', months:4},
+  {key:'summer', label:'Summer term', months:4}
 ];
+const MEDAL_PRICE = 3;       // one medal per licensed gymnast per term
+const CERT_PRICE  = 0.10;    // attendance certificates (10 to 120 sessions)
+const CERT_STEPS  = [10,20,30,40,50,60,70,80,90,100,110,120];
+// Postage by order size. Certificates count as one item per 10.
+const POSTAGE = [{upTo:20, price:4}, {upTo:100, price:8}, {upTo:Infinity, price:12}];
+function postageFor(items){ if(items <= 0) return 0; return POSTAGE.find(p => items <= p.upTo).price; }
+const ADMIN_MODE = new URLSearchParams(location.search).has('admin');
+const BOOK_PRICE  = 5;       // new gymnasts only (families pay £10)
 const LEVELS = [
   {key:'ruby', name:'Ruby', book:1, color:'var(--ruby)'},
   {key:'pink', name:'Pink', book:2, color:'var(--pink)'},
@@ -2972,41 +2982,15 @@ function currentTermKey(d = new Date()){
   const m = d.getMonth();
   return m >= 8 ? 'autumn' : (m <= 2 ? 'spring' : 'summer');
 }
-// A licence runs 12 months from activation. A renewal paid early starts when the current one ends.
-function addYear(d){ const x = new Date(d); x.setFullYear(x.getFullYear() + 1); return x; }
-function licenceExpiry(rec, now = new Date()){
-  const cur = rec && rec.expires ? toDate(rec.expires) : null;
-  return addYear(cur && cur > now ? cur : now);
+// Licence runs to 30 September after the season ends (a month's grace to renew)
+function seasonExpiry(season){ const y = +season.slice(0,4) + 1; return new Date(y, 9, 1); }
+// Months left in the season including this one, for the first-year pro-rata
+function monthsLeft(d = new Date()){ const m = d.getMonth(); return m >= 8 ? 12 - (m - 8) : 8 - m; }
+function clubFee(band, firstYear){
+  const b = CLUB_BANDS.find(x => x.key === band) || CLUB_BANDS[0];
+  return firstYear ? Math.round(b.founding * monthsLeft() / 12) : b.founding;
 }
-const clubFee = band => (CLUB_BANDS.find(x => x.key === band) || CLUB_BANDS[0]).price;
-const shopItem = k => SHOP.find(x => x.kind === k);
-// Adds a VAT line when NGL is VAT registered
-function withVat(lines){
-  if(!VAT_RATE) return lines;
-  const net = lines.reduce((a, l) => a + l.qty * l.unit, 0);
-  return [...lines, {kind:'vat', desc:`VAT at ${Math.round(VAT_RATE * 100)}%`, qty:1, unit:Math.round(net * VAT_RATE * 100) / 100}];
-}
-/* Book allowance: books in the order that started or renewed the licence, and every order since. */
-function bookAllowance(club, orders){
-  const band = (CLUB_BANDS.find(b => b.key === (club.rec && club.rec.band)) || CLUB_BANDS[0]);
-  const lic = orders.filter(o => o.kind === 'start' || o.kind === 'renew').sort((a,b) => toDate(b.createdAt) - toDate(a.createdAt))[0];
-  const from = lic ? toDate(lic.createdAt) : new Date(0);
-  const used = orders.filter(o => toDate(o.createdAt) >= from)
-    .reduce((a, o) => a + (o.lines || []).filter(l => l.kind === 'book').reduce((x, l) => x + l.qty, 0), 0);
-  return {band, used, limit: band.books, left: band.books == null ? Infinity : Math.max(0, band.books - used)};
-}
-// Upgrade = the difference between the two bands, pro-rata for the whole months left on the licence
-function monthsRemaining(rec, now = new Date()){
-  if(!rec || !rec.expires) return 12;
-  const e = toDate(rec.expires); let m = (e.getFullYear() - now.getFullYear()) * 12 + (e.getMonth() - now.getMonth());
-  if(e.getDate() > now.getDate()) m += 1;          // part month counts as a month
-  return Math.max(1, Math.min(12, m));
-}
-function upgradeCost(fromKey, toKey, rec){
-  const a = CLUB_BANDS.find(b => b.key === fromKey) || CLUB_BANDS[0], b = CLUB_BANDS.find(x => x.key === toKey) || a;
-  return Math.round((b.price - a.price) * monthsRemaining(rec) / 12 * 100) / 100;
-}
-const nextBand = key => CLUB_BANDS[Math.min(CLUB_BANDS.length - 1, CLUB_BANDS.findIndex(b => b.key === key) + 1)];
+const termFee = key => (TERMS.find(t => t.key === key) || TERMS[0]).months * GYMNAST_FEE_PER_MONTH;
 
 const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 function orderRef(){
@@ -3187,18 +3171,18 @@ const liveApi = {
     const {fs, D} = await fb();
     const batch = fs.writeBatch(D);
     batch.update(fs.doc(D, 'recOrders', order.id), {status:'paid', paidAt:fs.serverTimestamp()});
-    if(order.upgradeTo && club.rec){
-      batch.update(fs.doc(D, 'clubs', club.id), {rec:{...club.rec, band:order.upgradeTo}});
-    }else if(order.band){
+    if(order.band){
       batch.update(fs.doc(D, 'clubs', club.id), {rec:{status:'active', band:order.band, season:order.season,
-        expires: fs.Timestamp.fromDate(licenceExpiry(club.rec)), activatedAt: fs.serverTimestamp()}});
+        expires: fs.Timestamp.fromDate(seasonExpiry(order.season)), activatedAt: fs.serverTimestamp()}});
     }
     await batch.commit();
   },
+  async adminMarkSent(order){ const {fs, D} = await fb(); await fs.updateDoc(fs.doc(D, 'recOrders', order.id), {status:'sent', sentAt:fs.serverTimestamp()}); order.status = 'sent'; },
+  async saveDelivery(addr){ const {fs, D} = await fb(); await fs.updateDoc(fs.doc(D, 'clubs', S.uid), {deliveryAddress:addr}); S.club.deliveryAddress = addr; },
   async adminSetStatus(club, status){
     const {fs, D} = await fb();
     const rec = {...(club.rec || {}), status};
-    if(status === 'active' && !rec.expires){ rec.season = S.season; rec.expires = fs.Timestamp.fromDate(addYear(new Date())); rec.band = rec.band || 's'; }
+    if(status === 'active' && !rec.expires){ rec.season = S.season; rec.expires = fs.Timestamp.fromDate(seasonExpiry(S.season)); rec.band = rec.band || 's'; }
     await fs.updateDoc(fs.doc(D, 'clubs', club.id), {rec});
     club.rec = rec;
   },
@@ -3223,16 +3207,17 @@ const liveApi = {
 
 /* ---------- Preview (demo) implementation ---------- */
 const DEMO_CLUB = () => ({name:'SAADI Gymnastics', contact:'Dave Brooke', email:CONTACT_EMAIL, bgNumber:'',
-  rec:{status:'active', band:'m', season:S.season, expires:addYear(new Date(Date.now() - 30 * 86400000))}, recCode:'SAADI-7K4P',
+  rec:{status:'active', band:'m', season:S.season, expires:seasonExpiry(S.season)}, recCode:'SAADI-7K4P',
   recTerm:{start: new Date(Date.now() - 16 * 86400000).toISOString().slice(0,10), weeks:14, startBlock:1}});
 const demoApi = {
   async restore(){ return false; },
   async signIn(){
     S.club = DEMO_CLUB(); S.isAdmin = true;
-    S.orders = [{id:'ORD-DEMO1', clubId:'demo', clubName:S.club.name, kind:'start', band:'m', season:S.season, term:'autumn', status:'paid', createdAt:new Date(Date.now() - 30 * 86400000),
-      lines:[{kind:'club', desc:'Recreational Club Licence, 100 to 399 gymnasts (12 months)', qty:1, unit:clubFee('m')},
-             {kind:'medal', desc:'Recreational medals', qty:240, unit:shopItem('medal').price},
-             {kind:'book', desc:'Recreational award books', qty:240, unit:shopItem('book').price}]}];
+    S.orders = [{id:'ORD-DEMO1', clubId:'demo', clubName:S.club.name, kind:'start', band:'m', season:S.season, term:'autumn', status:'paid', createdAt:new Date(),
+      lines:[{kind:'club', desc:'Recreational Club Licence ' + S.season + ' (founding price, pro-rata)', qty:1, unit:clubFee('m', true)},
+             {kind:'gymnast', desc:'Gymnast Licences, Autumn term ' + S.season, qty:240, unit:termFee('autumn')},
+             {kind:'medal', desc:'Recreational medals, Autumn term', qty:240, unit:MEDAL_PRICE},
+             {kind:'book', desc:'Recreational award books (new gymnasts)', qty:60, unit:BOOK_PRICE}]}];
     return {ok:true};
   },
   async resetPassword(){ return {ok:true}; },
@@ -3251,10 +3236,11 @@ const demoApi = {
   async adminLoad(){ return {clubs:[{id:'demo', ...S.club}], orders:S.orders.slice().reverse()}; },
   async adminMarkPaid(order, club){
     const o = S.orders.find(x => x.id === order.id); if(o) o.status = 'paid';
-    if(order.upgradeTo && S.club.rec){ S.club.rec = {...S.club.rec, band:order.upgradeTo}; }
-    else if(order.band){ S.club.rec = {status:'active', band:order.band, season:order.season, expires:licenceExpiry(S.club.rec)}; }
+    if(order.band){ S.club.rec = {status:'active', band:order.band, season:order.season, expires:seasonExpiry(order.season)}; }
   },
-  async adminSetStatus(club, status){ S.club.rec = {...(S.club.rec || {band:'s', season:S.season, expires:addYear(new Date())}), status}; club.rec = S.club.rec; },
+  async adminMarkSent(order){ order.status = 'sent'; },
+  async saveDelivery(addr){ S.club.deliveryAddress = addr; },
+  async adminSetStatus(club, status){ S.club.rec = {...(S.club.rec || {band:'s', season:S.season, expires:seasonExpiry(S.season)}), status}; club.rec = S.club.rec; },
   async adminPublish(){ }
 };
 const api = FIREBASE_CONFIG ? liveApi : demoApi;
@@ -3275,8 +3261,7 @@ function setTop(){
     ta.innerHTML = `${S.club ? `<span class="pill">${esc(S.club.name)}</span>` : ''}<button class="btn ghost small" data-act="signout">Sign out</button>`;
     nav.hidden = false;
     const lock = !hasAccess() && !S.isAdmin;
-    const tabs = S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['orders','Orders'],['licence','Licence & pricing']] : [];
-    if(S.isAdmin) tabs.push(['admin','NGL Admin']);
+    const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
     nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
   }else{
     ta.innerHTML = `<button class="btn ghost small" data-go="login">Club login</button>`;
@@ -3286,13 +3271,13 @@ function setTop(){
 function show(){
   setTop();
   if(!signedIn){ screenLanding(); return; }
-  if(tab === 'admin' && S.isAdmin) return screenAdmin();
-  if(!S.club){ tab = 'admin'; return screenAdmin(); }
+  if(ADMIN_MODE) return S.isAdmin ? screenAdmin() : render(`<div class="card locked-card"><h2>NGL admins only</h2><p class="muted">This login isn’t an NGL admin account.</p></div>`);
+  if(!S.club) return render(`<div class="card locked-card"><h2>No club on this login</h2><p class="muted">NGL admin has moved to the main NGL Admin app (Awards licences).</p></div>`);
   if(CONTENT_TABS.includes(tab)){
     if(!hasAccess() && !S.isAdmin) return screenLocked();
     return withContent(() => ({club:screenClub, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
-  ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence})[tab]();
+  ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab] ? ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab]() : screenDashboard();
 }
 async function withContent(fn){
   if(S.content){ fn(); return; }
@@ -3381,7 +3366,7 @@ function pitchHTML(inside){
   ${inside ? '' : `
   <div class="section card" style="text-align:center">
     <h2>Licensed to BG clubs</h2>
-    <p class="muted">Clubs hold a yearly Club Licence and buy award books and medals through the Club Hub. Full pricing is in the Club Hub once you register.</p>
+    <p class="muted">Clubs hold a yearly Club Licence and register their gymnasts each term. Full pricing is in the Club Hub once you register.</p>
     <div class="btn-row" style="justify-content:center"><button class="btn" data-go="register">Register your club</button></div>
   </div>`}
   <div class="foot">Questions? <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></div>`;
@@ -3393,8 +3378,8 @@ function screenLogin(msg){
   render(`
     <div class="auth card">
       ${FIREBASE_CONFIG ? '' : '<div class="demo-banner">Preview mode: any email and password opens a demo club with an active licence and the NGL Admin tab</div>'}
-      <h2>Club login</h2>
-      <p class="muted">Use your NGL club account. If you already use NGL Schools, it’s the same login.</p>
+      <h2>${ADMIN_MODE ? 'NGL Recreational admin' : 'Club login'}</h2>
+      <p class="muted">${ADMIN_MODE ? 'Sign in with your NGL admin account.' : 'Use your NGL club account. If you already use NGL Schools, it’s the same login.'}</p>
       <form id="loginForm">
         <div class="field"><label for="em">Email</label><input class="input" id="em" type="email" autocomplete="email" required></div>
         <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" autocomplete="current-password" required></div>
@@ -3444,20 +3429,17 @@ function screenRegister(){
    CLUB SCREENS
    ===================================================================== */
 const pending = () => S.orders.filter(o => o.status !== 'paid');
-function orderFor(o){
-  const bits = [];
-  if(o.kind === 'start') bits.push('New Club Licence'); else if(o.kind === 'renew') bits.push('Licence renewal'); else if(o.upgradeTo) bits.push('Band upgrade');
-  const n = k => (o.lines || []).filter(l => l.kind === k).reduce((a, l) => a + l.qty, 0);
-  if(n('book')) bits.push(n('book') + ' books'); if(n('medal')) bits.push(n('medal') + ' medals'); if(n('tshirt')) bits.push(n('tshirt') + ' t-shirts');
-  if(n('gymnast')) bits.push(n('gymnast') + ' gymnast licences');
-  return bits.join(', ') || 'Order';
-}
 const bandOf = k => CLUB_BANDS.find(b => b.key === k) || CLUB_BANDS[0];
+function termGymnasts(season, term){
+  return S.orders.filter(o => o.season === season && o.term === term)
+    .reduce((a, o) => a + ((o.lines || []).find(l => l.kind === 'gymnast') || {qty:0}).qty, 0);
+}
 function screenDashboard(){
   const rec = S.club.rec;
   const active = hasAccess();
   const waiting = pending();
-  const allow = active ? bookAllowance(S.club, S.orders) : null;
+  const tKey = currentTermKey(), tLabel = TERMS.find(t => t.key === tKey).label;
+  const needsRenewal = rec && rec.status === 'active' && rec.season !== S.season;
   const daysLeft = rec && rec.expires ? Math.ceil((toDate(rec.expires) - new Date()) / 86400000) : 0;
   const lapsed = !active && rec && rec.expires && (rec.status === 'active' || rec.status === 'inactive') && toDate(rec.expires) <= new Date();
   let lic;
@@ -3466,17 +3448,17 @@ function screenDashboard(){
       <p class="eyebrow">Recreational Club Licence</p>
       <h2>${esc(S.club.name)} <span class="tag ok">✓ Licence paid</span></h2>
       <p class="lic-until">Paid until <b>${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</b></p>
-      <p class="muted">${esc(bandOf(rec.band).label)}</p>
+      <p class="muted">${esc(rec.season)} · ${esc(bandOf(rec.band).label)}</p>
       ${daysLeft <= 45 ? `<div class="lic-renew"><b>Your licence ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.</b> Renew now so your coaches and families keep access without a break.</div>` : ''}
       <div class="kpis">
-        <div class="kpi"><div class="v">${allow.limit == null ? allow.used : allow.used + ' / ' + allow.limit}</div><div class="l">${allow.limit == null ? 'Award books this licence year' : 'Award books used of your allowance'}</div></div>
+        <div class="kpi"><div class="v">${termGymnasts(S.season, tKey)}</div><div class="l">Gymnasts registered, ${esc(tLabel)}</div></div>
         <div class="kpi"><div class="v">${waiting.length}</div><div class="l">Invoices awaiting payment</div></div>
         <div class="kpi"><div class="v">16</div><div class="l">Award-book levels</div></div>
         <div class="kpi"><div class="v">7</div><div class="l">Lesson-plan blocks</div></div>
       </div>
       <div class="btn-row" style="margin-top:16px">
-        <button class="btn" data-act="shop-order">Order books, medals and t-shirts</button>
-        ${daysLeft <= 45 ? `<button class="btn" data-act="renew">Renew my licence</button>` : ''}
+        <button class="btn" data-act="term-order">Register gymnasts for a term</button>
+        ${needsRenewal || daysLeft <= 45 ? `<button class="btn ${daysLeft <= 45 ? '' : 'ghost'}" data-act="renew">Renew my licence</button>` : ''}
       </div>
     </div>
     <button class="card cp-dash" data-tab="club"><p class="eyebrow">Step 1</p><h2>${S.club.recTerm && S.club.recTerm.custom ? 'Your club plan' : 'Build your club plan'}</h2>
@@ -3493,7 +3475,7 @@ function screenDashboard(){
       <p class="eyebrow">Recreational Club Licence</p>
       <h2>${esc(S.club.name)} <span class="tag off">Expired</span></h2>
       <p class="lic-until">Your licence ended on <b>${fmtDate(new Date(toDate(rec.expires).getTime() - 86400000))}</b></p>
-      <p class="muted">Lesson plans, warm-ups, award books and ordering are locked until you renew. Your club plan and settings are kept.</p>
+      <p class="muted">Lesson plans, warm-ups and award books are locked until you renew. Your club plan and settings are kept.</p>
       <div class="btn-row"><button class="btn" data-act="renew">Renew my licence</button><button class="btn ghost" data-tab="licence">See pricing</button></div>
     </div>`;
   }else if(waiting.some(o => o.band)){
@@ -3508,7 +3490,7 @@ function screenDashboard(){
     lic = `<div class="card lic-card">
       <p class="eyebrow">Recreational Club Licence</p>
       <h2>Start your Recreational licence</h2>
-      <p class="muted">Choose your club size and add any books and medals you need to start, and we’ll send your invoice. Everything unlocks as soon as it’s paid, and your licence runs for 12 months from then.</p>
+      <p class="muted">Choose your club size, tell us how many gymnasts you’re starting with this term, and we’ll send your invoice. Everything unlocks as soon as it’s paid.</p>
       <p class="note">An NGL Schools licence doesn’t include Recreational.</p>
       <div class="btn-row"><button class="btn" data-act="start">Start my licence</button><button class="btn ghost" data-tab="licence">See pricing</button></div>
     </div>`;
@@ -3588,105 +3570,144 @@ function screenLocked(){
 }
 
 function screenLicence(){
-  const vat = VAT_RATE ? ' + VAT' : '';
+  const first = !S.club.rec;
   render(`
   <p class="eyebrow">Licence &amp; pricing</p><h1>NGL Recreational licensing</h1>
   <div class="card">
     <h2>Club Licence, per year</h2>
-    <p class="muted">One yearly licence gives your coaches the full programme in this Hub and lets you order award books, medals and t-shirts. It runs for 12 months from the day it’s activated.</p>
+    <p class="muted">Gives your coaches the full programme in this Hub. Renews each September. Founding clubs keep their founding price at renewal.</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>Club size</th><th class="num">Per year</th><th class="num">Award books per licence year</th></tr></thead>
-      <tbody>${CLUB_BANDS.map(b => `<tr ${S.club.rec && S.club.rec.band === b.key ? 'style="background:rgba(232,130,48,.12)"' : ''}><td>${b.label}</td><td class="num"><b>${gbp(b.price)}</b>${vat}</td><td class="num">${b.books == null ? 'No limit' : 'Up to ' + b.books}</td></tr>`).join('')}</tbody>
+      <thead><tr><th>Club size</th><th class="num">Founding price</th></tr></thead>
+      <tbody>${CLUB_BANDS.map(b => `<tr ${S.club.rec && S.club.rec.band === b.key ? 'style="background:rgba(232,130,48,.12)"' : ''}><td>${b.label}</td><td class="num"><s class="was">${gbp(b.full)}</s><b>${gbp(b.founding)}</b></td></tr>`).join('')}</tbody>
     </table></div>
-    <p class="note" style="margin-top:10px">Growing? If you need more books than your band allows, upgrade to the next band at any time. You pay the difference between the two bands for the months left on your licence, and your renewal date stays the same.</p>
+    ${first ? `<p class="note" style="margin-top:10px">Joining part way through the year? Your first Club Licence is charged pro-rata to September, so every club renews at the same time. Joining now: ${monthsLeft()} of 12 months.</p>` : ''}
   </div>
-  <div class="card">
-    <h2>Award books, medals and t-shirts</h2>
-    <div class="table-wrap"><table>
-      <thead><tr><th>Item</th><th class="num">Your price</th><th class="num">Suggested price to families</th></tr></thead>
-      <tbody>${SHOP.map(i => `<tr><td>${esc(i.name)}${i.note ? `<div class="note">${esc(i.note)}</div>` : ''}</td><td class="num">${gbp(i.price)}${vat}</td><td class="num">${esc(i.rrp)}</td></tr>`).join('')}</tbody>
-    </table></div>
-    <p class="note" style="margin-top:8px">At the suggested prices, a club with ${Math.ceil(CLUB_BANDS[0].price / (3 * (5 - SHOP[1].price) + (10 - SHOP[0].price)))} or more gymnasts covers its whole Club Licence from book and medal sales.</p>
+  <div class="grid2">
+    <div class="card">
+      <h2>Gymnast Licence, per term</h2>
+      <p class="muted">Register how many gymnasts you have at the start of each term. Numbers can be different every term.</p>
+      <table><tbody>
+        ${TERMS.map(t => `<tr><td>${t.label}</td><td class="num">${gbp(termFee(t.key))} per gymnast</td></tr>`).join('')}
+      </tbody></table>
+      <p class="note" style="margin-top:8px">${gbp(GYMNAST_FEE_PER_MONTH)} per gymnast per month.</p>
+    </div>
+    <div class="card">
+      <h2>Medals and books</h2>
+      <table><tbody>
+        <tr><td>Recreational medal, one per gymnast each term</td><td class="num">${gbp(MEDAL_PRICE)}</td></tr>
+        <tr><td>Award book, new gymnasts only</td><td class="num">${gbp(BOOK_PRICE)}</td></tr>
+      </tbody></table>
+      <p class="note" style="margin-top:8px">Most clubs charge families £5 a medal and £10 a book.</p>
+    </div>
   </div>
   ${pitchHTML(true)}`);
 }
 
+
+function orderFor(o){
+  if(o.kind === 'supplies') return 'Supplies';
+  return (o.band ? 'Club Licence ' + esc(o.season) : '') + (o.term ? (o.band ? ' + ' : '') + esc((TERMS.find(t => t.key === o.term) || {}).label || '') : '');
+}
+function statusTag(o){
+  if(o.status === 'sent') return '<span class="tag ok">Sent</span>';
+  if(o.status === 'paid') return o.kind === 'supplies' ? '<span class="tag info">Paid · being packed</span>' : '<span class="tag ok">Paid</span>';
+  return '<span class="tag wait">Awaiting payment</span>';
+}
+/* ---------- Order supplies: books, medals, attendance certificates ---------- */
+const SHOP = {};
+function shopLines(){
+  const L = [];
+  LEVELS.forEach(l => { const q = +SHOP['book' + l.book] || 0; if(q) L.push({kind:'book', desc:`Award book: Book ${l.book} (${l.name})`, qty:q, unit:BOOK_PRICE}); });
+  for(let lv = 1; lv <= 16; lv++){ const q = +SHOP['medal' + lv] || 0; if(q) L.push({kind:'medal', desc:`Recreational medal: Level ${lv} (${bookOf(lv).name})`, qty:q, unit:MEDAL_PRICE}); }
+  CERT_STEPS.forEach(n => { const q = +SHOP['cert' + n] || 0; if(q) L.push({kind:'cert', desc:`Attendance certificate: ${n} sessions`, qty:q, unit:CERT_PRICE}); });
+  const items = L.filter(l => l.kind !== 'cert').reduce((a, l) => a + l.qty, 0) + Math.ceil(L.filter(l => l.kind === 'cert').reduce((a, l) => a + l.qty, 0) / 10);
+  const post = postageFor(items);
+  if(post) L.push({kind:'postage', desc:`Postage and packing (${items} item${items === 1 ? '' : 's'})`, qty:1, unit:post});
+  return L;
+}
+function qtyBox(key, label, sub, color){
+  return `<label class="shop-q" ${color ? `style="--c:${color}"` : ''}><span class="shop-l">${label}${sub ? `<small>${sub}</small>` : ''}</span>
+    <input class="input" type="number" min="0" step="1" inputmode="numeric" data-shop="${key}" value="${SHOP[key] || ''}" placeholder="0"></label>`;
+}
+function screenShop(){
+  if(SHOP.address === undefined) SHOP.address = S.club.deliveryAddress || S.club.address || '';
+  render(`<p class="eyebrow">Order supplies</p><h1>Books, medals and certificates</h1>
+  <p class="muted">Pay by bank transfer when you receive the invoice. We post your order as soon as payment arrives.</p>
+  <div class="card"><h2>Award books <span class="muted shop-p">${gbp(BOOK_PRICE)} each</span></h2>
+    <div class="shop-grid four">${LEVELS.map(l => qtyBox('book' + l.book, 'Book ' + l.book, l.name + ' · Levels ' + ((l.book - 1) * 4 + 1) + '–' + l.book * 4, l.color)).join('')}</div></div>
+  <div class="card"><h2>Medals <span class="muted shop-p">${gbp(MEDAL_PRICE)} each</span></h2>
+    ${LEVELS.map(l => `<div class="shop-book" style="--c:${l.color}"><b>Book ${l.book} · ${l.name}</b><div class="shop-grid four">${[0,1,2,3].map(k => { const lv = (l.book - 1) * 4 + 1 + k; return qtyBox('medal' + lv, 'Level ' + lv, '', l.color); }).join('')}</div></div>`).join('')}</div>
+  <div class="card"><h2>Attendance certificates <span class="muted shop-p">${gbp(CERT_PRICE)} each</span></h2>
+    <div class="shop-grid six">${CERT_STEPS.map(n => qtyBox('cert' + n, n + ' sessions', '')).join('')}</div></div>
+  <div class="card"><h2>Delivery address</h2>
+    <textarea class="input" id="shopAddr" rows="4" placeholder="Club name, street, town, postcode">${esc(SHOP.address)}</textarea>
+    <p class="note">Postage: ${POSTAGE.map((p, i) => (p.upTo === Infinity ? 'over ' + POSTAGE[i - 1].upTo + ' items ' : 'up to ' + p.upTo + ' items ') + gbp(p.price)).join(' · ')}. Certificates count as one item per 10.</p></div>
+  <div class="card shop-sum" id="shopSum"></div>`);
+  shopSummary();
+}
+function shopSummary(){
+  const el = document.getElementById('shopSum'); if(!el) return;
+  const L = shopLines(), total = L.reduce((a, l) => a + l.qty * l.unit, 0), goods = L.some(l => l.kind !== 'postage');
+  el.innerHTML = `<h2>Your order</h2>${goods ? `<div class="table-wrap"><table><tbody>${L.map(l => `<tr><td>${esc(l.desc)}</td><td class="num">${l.qty} × ${gbp(l.unit)}</td><td class="num">${gbp(l.qty * l.unit)}</td></tr>`).join('')}
+    <tr><td colspan="2" class="num"><b>Total</b></td><td class="num"><b>${gbp(total)}</b></td></tr></tbody></table></div>` : '<p class="muted">Add quantities above to build your order.</p>'}
+    <p class="error" id="shopErr"></p>
+    <button class="btn" data-act="shop-order" ${goods ? '' : 'disabled'}>Place order and get invoice</button>`;
+}
 function screenOrders(){
   const rows = S.orders.slice().reverse();
   render(`<p class="eyebrow">Orders</p><h1>Orders and invoices</h1>
   <div class="card">${rows.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Order</th><th>Date</th><th>For</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
     <tbody>${rows.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${fmtDate(toDate(o.createdAt))}</td>
-      <td>${esc(orderFor(o))}</td>
+      <td>${orderFor(o)}</td>
       <td class="num">${gbp(orderTotal(o))}</td>
-      <td>${o.status === 'paid' ? '<span class="tag ok">Paid</span>' : '<span class="tag wait">Awaiting payment</span>'}</td>
+      <td>${statusTag(o)}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="invoice" data-order="${esc(o.id)}">Invoice</button></td></tr>`).join('')}</tbody>
   </table></div>` : `<p class="muted">No orders yet.</p><button class="btn" data-act="start">Start my licence</button>`}</div>`);
 }
 
 /* ---------- Order modals ---------- */
-// kind: 'start' (new licence + optional starter order), 'renew' (licence, can change band), 'shop' (books, medals, t-shirts)
 function orderModal(kind){
   const withLicence = kind === 'start' || kind === 'renew';
-  const curBand = S.club.rec && S.club.rec.band;
+  const firstYear = kind === 'start';
+  const tNow = currentTermKey();
   const m = modal(`
-    <h2>${kind === 'start' ? 'Start your Recreational licence' : kind === 'renew' ? 'Renew your Club Licence' : 'Order books, medals and t-shirts'}</h2>
+    <h2>${kind === 'start' ? 'Start your Recreational licence' : kind === 'renew' ? 'Renew your Club Licence' : 'Register gymnasts for a term'}</h2>
     <form id="oform">
-      ${withLicence ? `<div class="field"><label for="ob">Club size (recreational gymnasts)</label><select class="input" id="ob">${CLUB_BANDS.map(b => `<option value="${b.key}" ${curBand === b.key ? 'selected' : ''}>${b.label}, ${gbp(b.price)} a year</option>`).join('')}</select></div>` : ''}
-      ${SHOP.map(i => `<div class="field"><label for="q_${i.kind}">${esc(i.name)}s <span class="note">${gbp(i.price)} each${i.note ? ' · ' + esc(i.note) : ''}</span></label><input class="input" id="q_${i.kind}" type="number" min="0" step="1" value="0" inputmode="numeric"></div>`).join('')}
-      <div id="oallow" class="note" style="margin:-4px 0 10px"></div>
+      ${withLicence ? `<div class="field"><label for="ob">Club size (recreational gymnasts)</label><select class="input" id="ob">${CLUB_BANDS.map(b => `<option value="${b.key}" ${S.club.rec && S.club.rec.band === b.key ? 'selected' : ''}>${b.label}</option>`).join('')}</select></div>` : ''}
+      <div class="field"><label for="ot">Term</label><select class="input" id="ot">${TERMS.map(t => `<option value="${t.key}" ${t.key === tNow ? 'selected' : ''}>${t.label} ${S.season}</option>`).join('')}</select></div>
+      <div class="field"><label for="og">Gymnasts this term</label><input class="input" id="og" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="ok">New gymnasts needing a book</label><input class="input" id="ok" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
       <div id="osum"></div>
       <div class="btn-row" style="margin-top:14px"><button class="btn" type="submit">Place order</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
     </form>`);
   const q = id => m.querySelector('#' + id);
-  const qty = k => Math.max(0, parseInt(q('q_' + k).value) || 0);
-  let upgrade = false;
-  function state(){
-    // Allowance for the band this order will leave the club in
-    const bandKey = withLicence ? q('ob').value : curBand;
-    const band = CLUB_BANDS.find(b => b.key === bandKey) || CLUB_BANDS[0];
-    const used = kind === 'shop' ? bookAllowance(S.club, S.orders).used : 0;
-    const target = upgrade ? nextBand(bandKey) : band;
-    const over = band.books != null && used + qty('book') > band.books;
-    const fits = target.books == null || used + qty('book') <= target.books;
-    return {band, target, used, over, fits};
-  }
   function lines(){
-    const st = state(), L = [];
-    if(withLicence) L.push({kind:'club', desc:`Recreational Club Licence, ${st.band.label.replace(' recreational', '')} (12 months)`, qty:1, unit:st.band.price});
-    if(kind === 'shop' && upgrade && st.over){ const mr = monthsRemaining(S.club.rec); L.push({kind:'club', desc:`Club Licence upgrade, ${st.band.short} to ${st.target.short} (${mr} month${mr === 1 ? '' : 's'} left on your licence)`, qty:1, unit:upgradeCost(st.band.key, st.target.key, S.club.rec)}); }
-    SHOP.forEach(i => { const n = qty(i.kind); if(n) L.push({kind:i.kind, desc:i.name + 's', qty:n, unit:i.price}); });
-    return withVat(L);
+    const g = Math.max(0, parseInt(q('og').value) || 0), bk = Math.max(0, parseInt(q('ok').value) || 0), t = q('ot').value;
+    const tl = TERMS.find(x => x.key === t).label;
+    const L = [];
+    if(withLicence){ const b = q('ob').value; L.push({kind:'club', desc:`Recreational Club Licence ${S.season}${firstYear && monthsLeft() < 12 ? ' (founding price, ' + monthsLeft() + ' months pro-rata)' : ' (founding price)'}`, qty:1, unit:clubFee(b, firstYear)}); }
+    if(g) L.push({kind:'gymnast', desc:`Gymnast Licences, ${tl} ${S.season}`, qty:g, unit:termFee(t)});
+    if(g) L.push({kind:'medal', desc:`Recreational medals, ${tl}`, qty:g, unit:MEDAL_PRICE});
+    if(bk) L.push({kind:'book', desc:'Recreational award books (new gymnasts)', qty:bk, unit:BOOK_PRICE});
+    return L;
   }
   function sum(){
-    const st = state(), L = lines(), tot = L.reduce((a, l) => a + l.qty * l.unit, 0);
-    const lim = st.band.books;
-    let msg = lim == null ? 'No limit on award books for your club size.' : `Award books: ${st.used + qty('book')} of ${lim} for this licence year.`;
-    if(st.over){
-      const nb = nextBand(st.band.key);
-      msg = kind === 'shop'
-        ? `<b style="color:var(--ruby,#b00)">That’s more books than your band allows (${lim} a licence year, ${st.used} used).</b><br><label style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" id="oup" ${upgrade ? 'checked' : ''}> Upgrade to ${esc(nb.short)} gymnasts for ${gbp(upgradeCost(st.band.key, nb.key, S.club.rec))} (the difference for the ${monthsRemaining(S.club.rec)} month${monthsRemaining(S.club.rec) === 1 ? '' : 's'} left on your licence) and add it to this order</label>`
-        : `<b style="color:var(--ruby,#b00)">${lim} books is the most for this club size.</b> Choose a larger club size, or order fewer books.`;
-      if(upgrade && !st.fits) msg += `<br>Even after upgrading that’s more than ${nb.books} books. Please contact us.`;
-    }
-    q('oallow').innerHTML = msg;
-    const up = q('oup'); if(up) up.addEventListener('change', () => { upgrade = up.checked; sum(); });
+    const L = lines(), tot = L.reduce((a, l) => a + l.qty * l.unit, 0);
     q('osum').innerHTML = L.map(l => `<div class="sum"><span>${esc(l.desc)}${l.qty > 1 ? ` × ${l.qty}` : ''}</span><span>${gbp(l.qty * l.unit)}</span></div>`).join('')
       + `<div class="sum total"><span>Total</span><span>${gbp(tot)}</span></div>`;
   }
-  m.querySelectorAll('input[type=number]').forEach(i => i.addEventListener('input', sum));
+  q('og').addEventListener('input', () => { if(!q('ok').dataset.touched) q('ok').value = kind === 'start' ? q('og').value : q('ok').value; sum(); });
+  q('ok').addEventListener('input', () => { q('ok').dataset.touched = '1'; sum(); });
   m.querySelectorAll('select').forEach(s => s.addEventListener('change', sum));
   sum();
   q('oform').addEventListener('submit', async e => {
     e.preventDefault();
-    const st = state(), L = lines();
-    if(!L.length){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Add something to order.</p>'); return; }
-    if(st.over && !(kind === 'shop' && upgrade && st.fits)){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Please sort out the book allowance above first.</p>'); return; }
+    const L = lines();
+    if(!L.length){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Add at least one gymnast.</p>'); return; }
     const sb = e.target.querySelector('button[type=submit]'); sb.disabled = true; sb.textContent = 'Placing order…';
-    const order = {kind, season:S.season, term:currentTermKey(), band: withLicence ? q('ob').value : null, lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0)};
-    if(kind === 'shop' && upgrade && st.over) order.upgradeTo = st.target.key;
     let o;
-    try{ o = await api.placeOrder(order); }
+    try{ o = await api.placeOrder({kind, season:S.season, term:q('ot').value, band: withLicence ? q('ob').value : null, lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0)}); }
     catch(err){ console.error(err); sb.disabled = false; sb.textContent = 'Place order'; q('osum').insertAdjacentHTML('beforeend', '<p class="error">Couldn’t place the order. Please try again.</p>'); return; }
     m.querySelector('.modal').innerHTML = `<h2>Order ${esc(o.id)} placed</h2>
       <p class="muted">${gbp(orderTotal(o))}. Pay by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>.${withLicence ? ' Your programme unlocks as soon as payment is received.' : ''}</p>
@@ -3711,6 +3732,7 @@ function invoiceHTML(o, club){
     <div class="inv-cols">
       <div><div class="inv-label">From</div><b>${esc(INVOICE.businessName)}</b><br>${INVOICE.addressLines.map(esc).join('<br>')}<br>${esc(INVOICE.email)}</div>
       <div><div class="inv-label">Bill to</div><b>${esc(club.name || o.clubName || '')}</b><br>${club.contact ? esc(club.contact) + '<br>' : ''}${club.email ? esc(club.email) + '<br>' : ''}${club.bgNumber ? 'BG club no. ' + esc(club.bgNumber) : ''}</div>
+      ${o.delivery ? `<div><div class="inv-label">Deliver to</div>${esc(o.delivery).replace(/\n/g, '<br>')}</div>` : ''}
       <div><div class="inv-label">Invoice date</div>${fmtDate(issued)}<div class="inv-label" style="margin-top:10px">Payment due</div>${fmtDate(due)}</div>
     </div>
     <table class="inv-table"><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr></thead>
@@ -3719,7 +3741,7 @@ function invoiceHTML(o, club){
     <div class="inv-pay"><div class="inv-label">How to pay: bank transfer</div>
       <table><tr><td>Account name</td><td><b>${esc(INVOICE.bank.accountName)}</b></td></tr><tr><td>Sort code</td><td><b>${esc(INVOICE.bank.sortCode)}</b></td></tr>
       <tr><td>Account number</td><td><b>${esc(INVOICE.bank.accountNumber)}</b></td></tr><tr><td>Payment reference</td><td><b class="mono">${esc(o.id)}</b></td></tr></table>
-      <p>Please use the payment reference exactly as shown so we can match your payment.${o.kind === 'start' || o.kind === 'renew' ? ' Your Recreational programme unlocks as soon as payment is received.' : ''}</p></div>
+      <p>Please use the payment reference exactly as shown so we can match your payment.${o.band ? ' Your Recreational programme unlocks as soon as payment is received.' : ''}</p></div>
     <div class="inv-foot">${esc(INVOICE.businessName)} · ${esc(INVOICE.email)} · nglrecreational.co.uk</div></div>`;
 }
 function invoiceEmailHTML(o, club){
@@ -4196,16 +4218,21 @@ async function screenAdmin(){
   setTop();
   render(`<p class="muted">Loading…</p>`);
   try{ ADM = await api.adminLoad(); }catch(e){ console.error(e); render('<p class="error">Couldn’t load admin data.</p>'); return; }
-  const recClubs = ADM.clubs.filter(c => c.rec || ADM.orders.some(o => o.clubId === c.id));
-  const waiting = ADM.orders.filter(o => o.status !== 'paid');
-  render(`<p class="eyebrow">NGL Admin</p><h1>Recreational admin</h1>
+  const recClubs = ADM.clubs.slice().sort((a, b) => (b.rec ? 1 : 0) - (a.rec ? 1 : 0));
+  const waiting = ADM.orders.filter(o => o.status === 'awaiting-payment' || !o.status);
+  const toSend = ADM.orders.filter(o => o.kind === 'supplies' && o.status === 'paid');
+  render(`<p class="eyebrow">NGL Admin</p><h1>Recreational admin</h1><div class="btn-row" style="margin:-4px 0 14px"><button class="btn ghost small" data-act="adm-refresh">Refresh</button></div>
   <div class="card"><h2>Orders awaiting payment (${waiting.length})</h2>${waiting.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Order</th><th>Club</th><th>For</th><th class="num">Total</th><th></th></tr></thead>
-    <tbody>${waiting.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${esc(orderFor(o))}</td><td class="num">${gbp(orderTotal(o))}</td>
+    <tbody>${waiting.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${orderFor(o)}</td><td class="num">${gbp(orderTotal(o))}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-paid" data-order="${esc(o.id)}">Mark paid</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing outstanding.</p>'}</div>
-  <div class="card"><h2>Recreational clubs (${recClubs.length})</h2>${recClubs.length ? `<div class="table-wrap"><table>
-    <thead><tr><th>Club</th><th>Size</th><th>Licence until</th><th>Books used</th><th>Status</th><th></th></tr></thead>
-    <tbody>${recClubs.map(c => { const on = c.rec && c.rec.status === 'active'; return `<tr><td>${esc(c.name)}<div class="note">${esc(c.email || '')}</div></td><td>${c.rec ? esc(bandOf(c.rec.band).short) : '—'}</td><td>${c.rec && c.rec.expires ? fmtDate(new Date(toDate(c.rec.expires).getTime() - 86400000)) : '—'}</td><td>${(() => { if(!c.rec) return '—'; const a = bookAllowance(c, ADM.orders.filter(o => o.clubId === c.id)); return a.limit == null ? a.used : a.used + ' / ' + a.limit; })()}</td>
+  <div class="card"><h2>Supplies to send (${toSend.length})</h2>${toSend.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Club</th><th>Items</th><th>Deliver to</th><th></th></tr></thead>
+    <tbody>${toSend.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${(o.lines || []).filter(l => l.kind !== 'postage').map(l => `${l.qty} × ${esc(l.desc)}`).join('<br>')}</td><td style="white-space:pre-line">${esc(o.delivery || '')}</td>
+      <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-sent" data-order="${esc(o.id)}">Mark sent</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing waiting to be posted.</p>'}</div>
+  <div class="card"><h2>Clubs (${recClubs.length})</h2><p class="note">Every registered NGL club account. Recreational clubs are listed first.</p>${recClubs.length ? `<div class="table-wrap"><table>
+    <thead><tr><th>Club</th><th>Size</th><th>Season</th><th>Status</th><th></th></tr></thead>
+    <tbody>${recClubs.map(c => { const on = c.rec && c.rec.status === 'active'; return `<tr><td>${esc(c.name)}<div class="note">${esc(c.email || '')}</div></td><td>${c.rec ? esc(bandOf(c.rec.band).short) : '—'}</td><td>${c.rec ? esc(c.rec.season || '') : '—'}</td>
       <td>${on ? '<span class="tag ok">Active</span>' : c.rec ? '<span class="tag off">Off</span>' : '<span class="tag wait">Not started</span>'}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-status" data-club="${esc(c.id)}" data-to="${on ? 'inactive' : 'active'}">${on ? 'Switch off' : 'Switch on'}</button></td></tr>`; }).join('')}</tbody></table></div>` : '<p class="muted">No Recreational clubs yet.</p>'}</div>
   <div class="card"><h2>Publish programme content</h2>
@@ -4221,6 +4248,8 @@ async function screenAdmin(){
    EVENTS
    ===================================================================== */
 document.addEventListener('input', e => {
+  if(e.target.dataset && e.target.dataset.shop){ SHOP[e.target.dataset.shop] = Math.max(0, Math.floor(+e.target.value || 0)); shopSummary(); return; }
+  if(e.target.id === 'shopAddr'){ SHOP.address = e.target.value; return; }
   if(e.target.id === 'cpStart' || e.target.id === 'cpHalf'){ const d = cpDraft(); d.start = document.getElementById('cpStart').value; d.halfTerm = document.getElementById('cpHalf').value;
     const nx = document.querySelector('.cp-nav [data-n="4"]'); if(nx) nx.disabled = !d.start; }
 });
@@ -4252,7 +4281,7 @@ document.addEventListener('click', async e => {
   if(a === 'signout'){ await api.signOut(); signedIn = false; S.club = null; S.isAdmin = false; S.content = null; screenLanding(); }
   else if(a === 'start') orderModal('start');
   else if(a === 'renew') orderModal('renew');
-  else if(a === 'shop-order'){ if(hasAccess()) orderModal('shop'); else show(); }
+  else if(a === 'term-order') orderModal('term');
   else if(a === 'reset'){
     const em = (document.getElementById('em') || {}).value || '';
     const err = document.getElementById('err');
@@ -4284,6 +4313,25 @@ document.addEventListener('click', async e => {
     catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save: ' + (err && (err.code || err.message) || 'unknown error') + '. Please try again, or send this message to NGL.'; } }
   else if(a === 'vid-soon'){ const t = act.querySelector('.skillvid-soon'); if(t){ t.textContent = 'This video is coming soon'; } }
   else if(a === 'print-poster'){ printHTML(posterHTML(act.dataset.kind), false); }
+  else if(a === 'shop-order'){
+    const L = shopLines(), err = document.getElementById('shopErr');
+    if(!(SHOP.address || '').trim()){ err.textContent = 'Please add a delivery address.'; document.getElementById('shopAddr').focus(); return; }
+    act.disabled = true; act.textContent = 'Placing order…';
+    let o;
+    try{ o = await api.placeOrder({kind:'supplies', season:S.season, lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0), delivery:SHOP.address.trim()}); api.saveDelivery && api.saveDelivery(SHOP.address.trim()).catch(() => {}); }
+    catch(e2){ console.error(e2); act.disabled = false; act.textContent = 'Place order and get invoice'; err.textContent = 'Couldn’t place the order. Please try again.'; return; }
+    Object.keys(SHOP).forEach(k => { if(k !== 'address') delete SHOP[k]; });
+    const m = modal(`<h2>Order ${esc(o.id)} placed</h2><p class="muted">${gbp(orderTotal(o))}. Pay by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>. We’ll post it to you as soon as payment arrives.</p>
+      <div class="btn-row"><button class="btn" data-act="invoice" data-order="${esc(o.id)}">View invoice</button><button class="btn ghost" data-close>Done</button></div>
+      <p class="note" id="mailNote" style="margin:12px 0 0">${FIREBASE_CONFIG ? 'Emailing your invoice to ' + esc(S.club.email || '') + '…' : 'Preview mode: no email sent.'}</p>`);
+    m.querySelector('[data-close]').addEventListener('click', () => { tab = 'orders'; show(); });
+    if(FIREBASE_CONFIG) emailInvoice(o, S.club).then(() => { const n = document.getElementById('mailNote'); if(n){ n.style.color = 'var(--ok)'; n.textContent = '✓ Invoice emailed to ' + S.club.email + '.'; } }).catch(e3 => { console.error(e3); const n = document.getElementById('mailNote'); if(n) n.textContent = 'We couldn’t email the invoice just now, but you can view it in Orders.'; });
+  }
+  else if(a === 'adm-refresh'){ screenAdmin(); }
+  else if(a === 'adm-sent'){
+    const o = ADM.orders.find(x => x.id === act.dataset.order); if(!o) return;
+    act.disabled = true; try{ await api.adminMarkSent(o); screenAdmin(); }catch(e4){ console.error(e4); act.disabled = false; act.textContent = 'Failed, retry'; }
+  }
   else if(a === 'grp'){ const i = +act.dataset.i; const g = inGroup(i) ? UI.group.filter(x => x !== i) : [...UI.group, i].sort(); if(!g.length) return; UI.group = g; GROUP_STORE.set(g); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
@@ -4321,10 +4369,10 @@ document.addEventListener('click', async e => {
 (async () => {
   let restored = false;
   try{ restored = await api.restore(); }catch(e){ console.error(e); }
-  if(restored){ signedIn = true; tab = S.club ? 'dashboard' : 'admin'; show(); }
+  if(restored){ signedIn = true; tab = 'dashboard'; show(); }
   else{
     const go = new URLSearchParams(location.search).get('go');
-    if(go === 'register') screenRegister(); else if(go === 'login') screenLogin(); else screenLanding();
+    if(ADMIN_MODE) screenLogin(); else if(go === 'register') screenRegister(); else if(go === 'login') screenLogin(); else screenLanding();
   }
 })();
 
