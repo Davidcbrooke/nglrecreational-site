@@ -4415,9 +4415,9 @@ function runOrder(){
   const rec = rotaRec(), cls = recClassList().find(c => c.key === UI.run.cls);
   let pieces, j = 0;
   if(cls){
-    const gi = UI.run.gi, rotA = gi < 3;
-    pieces = (rotA ? (week === 'A' ? setA : setB) : (week === 'A' ? setB : setA));
-    j = rotA ? gi : gi - 3;
+    const gi = UI.run.gi, rotA = gi < 3, pat = rec && rec.pattern && rec.pattern[gi];
+    if(pat && Array.isArray(pat[week]) && pat[week].filter(have).length){ pieces = pat[week].filter(have); j = 0; }   // the club's own pattern
+    else{ pieces = (rotA ? (week === 'A' ? setA : setB) : (week === 'A' ? setB : setA)); j = rotA ? gi : gi - 3; }
   }else{
     // No Rotation Planner classes: the group goes round the three pieces of whichever set it starts on
     pieces = setB.includes(UI.run.startCode) ? setB : setA;
