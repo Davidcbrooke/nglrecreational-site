@@ -4396,6 +4396,11 @@ const hhmm = m => { m = Math.round(m); const h = Math.floor(m / 60), mi = m % 60
 function rotaRec(){
   try{ const r = S.club && S.club.rotaJson ? JSON.parse(S.club.rotaJson) : null; return (r && r.rec && r.rec.classes && r.rec.classes.length) ? r.rec : null; }catch(e){ return null; }
 }
+// Each Rotation Planner class can run on several days: one entry per class per day
+function recClassList(){
+  const rec = rotaRec(); if(!rec) return [];
+  return rec.classes.flatMap(c => ((c.days && c.days.length) ? c.days : [c.day || 'Monday']).map(d => Object.assign({}, c, {day:d, key:c.id + '|' + d})));
+}
 // The fortnight and week being coached (from the term dates, or chosen by the coach)
 function runWhen(){
   const now = planNow(), blocks = clubPlan().blocks;
@@ -4407,14 +4412,15 @@ function runOrder(){
   const {b, week} = runWhen(), t = planDefaults(S.club.recTerm), rule = CLASS_RULES[t.classLen] || CLASS_RULES[60];
   const have = c => b.pieces.some(p => p.code === c);
   const setA = WEEK_A.filter(have), setB = WEEK_B.filter(have);
-  const rec = rotaRec(), cls = rec && rec.classes.find(c => c.id === UI.run.cls);
+  const rec = rotaRec(), cls = recClassList().find(c => c.key === UI.run.cls);
   let pieces, j = 0;
   if(cls){
     const gi = UI.run.gi, rotA = gi < 3;
     pieces = (rotA ? (week === 'A' ? setA : setB) : (week === 'A' ? setB : setA));
     j = rotA ? gi : gi - 3;
   }else{
-    pieces = week === 'A' ? setA : setB;
+    // No Rotation Planner classes: the group goes round the three pieces of whichever set it starts on
+    pieces = setB.includes(UI.run.startCode) ? setB : setA;
     j = Math.max(0, pieces.indexOf(UI.run.startCode));
   }
   const n = pieces.length, order = pieces.map((_, r) => pieces[(j + r) % n]);
@@ -4429,21 +4435,25 @@ function runOrder(){
 function screenRun(){ return UI.rstep === 'go' ? runSequence() : runPick(); }
 function runPick(){
   const rec = rotaRec(), now = planNow(), blocks = clubPlan().blocks, {b, week} = runWhen();
-  const today = DAYS_W[(new Date().getDay() + 6) % 7];
-  const classes = rec ? rec.classes.slice().sort((x, y) => (x.day === today ? -1 : 0) - (y.day === today ? -1 : 0) || DAYS_W.indexOf(x.day) - DAYS_W.indexOf(y.day) || x.start - y.start) : [];
-  const cls = rec && rec.classes.find(c => c.id === UI.run.cls);
-  const pieces = (week === 'A' ? WEEK_A : WEEK_B).filter(c => b.pieces.some(p => p.code === c));
+  const today = DAYS_W[(new Date().getDay() + 6) % 7], all = recClassList();
+  const days = DAYS_W.filter(d => all.some(c => c.day === d));
+  const day = days.includes(UI.run.day) ? UI.run.day : (days.includes(today) ? today : days[0]);
+  const classes = all.filter(c => c.day === day).sort((x, y) => x.start - y.start);
+  const cls = all.find(c => c.key === UI.run.cls);
+  const pieces = [...WEEK_A, ...WEEK_B].filter(c => b.pieces.some(p => p.code === c));
   render(`<div class="flow">
     <div class="flow-hrow"><h1 class="flow-h">Run your class</h1><button class="btn ghost small" data-tab="plan">Browse &amp; print the plan</button></div>
     <p class="flow-sub">${now ? `This week: <b>${esc(b.assessment ? 'Assessment' : b.weeks)} · Week ${week}</b> (week ${now.wk} of ${now.W})` : `<b>${esc(b.assessment ? 'Assessment' : b.weeks)} · Week ${week}</b>`}</p>
     ${now ? '' : `<p class="flow-l">Which fortnight?</p><div class="chips">${blocks.map(x => `<button class="chip ${x.n === b.n ? 'on' : ''}" data-act="run-set" data-k="block" data-v="${x.n}">${esc(x.assessment ? 'Assessment' : x.weeks)}</button>`).join('')}</div>
       <p class="flow-l">Which week?</p><div class="chips">${['A','B'].map(w => `<button class="chip ${w === week ? 'on' : ''}" data-act="run-set" data-k="week" data-v="${w}">Week ${w}</button>`).join('')}</div>`}
     ${rec ? `<p class="flow-l">1 · Which class?</p>
-      <div class="bbgrid">${classes.map(c => `<button class="bigbtn ${c.id === UI.run.cls ? 'now' : ''}" data-act="run-cls" data-v="${c.id}"><span class="bb-t">${esc(c.day.slice(0,3))} ${hhmm(c.start)}</span><span class="bb-k">${c.groups} group${c.groups === 1 ? '' : 's'}${c.day === today ? ' · today' : ''}</span></button>`).join('')}</div>
+      ${days.length > 1 ? `<div class="chips" style="margin-bottom:10px">${days.map(d => `<button class="chip ${d === day ? 'on' : ''}" data-act="run-day" data-v="${d}">${d === today ? 'Today' : d.slice(0,3)}</button>`).join('')}</div>` : ''}
+      <div class="bbgrid">${classes.map(c => `<button class="bigbtn ${c.key === UI.run.cls ? 'now' : ''}" data-act="run-cls" data-v="${esc(c.key)}"><span class="bb-t">${hhmm(c.start)}</span><span class="bb-k">${esc(c.day)} · ${c.groups} group${c.groups === 1 ? '' : 's'}</span></button>`).join('')}</div>
       ${cls ? `<p class="flow-l">2 · Which group are you coaching?</p>
         <div class="bbgrid three">${Array.from({length:cls.groups}, (_, gi) => `<button class="bigbtn grpc ${gi === UI.run.gi ? 'now' : ''}" style="--g:${GROUP_COLS[gi][1]}" data-act="run-gi" data-v="${gi}"><span class="bb-t">${esc((cls.names && cls.names[gi]) || GROUP_COLS[gi][0])}</span><span class="bb-k">Rotation ${gi < 3 ? 'A' : 'B'}</span></button>`).join('')}</div>` : ''}`
     : `<div class="card" style="margin-top:14px"><p class="muted" style="margin:0 0 8px">Add your Recreational classes in the free NGL Rotation Planner and this screen will know each group’s rotation order for you.</p><a class="btn ghost small" href="${ROTA_URL}" target="_blank" rel="noopener">Open the Rotation Planner</a></div>
-      <p class="flow-l">Where does your group start this week?</p>
+      <p class="flow-l">Which piece does your group start on?</p>
+      <p class="note" style="margin:-6px 0 8px">With up to six groups in the hall, groups start on all six pieces. Your group then goes round the other two pieces in its set.</p>
       <div class="bbgrid three">${pieces.map(c => { const p = b.pieces.find(x => x.code === c); return `<button class="bigbtn ${UI.run.startCode === c ? 'now' : ''}" data-act="run-startp" data-v="${c}"><span class="bb-t">${esc(p.piece)}</span><span class="bb-k">${esc(p.theme)}</span></button>`; }).join('')}</div>`}
     <p class="flow-l">${rec ? '3 · ' : ''}Which books is your group on?</p>
     ${groupPicker(true)}
@@ -4694,6 +4704,7 @@ document.addEventListener('click', async e => {
   else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
   else if(a === 'run-set'){ UI.run[act.dataset.k] = act.dataset.k === 'block' ? +act.dataset.v : act.dataset.v; RUN_STORE.set(UI.run); show(); }
+  else if(a === 'run-day'){ UI.run.day = act.dataset.v; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'run-cls'){ UI.run.cls = act.dataset.v; UI.run.gi = 0; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'run-gi'){ UI.run.gi = +act.dataset.v; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'run-startp'){ UI.run.startCode = act.dataset.v; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
