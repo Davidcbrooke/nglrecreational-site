@@ -448,6 +448,63 @@
   .stars{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
   .star{font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid var(--c);}
   .star .sk{font-weight:600;color:var(--muted);}
+
+  /* Run your class */
+  .runprev{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:16px 0 12px;}
+  .runprev i{color:var(--muted);font-style:normal;}
+  .rp{display:inline-flex;flex-direction:column;align-items:center;gap:1px;padding:7px 11px;border-radius:12px;border:1px solid var(--line);background:var(--navy-3);color:var(--white);font-weight:800;font-size:13px;}
+  .rp small{font-size:11px;color:var(--muted);font-weight:700;}
+  .rp.piece{border-color:var(--p);box-shadow:inset 0 -3px 0 var(--p);}
+  .runprog{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:8px 0 14px;padding-bottom:2px;}
+  .runprog::-webkit-scrollbar{display:none;}
+  .runprog .rp{cursor:pointer;flex:0 0 auto;}
+  .runprog .rp.done{opacity:.55;}
+  .runprog .rp.on{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);box-shadow:none;}
+  .runprog .rp.on small{color:var(--rec-ink);}
+  .runprog .rp.piece.on{background:var(--p);border-color:var(--p);color:#fff;}
+  .runprog .rp.piece.on small{color:#fff;}
+  .runhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--muted);}
+  .runhead b{color:var(--white);}
+  .rundot{width:16px;height:16px;border-radius:50%;display:inline-block;border:2px solid rgba(255,255,255,.7);}
+  .runtitle{border-left:8px solid var(--p,var(--rec));padding-left:14px;margin:6px 0 14px;}
+  .runstep{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--p,var(--rec));}
+  .runwarn{color:var(--warn);font-weight:900;}
+  .runnext{position:sticky;bottom:0;padding:14px 0 calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(10,20,64,0) 0%,var(--navy) 28%);display:flex;flex-direction:column;gap:8px;align-items:stretch;margin-top:18px;}
+  .bigbtn.go.rotate{background:var(--p);border-color:var(--p);}
+  .bigbtn.go.rotate .bb-t,.bigbtn.go.rotate .bb-k{color:#fff;}
+  .bigbtn.grpc{border-left:10px solid var(--g);}
+  .rotflash{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:var(--p);color:#fff;text-align:center;animation:rfIn .3s ease;transition:opacity .4s ease;}
+  .rotflash.out{opacity:0;}
+  .rotflash small{display:block;font-size:22px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.9;}
+  .rotflash b{display:block;font-size:min(16vw,110px);font-weight:900;line-height:1.05;}
+  @keyframes rfIn{from{transform:scale(1.15);opacity:0}to{transform:none;opacity:1}}
+
+  .runprog .rpn{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--navy-3);color:var(--white);font-weight:900;font-size:14px;cursor:pointer;}
+  .runprog .rpn.done{opacity:.45;}
+  .runprog .rpn.on{background:var(--p,var(--rec));border-color:var(--p,var(--rec));color:#fff;transform:scale(1.12);}
+  .stephead{display:flex;gap:14px;align-items:center;margin:4px 0 16px;}
+  .stepnum{flex:0 0 auto;width:68px;height:68px;border-radius:20px;background:var(--p,var(--rec));color:#fff;font-weight:900;font-size:40px;display:grid;place-items:center;}
+  .stephead .flow-h{margin:2px 0 2px;}
+  .bigline{font-size:19px;line-height:1.45;margin:0 0 14px;}
+  .bigcard{background:var(--navy-3);border:1px solid var(--line);border-radius:18px;padding:18px 20px;font-size:19px;line-height:1.5;}
+  .bigcard p{margin:0 0 10px;}
+  .rotcard{background:var(--p);color:#fff;border-radius:22px;padding:34px 20px;text-align:center;display:flex;flex-direction:column;gap:6px;}
+  .rotcard small{font-size:18px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.9;}
+  .rotcard b{font-size:min(13vw,64px);font-weight:900;line-height:1.05;}
+  .rotcard span{font-weight:800;font-size:16px;opacity:.95;}
+  .rotcard em{font-style:normal;font-size:17px;opacity:.9;}
+  .demo{display:flex;flex-direction:column;gap:10px;}
+  .dstn{display:flex;gap:12px;align-items:flex-start;background:var(--navy-3);border:1px solid var(--line);border-radius:16px;padding:12px;}
+  .dnum{flex:0 0 auto;width:44px;height:44px;border-radius:12px;background:var(--rec);color:var(--rec-ink);font-weight:900;font-size:24px;display:grid;place-items:center;}
+  .dbody{flex:1;min-width:0;}
+  .dtitle{font-weight:800;font-size:17px;line-height:1.35;}
+  .dwhy{font-size:14px;color:var(--muted);margin-top:4px;line-height:1.4;}
+  .dwhy b{color:var(--white);}
+  .dass{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;}
+  .drungs{margin-top:8px;}
+  .drungs summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--rec);}
+  .dphoto{flex:0 0 auto;width:74px;height:74px;border-radius:12px;overflow:hidden;border:0;padding:0;background:var(--navy-2);cursor:pointer;}
+  .dphoto img{width:100%;height:100%;object-fit:cover;display:block;}
 </style>
 </head>
 <body>
@@ -3326,7 +3383,7 @@ let tab = 'dashboard';
 const UI = {block:1, piece:'all', level:'all', wblock:1, book:1};
 const $view = document.getElementById('view');
 function render(html){ $view.innerHTML = '<div class="screen">' + html + '</div>'; }
-const CONTENT_TABS = ['club','plan','warmups','books','competition'];
+const CONTENT_TABS = ['club','run','plan','warmups','books','competition'];
 function setTop(){
   const ta = document.getElementById('topActions');
   const nav = document.getElementById('navtabs');
@@ -3334,7 +3391,7 @@ function setTop(){
     ta.innerHTML = `${S.club ? `<span class="pill">${esc(S.club.name)}</span>` : ''}<button class="btn ghost small" data-act="signout">Sign out</button>`;
     nav.hidden = false;
     const lock = !hasAccess() && !S.isAdmin;
-    const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['warmups','Warm-ups'],['plan','Lesson plan'],['books','Award books'],['competition','Competition'],['rotations','Class rotations'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
+    const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['run','Run your class'],['books','Award books'],['competition','Competition'],['rotations','Class rotations'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
     nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
   }else{
     ta.innerHTML = `<button class="btn ghost small" data-go="login">Club login</button>`;
@@ -3348,7 +3405,7 @@ function show(){
   if(!S.club) return render(`<div class="card locked-card"><h2>No club on this login</h2><p class="muted">NGL admin has moved to the main NGL Admin app (Awards licences).</p></div>`);
   if(CONTENT_TABS.includes(tab)){
     if(!hasAccess() && !S.isAdmin) return screenLocked();
-    return withContent(() => ({club:screenClub, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
+    return withContent(() => ({club:screenClub, run:screenRun, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
   if(tab === 'rotations'){ tab = 'dashboard'; window.open('https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html', '_blank', 'noopener'); return show(); }
   if(tab === 'shop' && !hasAccess()) return screenLocked();
@@ -3534,8 +3591,8 @@ function screenDashboard(){
     <button class="card cp-dash" data-tab="club"><p class="eyebrow">Step 1</p><h2>${S.club.recTerm && S.club.recTerm.custom ? 'Your club plan' : 'Build your club plan'}</h2>
       <p class="muted" style="margin:0">${S.club.recTerm && S.club.recTerm.custom ? 'Change your apparatus, term dates or class length, and print your plan.' : 'Tell us your apparatus, term and class length, and we’ll build your lesson plan.'}</p></button>
     <div class="grid4">
-      <button class="card" data-tab="plan" style="text-align:left;cursor:pointer"><h3>Lesson plan</h3><p class="muted" style="margin:0">Stations for every block, at four levels.</p></button>
-      <button class="card" data-tab="warmups" style="text-align:left;cursor:pointer"><h3>Warm-ups</h3><p class="muted" style="margin:0">10-minute physical prep for each block.</p></button>
+      <button class="card" data-tab="run" style="text-align:left;cursor:pointer"><h3>Run your class</h3><p class="muted" style="margin:0">Warm-up, each piece in your group’s order, then cool-down.</p></button>
+      <button class="card" data-tab="plan" style="text-align:left;cursor:pointer"><h3>Plan &amp; print</h3><p class="muted" style="margin:0">Browse every fortnight and print the plans.</p></button>
       <button class="card" data-tab="books" style="text-align:left;cursor:pointer"><h3>Award books</h3><p class="muted" style="margin:0">Skills by level and assessment sheets.</p></button>
       <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
     </div>
@@ -4190,6 +4247,21 @@ function skillVideoHTML(p){
       : `<button class="skillvid-box empty" data-act="vid-soon" aria-label="Play the ${esc(p.theme)} video"><span class="skillvid-play"></span><span class="skillvid-soon">${esc(themes[0])} · video coming soon</span></button>`}
   </div>`;
 }
+function setupPhotosHTML(p){
+  return `<div class="setgrid">${p.stations.map(s => { const ph = stationPhotos(s);
+      return `<div class="setcard"><div class="setn">${s.n}</div>
+        ${ph.length ? `<button class="setphoto" data-act="photo" data-img-id="${ph[0]}" aria-label="Enlarge station ${s.n} photo"><img data-img="${ph[0]}" alt="Station ${s.n} set-up"></button>
+          ${ph.length > 1 ? `<div class="thumbs">${ph.slice(1).map(h => `<button class="thumb" data-act="photo" data-img-id="${h}" aria-label="Enlarge photo"><img data-img="${h}" alt="Station ${s.n} set-up"></button>`).join('')}</div>` : ''}`
+        : `<div class="setphoto empty">No photo yet</div>`}
+      </div>`; }).join('')}</div>`;
+}
+function ladderBodyHTML(p){
+  return p.stations.map(s => `<div class="ladder"><div class="ladder-h">Station ${s.n}</div>${tipsHTML(s)}
+      ${[0,1,2,3].filter(inGroup).map(i => s.levels[i] ? `<div class="rung ${starsHTML(s, i) ? 'starred' : ''}">
+        <div class="rung-n">${RUNGS[i].name}<span>${RUNGS[i].age}</span></div>
+        <div class="rung-t">${fmtStation(s.levels[i])}</div>${starsHTML(s, i)}</div>` : '').join('')}
+    </div>`).join('') + `<p class="note">★ marks a rung that prepares an award-book checkpoint: the book colour and level it is assessed at.</p>`;
+}
 function planSetup(b, p){
   render(`<div class="flow">
     ${backBar(b.assessment ? 'Assessment fortnight' : b.weeks, 'app')}
@@ -4269,6 +4341,16 @@ function fortnightButtons(key, now){
       <span class="bb-t">${esc(x.assessment ? 'Assessment' : x.weeks)}</span>
       <span class="bb-k">${esc(x.assessment ? x.weeks : x.pieces.filter(p => WEEK_A.includes(p.code)).map(p => p.theme).join(' · '))}</span></button>`).join('')}</div>`;
 }
+const WARM_PARTS = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
+function warmupBodyHTML(blk){
+  const b = S.content.warmups[blk.warm];
+  return `<p class="flow-sub"><b>Focus:</b> ${esc(b.focus)}</p>` + (b.assess ? `<div class="ladder"><div class="ladder-h">Assessment warm-up</div><div class="rung"><div class="rung-t">Pulse raiser for everyone: stretch, tuck and star jumps in connection (3 min). Then each gymnast runs the four Physical Prep skills from their own award-book level while coaches check them off (7 min).</div></div></div>` :
+    WARM_PARTS.map(([k, n, t]) => `<div class="ladder"><div class="ladder-h">${n} <span class="muted" style="font-weight:700;font-size:14px">· ${t}</span></div>
+      ${[0,1,2,3].filter(inGroup).map(c => (b.parts[k][c] || []).length ? `<div class="rung"><div class="rung-n">${RUNGS[c].name}<span>${RUNGS[c].age}</span></div>
+        <div class="rung-t">${b.parts[k][c].map(x => esc(x.txt)).join('<br>')}</div>
+        <div class="stars">${b.parts[k][c].map(x => { const bk = bookOf(x.L); return `<span class="star" style="--c:${bk.color}">★ ${bk.name} L${x.L}</span>`; }).join('')}</div></div>` : '').join('')}
+    </div>`).join('')) + `<p class="note">The whole group warms up together, each child on the rung that suits them. ★ shows the award-book level each exercise comes from.</p>`;
+}
 function screenWarmups(){
   const W = S.content.warmups, now = planNow();
   if(!UI.fromPlan && UI.wstep !== 'show'){
@@ -4279,7 +4361,7 @@ function screenWarmups(){
   }
   const pblocks = clubPlan().blocks, blk = pblocks.find(x => x.n === UI.wblock) || pblocks[0];
   const b = W[blk.warm];
-  const parts = [['pulse','Pulse raiser','3 min'],['mob','Mobility','3 min'],['str','Strength & shapes','4 min']];
+  const parts = WARM_PARTS;
   render(`<div class="flow">
     ${UI.fromPlan ? `<button class="backbar" data-act="to-plan">← ${esc(blk.assessment ? 'Assessment fortnight' : blk.weeks)}</button>` : `<button class="backbar" data-ui="wstep" data-v="weeks">← Fortnights</button>`}
     <h1 class="flow-h">Warm-up · ${esc(blk.assessment ? 'Assessment' : blk.weeks)}</h1>
@@ -4293,6 +4375,162 @@ function screenWarmups(){
     </div>`).join('')}
     <p class="note">The whole group warms up together, each child on the rung that suits them. ★ shows the award-book level each exercise comes from.</p>
   </div>`);
+}
+
+/* =====================================================================
+   RUN YOUR CLASS: warm-up, each piece in rotation order, "Rotate to …", cool-down
+   The order comes from the club's Rotation Planner (Recreational classes);
+   without it the coach picks where the group starts.
+   ===================================================================== */
+const ROTA_URL = 'https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html';
+const GROUP_COLS = [['Orange','#F28C28'],['Yellow','#F5C518'],['Blue','#2F80ED'],['Red','#E5383B'],['Green','#2EAD5B'],['Purple','#8E44AD']];
+const PIECE_COL = {FF:'#4a90d9', BF:'#2c6fb8', VT:'#5cb85c', BM:'#e8914f', BA:'#7b68ee', FT:'#d9534f'};
+const RUN_STORE = {
+  get(){ try{ return JSON.parse(localStorage.getItem('nglrec-run') || '{}') || {}; }catch(e){ return {}; } },
+  set(v){ try{ localStorage.setItem('nglrec-run', JSON.stringify(v)); }catch(e){} }
+};
+UI.run = Object.assign({cls:null, gi:0, startCode:null}, RUN_STORE.get());
+UI.rstep = 'pick'; UI.ri = 0;
+const DAYS_W = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const hhmm = m => { m = Math.round(m); const h = Math.floor(m / 60), mi = m % 60, hh = h > 12 ? h - 12 : (h === 0 ? 12 : h); return hh + ':' + String(mi).padStart(2, '0') + (h >= 12 ? 'pm' : 'am'); };
+function rotaRec(){
+  try{ const r = S.club && S.club.rotaJson ? JSON.parse(S.club.rotaJson) : null; return (r && r.rec && r.rec.classes && r.rec.classes.length) ? r.rec : null; }catch(e){ return null; }
+}
+// The fortnight and week being coached (from the term dates, or chosen by the coach)
+function runWhen(){
+  const now = planNow(), blocks = clubPlan().blocks;
+  const block = UI.run.block || (now ? now.block : blocks[0].n), week = UI.run.week || (now ? now.week : 'A');
+  return {b: blocks.find(x => x.n === block) || blocks[0], week, now};
+}
+// This group's pieces in order, with times when we know the class
+function runOrder(){
+  const {b, week} = runWhen(), t = planDefaults(S.club.recTerm), rule = CLASS_RULES[t.classLen] || CLASS_RULES[60];
+  const have = c => b.pieces.some(p => p.code === c);
+  const setA = WEEK_A.filter(have), setB = WEEK_B.filter(have);
+  const rec = rotaRec(), cls = rec && rec.classes.find(c => c.id === UI.run.cls);
+  let pieces, j = 0;
+  if(cls){
+    const gi = UI.run.gi, rotA = gi < 3;
+    pieces = (rotA ? (week === 'A' ? setA : setB) : (week === 'A' ? setB : setA));
+    j = rotA ? gi : gi - 3;
+  }else{
+    pieces = week === 'A' ? setA : setB;
+    j = Math.max(0, pieces.indexOf(UI.run.startCode));
+  }
+  const n = pieces.length, order = pieces.map((_, r) => pieces[(j + r) % n]);
+  const start = cls ? cls.start : null, teach = t.classLen - rule.warm - rule.cool, base = Math.floor(teach / Math.max(1, n));
+  const steps = [{k:'warm', a:start, d:rule.warm}];
+  let at = start == null ? null : start + rule.warm;
+  order.forEach((code, r) => { const d = r === n - 1 ? teach - base * (n - 1) : base;
+    ['rot','vid','demo'].forEach(k => steps.push({k, code, a:at, d})); if(at != null) at += d; });
+  steps.push({k:'cool', a:at, d:rule.cool});
+  return {steps, b, week, cls, map:(rec && rec.map) || {}};
+}
+function screenRun(){ return UI.rstep === 'go' ? runSequence() : runPick(); }
+function runPick(){
+  const rec = rotaRec(), now = planNow(), blocks = clubPlan().blocks, {b, week} = runWhen();
+  const today = DAYS_W[(new Date().getDay() + 6) % 7];
+  const classes = rec ? rec.classes.slice().sort((x, y) => (x.day === today ? -1 : 0) - (y.day === today ? -1 : 0) || DAYS_W.indexOf(x.day) - DAYS_W.indexOf(y.day) || x.start - y.start) : [];
+  const cls = rec && rec.classes.find(c => c.id === UI.run.cls);
+  const pieces = (week === 'A' ? WEEK_A : WEEK_B).filter(c => b.pieces.some(p => p.code === c));
+  render(`<div class="flow">
+    <div class="flow-hrow"><h1 class="flow-h">Run your class</h1><button class="btn ghost small" data-tab="plan">Browse &amp; print the plan</button></div>
+    <p class="flow-sub">${now ? `This week: <b>${esc(b.assessment ? 'Assessment' : b.weeks)} · Week ${week}</b> (week ${now.wk} of ${now.W})` : `<b>${esc(b.assessment ? 'Assessment' : b.weeks)} · Week ${week}</b>`}</p>
+    ${now ? '' : `<p class="flow-l">Which fortnight?</p><div class="chips">${blocks.map(x => `<button class="chip ${x.n === b.n ? 'on' : ''}" data-act="run-set" data-k="block" data-v="${x.n}">${esc(x.assessment ? 'Assessment' : x.weeks)}</button>`).join('')}</div>
+      <p class="flow-l">Which week?</p><div class="chips">${['A','B'].map(w => `<button class="chip ${w === week ? 'on' : ''}" data-act="run-set" data-k="week" data-v="${w}">Week ${w}</button>`).join('')}</div>`}
+    ${rec ? `<p class="flow-l">1 · Which class?</p>
+      <div class="bbgrid">${classes.map(c => `<button class="bigbtn ${c.id === UI.run.cls ? 'now' : ''}" data-act="run-cls" data-v="${c.id}"><span class="bb-t">${esc(c.day.slice(0,3))} ${hhmm(c.start)}</span><span class="bb-k">${c.groups} group${c.groups === 1 ? '' : 's'}${c.day === today ? ' · today' : ''}</span></button>`).join('')}</div>
+      ${cls ? `<p class="flow-l">2 · Which group are you coaching?</p>
+        <div class="bbgrid three">${Array.from({length:cls.groups}, (_, gi) => `<button class="bigbtn grpc ${gi === UI.run.gi ? 'now' : ''}" style="--g:${GROUP_COLS[gi][1]}" data-act="run-gi" data-v="${gi}"><span class="bb-t">${esc((cls.names && cls.names[gi]) || GROUP_COLS[gi][0])}</span><span class="bb-k">Rotation ${gi < 3 ? 'A' : 'B'}</span></button>`).join('')}</div>` : ''}`
+    : `<div class="card" style="margin-top:14px"><p class="muted" style="margin:0 0 8px">Add your Recreational classes in the free NGL Rotation Planner and this screen will know each group’s rotation order for you.</p><a class="btn ghost small" href="${ROTA_URL}" target="_blank" rel="noopener">Open the Rotation Planner</a></div>
+      <p class="flow-l">Where does your group start this week?</p>
+      <div class="bbgrid three">${pieces.map(c => { const p = b.pieces.find(x => x.code === c); return `<button class="bigbtn ${UI.run.startCode === c ? 'now' : ''}" data-act="run-startp" data-v="${c}"><span class="bb-t">${esc(p.piece)}</span><span class="bb-k">${esc(p.theme)}</span></button>`; }).join('')}</div>`}
+    <p class="flow-l">${rec ? '3 · ' : ''}Which books is your group on?</p>
+    ${groupPicker(true)}
+    ${(rec ? cls : UI.run.startCode) ? (() => { const o = runOrder(); return `<div class="runprev">${o.steps.filter(s => s.k !== 'vid' && s.k !== 'demo').map(s => `<span class="rp ${s.k === 'rot' ? 'piece' : s.k}" style="${s.k === 'rot' ? `--p:${PIECE_COL[s.code]}` : ''}">${s.k === 'warm' ? 'Warm-up' : s.k === 'cool' ? 'Cool-down' : esc(PIECE_NAMES[s.code])}${s.a != null ? `<small>${hhmm(s.a)}</small>` : ''}</span>`).join('<i>›</i>')}</div>
+      <button class="bigbtn wide go" data-act="run-start"><span class="bb-t">Start class →</span><span class="bb-k">Warm-up first, then each piece in order</span></button>`; })() : ''}
+  </div>`);
+}
+const runSteps = () => runOrder().steps;
+function stepLabel(s){
+  return s.k === 'warm' ? 'Warm-up' : s.k === 'cool' ? 'Cool-down' : s.k === 'rot' ? 'Rotate to ' + PIECE_NAMES[s.code] : s.k === 'vid' ? 'Show the skill' : 'Demo the stations';
+}
+// One line per station: what it builds towards, and whether it is assessed
+function demoStationsHTML(p){
+  const books = [0,1,2,3].filter(inGroup), low = books[0] != null ? books[0] : 0;
+  const myColours = books.map(i => LEVELS[i].name);
+  return `<div class="demo">${p.stations.map(s => {
+    const txt = String(s.levels[low] || s.levels.find(Boolean) || '').replace(/FINAL SKILL:?\s*/i, '').replace(/SUPPORTED/g, 'Supported');
+    const short = txt.length > 70 ? txt.slice(0, 68).replace(/\s+\S*$/, '') + '…' : txt;
+    const asses = books.flatMap(i => (s.assess && s.assess[String(i)]) || []);
+    const core = [...new Set(asses.flatMap(y => (y.c || []).filter(([cl]) => myColours.includes(cl)).map(([cl, el]) => books.length > 1 ? `${el} (${cl})` : el)))];
+    const ph = stationPhotos(s)[0];
+    const why = core.length ? `Builds the core skill${core.length > 1 ? 's' : ''}: <b>${core.map(esc).join(' · ')}</b>` : (s.tips && s.tips.watch ? `Look for: ${esc(s.tips.watch.split('. ')[0].replace(/\.$/, ''))}.` : '');
+    return `<div class="dstn">
+      <div class="dnum">${s.n}</div>
+      <div class="dbody"><div class="dtitle">${esc(short)}</div>
+        ${why ? `<div class="dwhy">${why}</div>` : ''}
+        ${asses.length ? `<div class="dass">${[...new Map(asses.map(y => [y.L + y.s, y])).values()].map(y => { const bk = bookOf(y.L); return `<span class="star" style="--c:${bk.color}">★ Assessed · ${bk.name} L${y.L}</span>`; }).join('')}</div>` : ''}
+        <details class="drungs"><summary>What each child does</summary>${[0,1,2,3].filter(inGroup).map(i => s.levels[i] ? `<div class="rung"><div class="rung-n">${RUNGS[i].name}</div><div class="rung-t">${fmtStation(s.levels[i])}</div></div>` : '').join('')}${tipsHTML(s)}</details>
+      </div>
+      ${ph ? `<button class="dphoto" data-act="photo" data-img-id="${ph}" aria-label="Enlarge station ${s.n} photo"><img data-img="${ph}" alt="Station ${s.n}"></button>` : ''}
+    </div>`; }).join('')}</div>`;
+}
+function runSequence(){
+  const o = runOrder(), steps = o.steps, i = Math.min(UI.ri, steps.length - 1), s = steps[i], nxt = steps[i + 1];
+  const g = o.cls ? GROUP_COLS[UI.run.gi] : null, gname = o.cls ? ((o.cls.names && o.cls.names[UI.run.gi]) || g[0]) : '';
+  const p = s.code ? o.b.pieces.find(x => x.code === s.code) : null, col = s.code ? PIECE_COL[s.code] : '';
+  const loc = c => o.map[c] && o.map[c].toUpperCase() !== PIECE_NAMES[c].toUpperCase() ? o.map[c] : '';
+  const pieceNo = s.code ? o.steps.filter(x => x.k === 'rot').findIndex(x => x.code === s.code) + 1 : 0, pieces = o.steps.filter(x => x.k === 'rot').length;
+  let body = '';
+  if(s.k === 'warm') body = groupPicker(true) + warmupBodyHTML(o.b);
+  else if(s.k === 'cool') body = `<div class="bigcard"><p>Bring the group together on the floor.</p><p>Gentle stretches for the muscles used today.</p><p>Ask: <b>what did we learn on each piece?</b> Praise effort.</p></div>`;
+  else if(s.k === 'rot') body = `<div class="rotcard" style="--p:${col}"><small>Rotate to</small><b>${esc(PIECE_NAMES[s.code])}</b>${loc(s.code) ? `<span>${esc(loc(s.code))}</span>` : ''}<em>${esc(p.theme)}</em></div>`;
+  else if(s.k === 'vid') body = `<p class="bigline">Gather the group and show them today’s skill: <b>${esc(p.theme)}</b>.</p>${skillVideoHTML(p)}`;
+  else body = `<p class="bigline">Walk the group round. At each station, show the shape and say <b>why it matters</b> for today’s skill. ★ stations are on the award book.</p>${groupPicker(true)}${demoStationsHTML(p)}`;
+  const nextLabel = !nxt ? 'Finish class ✓' : nxt.k === 'rot' ? 'Rotate to ' + PIECE_NAMES[nxt.code] + ' →' : nxt.k === 'vid' ? 'We’re here: show the skill →' : nxt.k === 'demo' ? 'Demo the stations →' : 'Cool-down →';
+  render(`<div class="flow run">
+    <div class="runhead">${g ? `<span class="rundot" style="background:${g[1]}"></span><b>${esc(gname)}</b> · ${esc(o.cls.day.slice(0,3))} ${hhmm(o.cls.start)} · ` : ''}${esc(o.b.assessment ? 'Assessment' : o.b.weeks)} · Week ${o.week}
+      <button class="btn ghost small" data-act="run-exit" style="margin-left:auto">Change</button></div>
+    <div class="runprog">${steps.map((x, k) => `<button class="rpn ${k === i ? 'on' : ''} ${k < i ? 'done' : ''}" style="${x.code ? `--p:${PIECE_COL[x.code]}` : ''}" data-act="run-go" data-v="${k}" aria-label="Step ${k + 1}: ${esc(stepLabel(x))}">${k + 1}</button>`).join('')}</div>
+    <div class="stephead" style="${col ? `--p:${col}` : ''}">
+      <div class="stepnum">${i + 1}</div>
+      <div><div class="runstep">${s.code ? `${esc(PIECE_NAMES[s.code])} · piece ${pieceNo} of ${pieces}` : `Step ${i + 1} of ${steps.length}`}</div>
+        <h1 class="flow-h">${esc(stepLabel(s))}</h1>
+        <p class="flow-sub" style="margin:0">${s.a != null ? `${hhmm(s.a)}–${hhmm(s.a + s.d)}` : `${s.d} min`}<span id="runLeft"></span></p></div></div>
+    ${body}
+    <div class="runnext"><button class="bigbtn wide go ${nxt && nxt.k === 'rot' ? 'rotate' : ''}" style="${nxt && nxt.k === 'rot' ? `--p:${PIECE_COL[nxt.code]}` : ''}" data-act="run-next"><span class="bb-t">${esc(nextLabel)}</span></button>
+      ${i > 0 ? `<button class="btn ghost small" data-act="run-go" data-v="${i - 1}">← Back</button>` : ''}</div>
+  </div>`);
+  hydrateImages($view);
+  runTick();
+}
+// Countdown to the next rotation when the class is on now
+let RUN_TIMER = null;
+function runTick(){
+  clearInterval(RUN_TIMER);
+  const upd = () => {
+    const el = document.getElementById('runLeft'); if(!el){ clearInterval(RUN_TIMER); return; }
+    const o = runOrder(), s = o.steps[Math.min(UI.ri, o.steps.length - 1)];
+    if(!o.cls || s.a == null || DAYS_W[(new Date().getDay() + 6) % 7] !== o.cls.day){ el.textContent = ''; return; }
+    const d = new Date(), m = d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60, left = s.a + s.d - m;
+    el.textContent = left > 0 && m >= s.a ? ` · ${Math.ceil(left)} min left` : (m < s.a ? ` · starts in ${Math.ceil(s.a - m)} min` : ' · time to move on');
+    el.className = left > 0 && left <= 2 && m >= s.a ? 'runwarn' : '';
+  };
+  upd(); RUN_TIMER = setInterval(upd, 15000);
+}
+// If the class is on now, open on the right step
+function runStepNow(){
+  const o = runOrder(); if(!o.cls || DAYS_W[(new Date().getDay() + 6) % 7] !== o.cls.day) return 0;
+  const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+  const k = o.steps.findIndex(s => s.a != null && m >= s.a && m < s.a + s.d);   // first step of whatever is on now
+  return k < 0 ? 0 : k;
+}
+function rotateFlash(code, then){
+  const el = document.createElement('div'); el.className = 'rotflash'; el.style.setProperty('--p', PIECE_COL[code] || '#E88230');
+  el.innerHTML = `<div><small>Rotate to</small><b>${esc(PIECE_NAMES[code])}</b></div>`;
+  document.body.appendChild(el); then();
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 1300);
 }
 
 const BOOK_PIECES = ['Floor','Vault','Beam','Bars','Rebound','Physical Prep'];
@@ -4455,6 +4693,19 @@ document.addEventListener('click', async e => {
   else if(a === 'grp'){ const i = +act.dataset.i; const g = inGroup(i) ? UI.group.filter(x => x !== i) : [...UI.group, i].sort(); if(!g.length) return; UI.group = g; GROUP_STORE.set(g); const y = window.scrollY; show(); window.scrollTo(0, y); }
   else if(a === 'print-plan'){ printHTML(planPrintHTML(act.dataset.scope || 'piece', act.dataset.arg), true); }
   else if(a === 'to-plan'){ UI.fromPlan = false; tab = 'plan'; show(); window.scrollTo(0,0); }
+  else if(a === 'run-set'){ UI.run[act.dataset.k] = act.dataset.k === 'block' ? +act.dataset.v : act.dataset.v; RUN_STORE.set(UI.run); show(); }
+  else if(a === 'run-cls'){ UI.run.cls = act.dataset.v; UI.run.gi = 0; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
+  else if(a === 'run-gi'){ UI.run.gi = +act.dataset.v; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
+  else if(a === 'run-startp'){ UI.run.startCode = act.dataset.v; RUN_STORE.set(UI.run); const y = window.scrollY; show(); window.scrollTo(0, y); }
+  else if(a === 'run-start'){ UI.rstep = 'go'; UI.ri = runStepNow(); show(); window.scrollTo(0,0); }
+  else if(a === 'run-go'){ UI.ri = +act.dataset.v; show(); window.scrollTo(0,0); }
+  else if(a === 'run-exit'){ UI.rstep = 'pick'; clearInterval(RUN_TIMER); show(); window.scrollTo(0,0); }
+  else if(a === 'run-next'){
+    const st = runSteps(), nx = st[UI.ri + 1];
+    if(!nx){ UI.rstep = 'pick'; UI.ri = 0; clearInterval(RUN_TIMER); show(); window.scrollTo(0,0); return; }
+    const go = () => { UI.ri += 1; show(); window.scrollTo(0,0); };
+    go();
+  }
   else if(a === 'plan-warmup'){ UI.wblock = UI.block; UI.fromPlan = true; tab = 'warmups'; show(); window.scrollTo(0,0); }
   else if(a === 'photo'){ const d = IMG.cache[act.dataset.imgId]; if(d){ const m = modal(`<img src="${d}" alt="Station set-up photo" style="width:100%;border-radius:12px;display:block"><div class="btn-row" style="margin-top:12px"><button class="btn ghost" data-close>Close</button></div>`); m.querySelector('.modal').classList.add('modal-wide'); } }
   else if(a === 'family') familyModal();
