@@ -341,6 +341,7 @@
 
   /* ---------- Show your class today's skill ---------- */
   .skillvid{margin:0 0 16px;}
+  .vidparts{margin:0 0 10px;}
   .skillvid-h{font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);margin:0 0 8px 2px;}
   .skillvid-box{position:relative;display:block;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--line);}
   .skillvid-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
@@ -3242,7 +3243,7 @@ const liveApi = {
     const meta = await fs.getDoc(fs.doc(D, 'recContent', 'meta'));
     if(!meta.exists()) throw new Error('No content published yet');
     const key = meta.data().key; S.contentKey = key;
-    const keys = ['plan','warmups','book','competition','imgIndex'];
+    const keys = ['plan','warmups','book','competition','imgIndex','videos'];
     const snaps = await Promise.all(keys.map(k => fs.getDoc(fs.doc(D, 'recShared', key, 'docs', k))));
     const c = {};
     snaps.forEach((s, i) => { if(s.exists()) c[keys[i]] = JSON.parse(s.data().json); });
@@ -3326,6 +3327,7 @@ const liveApi = {
     const put = (name, obj) => fs.setDoc(fs.doc(D, 'recShared', key, 'docs', name), {json: JSON.stringify(obj), version: content.version || '', updatedAt: fs.serverTimestamp()});
     for(const k of ['plan','warmups','book','competition']){ progress && progress('Uploading ' + k + '…'); await put(k, content[k]); }
     await put('imgIndex', idx);
+    await put('videos', content.videos || {});
     for(let n = 0; n < imgs.length; n++){ progress && progress(`Uploading photos ${n + 1} of ${imgs.length}…`); await put('img' + n, imgs[n]); }
     await fs.setDoc(fs.doc(D, 'recContent', 'meta'), {key, version: content.version || '', updatedAt: fs.serverTimestamp()});
     progress && progress('Updating family codes…');
@@ -4237,13 +4239,16 @@ function planApparatus(b, now){
   </div>`);
 }
 // "Show your class today's skill": one video per apparatus theme.
-// Videos live in the content file as videos["FF|Handstand Turns"] = YouTube id.
+// Videos live in the content file as videos["FF|Handstand Turns"] = [YouTube id, …] (one or more parts).
+const vidSrc = id => `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&playsinline=1`;
 function skillVideoHTML(p){
   const vids = S.content.videos || {};
   const themes = String(p.theme).split(' + ');
-  const id = themes.map(t => vids[p.code + '|' + t]).find(Boolean);
+  const list = themes.flatMap(t => { const v = vids[p.code + '|' + t]; return !v ? [] : Array.isArray(v) ? v : [v]; }).filter(Boolean);
+  const id = list[0];
   return `<div class="skillvid"><div class="skillvid-h">Show your class today’s skill</div>
-    ${id ? `<div class="skillvid-box"><iframe src="https://www.youtube-nocookie.com/embed/${esc(id)}?rel=0" title="${esc(p.theme)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+    ${list.length > 1 ? `<div class="chips vidparts">${list.map((v, i) => `<button class="chip ${i ? '' : 'on'}" data-act="vid-part" data-v="${esc(v)}">Part ${i + 1}</button>`).join('')}</div>` : ''}
+    ${id ? `<div class="skillvid-box"><iframe src="${vidSrc(id)}" title="${esc(p.theme)}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
       : `<button class="skillvid-box empty" data-act="vid-soon" aria-label="Play the ${esc(p.theme)} video"><span class="skillvid-play"></span><span class="skillvid-soon">${esc(themes[0])} · video coming soon</span></button>`}
   </div>`;
 }
@@ -4678,6 +4683,7 @@ document.addEventListener('click', async e => {
   else if(a === 'cp-save'){ const d = cpDraft(), n = document.getElementById('cpNote'); act.disabled = true; n.textContent = 'Saving…';
     try{ await api.saveFamily(Object.assign({}, d, {custom:true, startBlock:1})); PLAN_CACHE = null; UI.cstep = 0; UI.cdraft = null; UI.pstep = 'weeks'; show(); window.scrollTo(0,0); }
     catch(err){ console.error(err); act.disabled = false; n.textContent = 'Couldn’t save: ' + (err && (err.code || err.message) || 'unknown error') + '. Please try again, or send this message to NGL.'; } }
+  else if(a === 'vid-part'){ const w = act.closest('.skillvid'), f = w && w.querySelector('iframe'); if(f) f.src = vidSrc(act.dataset.v); w.querySelectorAll('.vidparts .chip').forEach(c => c.classList.toggle('on', c === act)); }
   else if(a === 'vid-soon'){ const t = act.querySelector('.skillvid-soon'); if(t){ t.textContent = 'This video is coming soon'; } }
   else if(a === 'print-poster'){ printHTML(posterHTML(act.dataset.kind), false); }
   else if(a === 'shop-place'){
