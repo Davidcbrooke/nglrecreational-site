@@ -4299,7 +4299,7 @@ function planApparatus(b, now){
 }
 // "Show your class today's skill": one video per apparatus theme.
 // Videos live in the content file as videos["FF|Handstand Turns"] = [YouTube id, …] (one or more parts).
-const vidSrc = id => `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&playsinline=1`;
+const vidSrc = id => `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&playsinline=1&mute=1`;   // always start muted
 function skillVideoHTML(p){
   const vids = S.content.videos || {};
   const themes = String(p.theme).split(' + ');
