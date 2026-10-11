@@ -3040,11 +3040,39 @@ const EMAILJS = { serviceId:'service_3qlufgh', templateId:'template_8i40iia', pu
    activated. Books, medals and t-shirts are bought through the Hub while the licence is active.
    Each band can buy books up to 10% above its top gymnast number in a licence year; past that
    the club upgrades to the next band for the difference. */
+/* Oct 2026 bands (same bands for every NGL pathway; Recreational is priced higher).
+   Keys s/m/l are kept from the old 3-band model so existing licences keep their price:
+   s = 50–99 (£500), m = 100–249 (£1,000), l = 400–599 (£1,500). */
 const CLUB_BANDS = [
-  {key:'s', label:'Up to 99 recreational gymnasts',  short:'Under 100', price:500,  books:110},
-  {key:'m', label:'100 to 399 recreational gymnasts', short:'100–399',  price:1000, books:440},
-  {key:'l', label:'400 or more recreational gymnasts', short:'400+',    price:1500, books:null}   // null = no limit
+  {key:'xs', label:'1 to 24 recreational gymnasts',    short:'1–24',    price:200,  books:27},
+  {key:'sm', label:'25 to 49 recreational gymnasts',   short:'25–49',   price:300,  books:54},
+  {key:'s',  label:'50 to 99 recreational gymnasts',   short:'50–99',   price:500,  books:109},
+  {key:'m',  label:'100 to 249 recreational gymnasts', short:'100–249', price:1000, books:274},
+  {key:'m2', label:'250 to 399 recreational gymnasts', short:'250–399', price:1250, books:439},
+  {key:'l',  label:'400 to 599 recreational gymnasts', short:'400–599', price:1500, books:659},
+  {key:'xl', label:'600 or more recreational gymnasts', short:'600+',   price:2000, books:null}   // null = no limit
 ];
+/* Multi-pathway discount: 5% off every pathway licence except the club's most expensive.
+   Other pathways' yearly prices by band (Schools and Pre-School share one price list;
+   Pre-School tops out at the 100+ band). */
+const MULTI_PATHWAY_DISCOUNT = 0.05;
+const OTHER_PATHWAY_PRICES = {
+  schools:   {xs:150, sm:250, s:400, m:750, m2:1000, l:1250, xl:1500},
+  preschool: {xs:150, sm:250, s:400, m:750}
+};
+// The club's other active pathway licences, as yearly prices
+function otherLicencePrices(club, now = new Date()){
+  return Object.keys(OTHER_PATHWAY_PRICES).map(k => {
+    const lic = club && club[k];
+    if(!lic || lic.status !== 'active' || (lic.expires && toDate(lic.expires) < now)) return 0;
+    return OTHER_PATHWAY_PRICES[k][lic.band] || 0;
+  }).filter(Boolean);
+}
+// 5% off this licence when the club already holds a pathway licence that costs the same or more
+function multiPathwayDiscount(club, price){
+  if(!price || !(price > 0)) return 0;
+  return otherLicencePrices(club).some(x => x >= price) ? Math.round(price * MULTI_PATHWAY_DISCOUNT * 100) / 100 : 0;
+}
 const PRICES = [
   {kind:'book',   name:'Recreational award book',  price:5,  rrp:'£10',      note:'Lasts more than a year (4 levels)'},
   {kind:'medal',  name:'Recreational medal',       price:3, rrp:'£5',       note:'One per gymnast each term'},
@@ -3073,7 +3101,7 @@ const LEVELS = [
   {key:'indigo', name:'Indigo', book:4, color:'var(--indigo)'}
 ];
 
-const gbp = n => '£' + Number(n).toLocaleString('en-GB', {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2});
+const gbp = n => (n < 0 ? '−£' : '£') + Math.abs(Number(n)).toLocaleString('en-GB', {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2});
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- Season / terms ---------- */
@@ -3346,7 +3374,7 @@ const demoApi = {
   async signIn(){
     S.club = DEMO_CLUB(); S.isAdmin = true;
     S.orders = [{id:'ORD-DEMO1', clubId:'demo', clubName:S.club.name, kind:'start', band:'m', season:S.season, term:'autumn', status:'paid', createdAt:new Date(Date.now() - 30 * 86400000),
-      lines:[{kind:'club', desc:'Recreational Club Licence, 100 to 399 gymnasts (12 months)', qty:1, unit:clubFee('m')},
+      lines:[{kind:'club', desc:'Recreational Club Licence, 100 to 249 gymnasts (12 months)', qty:1, unit:clubFee('m')},
              {kind:'medal', desc:'Recreational medals', qty:240, unit:shopItem('medal').price},
              {kind:'book', desc:'Recreational award books', qty:240, unit:shopItem('book').price}]}];
     return {ok:true};
@@ -3726,7 +3754,8 @@ function screenLicence(){
       <thead><tr><th>Club size</th><th class="num">Per year</th><th class="num">Award books per licence year</th></tr></thead>
       <tbody>${CLUB_BANDS.map(b => `<tr ${S.club.rec && S.club.rec.band === b.key ? 'style="background:rgba(232,130,48,.12)"' : ''}><td>${b.label}</td><td class="num"><b>${gbp(b.price)}</b>${vat}</td><td class="num">${b.books == null ? 'No limit' : 'Up to ' + b.books}</td></tr>`).join('')}</tbody>
     </table></div>
-    <p class="note" style="margin-top:10px">Growing? If you need more books than your band allows, upgrade to the next band at any time. You pay the difference between the two bands for the months left on your licence, and your renewal date stays the same.</p>
+    <p class="note" style="margin-top:10px"><b>Running more than one NGL pathway?</b> You get 5% off every pathway licence except your most expensive one.</p>
+    <p class="note" style="margin-top:6px">Growing? If you need more books than your band allows, upgrade to the next band at any time. You pay the difference between the two bands for the months left on your licence, and your renewal date stays the same.</p>
   </div>
   <div class="card">
     <h2>Award books, medals, certificates and t-shirts</h2>
@@ -3773,7 +3802,7 @@ function shopLines(){
   for(let lv = 1; lv <= 16; lv++){ const q = +SHOP['medal' + lv] || 0; if(q) L.push({kind:'medal', desc:`Recreational medal: Level ${lv} (${bookOf(lv).name})`, qty:q, unit:MEDAL_PRICE}); }
   CERT_STEPS.forEach(n => { const q = +SHOP['cert' + n] || 0; if(q) L.push({kind:'cert', desc:`Attendance certificate: ${n} sessions`, qty:q, unit:CERT_PRICE}); });
   if(+SHOP.tshirt) L.push({kind:'tshirt', desc:'NGL children’s t-shirt', qty:+SHOP.tshirt, unit:TSHIRT_PRICE});
-  const items = L.filter(l => l.kind !== 'cert' && l.kind !== 'club').reduce((a, l) => a + l.qty, 0) + Math.ceil(L.filter(l => l.kind === 'cert').reduce((a, l) => a + l.qty, 0) / 10);
+  const items = L.filter(l => l.kind !== 'cert' && l.kind !== 'club' && l.kind !== 'discount').reduce((a, l) => a + l.qty, 0) + Math.ceil(L.filter(l => l.kind === 'cert').reduce((a, l) => a + l.qty, 0) / 10);
   const post = postageFor(items);
   if(post) L.push({kind:'postage', desc:`Postage and packing (${items} item${items === 1 ? '' : 's'})`, qty:1, unit:post});
   return withVat(L);
@@ -3858,7 +3887,11 @@ function orderModal(kind){
   }
   function lines(){
     const st = state(), L = [];
-    if(withLicence) L.push({kind:'club', desc:`Recreational Club Licence, ${st.band.label.replace(' recreational', '')} (12 months)`, qty:1, unit:st.band.price});
+    if(withLicence){
+      L.push({kind:'club', desc:`Recreational Club Licence, ${st.band.label.replace(' recreational', '')} (12 months)`, qty:1, unit:st.band.price});
+      const d = multiPathwayDiscount(S.club, st.band.price);
+      if(d) L.push({kind:'discount', desc:'Multi-pathway discount (5%)', qty:1, unit:-d});
+    }
     if(kind === 'shop' && upgrade && st.over){ const mr = monthsRemaining(S.club.rec); L.push({kind:'club', desc:`Club Licence upgrade, ${st.band.short} to ${st.target.short} (${mr} month${mr === 1 ? '' : 's'} left on your licence)`, qty:1, unit:upgradeCost(st.band.key, st.target.key, S.club.rec)}); }
     return withVat(L);
   }
@@ -4614,7 +4647,7 @@ async function screenAdmin(){
       <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-paid" data-order="${esc(o.id)}">Mark paid</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing outstanding.</p>'}</div>
   <div class="card"><h2>Supplies to send (${toSend.length})</h2>${toSend.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Order</th><th>Club</th><th>Items</th><th>Deliver to</th><th></th></tr></thead>
-    <tbody>${toSend.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${(o.lines || []).filter(l => l.kind !== 'postage').map(l => `${l.qty} × ${esc(l.desc)}`).join('<br>')}</td><td style="white-space:pre-line">${esc(o.delivery || '')}</td>
+    <tbody>${toSend.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${(o.lines || []).filter(l => l.kind !== 'postage' && l.kind !== 'discount' && l.kind !== 'club').map(l => `${l.qty} × ${esc(l.desc)}`).join('<br>')}</td><td style="white-space:pre-line">${esc(o.delivery || '')}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-sent" data-order="${esc(o.id)}">Mark sent</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing waiting to be posted.</p>'}</div>
   <div class="card"><h2>Clubs (${recClubs.length})</h2><p class="note">Every registered NGL club account. Recreational clubs are listed first.</p>${recClubs.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Club</th><th>Size</th><th>Licence until</th><th>Books used</th><th>Status</th><th></th></tr></thead>
