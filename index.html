@@ -480,9 +480,14 @@
   .rotflash b{display:block;font-size:min(16vw,110px);font-weight:900;line-height:1.05;}
   @keyframes rfIn{from{transform:scale(1.15);opacity:0}to{transform:none;opacity:1}}
 
-  .runprog .rpn{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--navy-3);color:var(--white);font-weight:900;font-size:14px;cursor:pointer;}
-  .runprog .rpn.done{opacity:.45;}
-  .runprog .rpn.on{background:var(--p,var(--rec));border-color:var(--p,var(--rec));color:#fff;transform:scale(1.12);}
+  .runprog{gap:10px;align-items:flex-end;}
+  .rpg{flex:0 0 auto;display:flex;flex-direction:column;gap:4px;padding:5px 7px 6px;border-radius:14px;background:color-mix(in srgb,var(--p) 14%,transparent);border:2px solid transparent;}
+  .rpg.cur{border-color:var(--p);}
+  .rpg-l{font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--p);white-space:nowrap;filter:brightness(1.25);}
+  .rpg-b{display:flex;gap:5px;}
+  .runprog .rpn{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:2px solid var(--p);background:color-mix(in srgb,var(--p) 30%,var(--navy-3));color:var(--white);font-weight:900;font-size:14px;cursor:pointer;}
+  .runprog .rpn.done{opacity:.5;}
+  .runprog .rpn.on{background:var(--p);border-color:#fff;color:#fff;transform:scale(1.12);}
   .stephead{display:flex;gap:14px;align-items:center;margin:4px 0 16px;}
   .stepnum{flex:0 0 auto;width:68px;height:68px;border-radius:20px;background:var(--p,var(--rec));color:#fff;font-weight:900;font-size:40px;display:grid;place-items:center;}
   .stephead .flow-h{margin:2px 0 2px;}
@@ -4448,7 +4453,7 @@ function screenWarmups(){
    ===================================================================== */
 const ROTA_URL = 'https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html';
 const GROUP_COLS = [['Orange','#F28C28'],['Yellow','#F5C518'],['Blue','#2F80ED'],['Red','#E5383B'],['Green','#2EAD5B'],['Purple','#8E44AD']];
-const PIECE_COL = {FF:'#4a90d9', BF:'#2c6fb8', VT:'#5cb85c', BM:'#e8914f', BA:'#7b68ee', FT:'#d9534f'};
+const PIECE_COL = {FF:'#4a90d9', BF:'#01AFB8', VT:'#5cb85c', BM:'#e8914f', BA:'#7b68ee', FT:'#d9534f'};
 const RUN_STORE = {
   get(){ try{ return JSON.parse(localStorage.getItem('nglrec-run') || '{}') || {}; }catch(e){ return {}; } },
   set(v){ try{ localStorage.setItem('nglrec-run', JSON.stringify(v)); }catch(e){} }
@@ -4550,6 +4555,23 @@ function demoStationsHTML(p){
       ${ph ? `<button class="dphoto" data-act="photo" data-img-id="${ph}" aria-label="Enlarge station ${s.n} photo"><img data-img="${ph}" alt="Station ${s.n}"></button>` : ''}
     </div>`; }).join('')}</div>`;
 }
+// Step strip groups: Warm-up, one group per rotation (in that piece's colour), Cool-down
+const RUN_WARM_COL = '#F8B400', RUN_COOL_COL = '#90276A';
+function runGroups(steps){
+  const gs = []; let r = 0;
+  steps.forEach((x, k) => {
+    const key = x.k === 'warm' || x.k === 'cool' ? x.k : 'r' + x.code;
+    let g = gs[gs.length - 1];
+    if(!g || g.key !== key){
+      if(x.code) r++;
+      g = {key, ks:[], col: x.k === 'warm' ? RUN_WARM_COL : x.k === 'cool' ? RUN_COOL_COL : PIECE_COL[x.code],
+        label: x.k === 'warm' ? 'Warm-up' : x.k === 'cool' ? 'Cool-down' : `Rotation ${r} · ${PIECE_NAMES[x.code]}`};
+      gs.push(g);
+    }
+    g.ks.push(k);
+  });
+  return gs;
+}
 function runSequence(){
   const o = runOrder(), steps = o.steps, i = Math.min(UI.ri, steps.length - 1), s = steps[i], nxt = steps[i + 1];
   const g = o.cls ? GROUP_COLS[UI.run.gi] : null, gname = o.cls ? ((o.cls.names && o.cls.names[UI.run.gi]) || g[0]) : '';
@@ -4566,7 +4588,9 @@ function runSequence(){
   render(`<div class="flow run">
     <div class="runhead">${g ? `<span class="rundot" style="background:${g[1]}"></span><b>${esc(gname)}</b> · ${esc(o.cls.day.slice(0,3))} ${hhmm(o.cls.start)} · ` : ''}${esc(o.b.assessment ? 'Assessment' : o.b.weeks)} · Week ${o.week}
       <button class="btn ghost small" data-act="run-exit" style="margin-left:auto">Change</button></div>
-    <div class="runprog">${steps.map((x, k) => `<button class="rpn ${k === i ? 'on' : ''} ${k < i ? 'done' : ''}" style="${x.code ? `--p:${PIECE_COL[x.code]}` : ''}" data-act="run-go" data-v="${k}" aria-label="Step ${k + 1}: ${esc(stepLabel(x))}">${k + 1}</button>`).join('')}</div>
+    <div class="runprog">${runGroups(steps).map(g => `<div class="rpg ${g.ks.includes(i) ? 'cur' : ''}" style="--p:${g.col}">
+      <div class="rpg-l">${esc(g.label)}</div>
+      <div class="rpg-b">${g.ks.map(k => `<button class="rpn ${k === i ? 'on' : ''} ${k < i ? 'done' : ''}" data-act="run-go" data-v="${k}" aria-label="Step ${k + 1}: ${esc(stepLabel(steps[k]))}">${k + 1}</button>`).join('')}</div></div>`).join('')}</div>
     <div class="stephead" style="${col ? `--p:${col}` : ''}">
       <div class="stepnum">${i + 1}</div>
       <div><div class="runstep">${s.code ? `${esc(PIECE_NAMES[s.code])} · piece ${pieceNo} of ${pieces}` : `Step ${i + 1} of ${steps.length}`}</div>
