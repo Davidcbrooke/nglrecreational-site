@@ -3513,15 +3513,16 @@ function screenLogin(msg){
     <div class="auth card">
       ${FIREBASE_CONFIG ? '' : '<div class="demo-banner">Preview mode: any email and password opens a demo club with an active licence and the NGL Admin tab</div>'}
       <h2>${ADMIN_MODE ? 'NGL Recreational admin' : 'Club login'}</h2>
-      <p class="muted">${ADMIN_MODE ? 'Sign in with your NGL admin account.' : 'Use your NGL club account. If you already use NGL Schools, it’s the same login.'}</p>
+      <p class="muted">${ADMIN_MODE ? 'Sign in with your NGL admin account.' : 'Use your NGL club account: the same login as the NGL Club Hub and NGL Schools.'}</p>
       <form id="loginForm">
         <div class="field"><label for="em">Email</label><input class="input" id="em" type="email" autocomplete="email" required></div>
         <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" autocomplete="current-password" required></div>
         <p class="error" id="err">${esc(msg||'')}</p>
         <button class="btn block" type="submit">Sign in</button>
       </form>
-      <p class="note" style="margin-top:14px;text-align:center">New to NGL? <a href="#" data-go="register">Register your club</a><br><a href="#" data-act="reset">Forgotten your password?</a></p>
+      <p class="note" style="margin-top:14px;text-align:center">New to NGL? <a href="#" data-go="register">Create your club account</a><br><a href="#" data-act="reset">Forgotten your password?</a></p>
     </div>`);
+  { const pre = new URLSearchParams(location.search).get('email'); const el = document.getElementById('em'); if(pre && el && !el.value) el.value = pre; }
   document.getElementById('loginForm').addEventListener('submit', async e => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = 'Signing in…';
@@ -3532,6 +3533,20 @@ function screenLogin(msg){
   });
 }
 function screenRegister(){
+  setTop();
+  render(`
+    <div class="auth card">
+      <h2>Create your NGL club account</h2>
+      <p class="muted">One club account works for NGL Recreational, the NGL Club Hub and every other NGL programme. You create it once, in the NGL Club Hub.</p>
+      <ol style="text-align:left;line-height:1.6;margin:12px 0 16px;padding-left:20px">
+        <li>Create your club account in the NGL Club Hub.</li>
+        <li>Come back here and log in with the same email and password.</li>
+      </ol>
+      <a class="btn block" href="https://club.nationalgymnasticsleague.co.uk/#register">Create your club account</a>
+      <p class="note" style="margin-top:14px;text-align:center">Already have an account? <a href="#" data-go="login">Log in</a></p>
+    </div>`);
+}
+function screenRegisterLegacy(){
   setTop();
   render(`
     <div class="auth card">
