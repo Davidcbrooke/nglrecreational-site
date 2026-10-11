@@ -3866,7 +3866,9 @@ function orderModal(kind){
   const m = modal(`
     <h2>${kind === 'start' ? 'Start your Recreational licence' : kind === 'renew' ? 'Renew your Club Licence' : 'Order books, medals and t-shirts'}</h2>
     <form id="oform">
-      ${withLicence ? `<div class="field"><label for="ob">Club size (recreational gymnasts)</label><select class="input" id="ob">${CLUB_BANDS.map(b => `<option value="${b.key}" ${curBand === b.key ? 'selected' : ''}>${b.label}, ${gbp(b.price)} a year</option>`).join('')}</select></div>` : ''}
+      ${withLicence ? `<div class="field"><label for="ogn">How many recreational gymnasts does your club have?</label><input class="input" id="ogn" type="number" min="1" max="10000" required value="${S.club.recGymnasts || (S.orders.filter(x => x.declaredGymnasts).slice(-1)[0] || {}).declaredGymnasts || ''}"><input type="hidden" id="ob" value="${curBand || CLUB_BANDS[0].key}"></div>
+      <p class="note" id="oband" style="margin:-6px 0 10px"></p>
+      <label style="display:flex;gap:8px;align-items:flex-start;margin:0 0 12px"><input type="checkbox" id="odec" required style="width:auto;margin-top:3px"><span>I confirm this is our current number of recreational gymnasts. We’ll upgrade if we grow into the next band, and NGL may ask us for evidence, such as a register count.</span></label>` : ''}
       <p class="note">Award books, medals, certificates and t-shirts are ordered from <b>Order supplies</b> once your licence is paid.</p>
       <div id="oallow" class="note" style="margin:-4px 0 10px"></div>
       <div id="osum"></div>
@@ -3875,6 +3877,12 @@ function orderModal(kind){
   const q = id => m.querySelector('#' + id);
   const qty = k => { const el = q('q_' + k); return el ? Math.max(0, parseInt(el.value) || 0) : 0; };
   let upgrade = false;
+  const bandForCount = n => CLUB_BANDS.find((b, i) => i === CLUB_BANDS.length - 1 || n <= [24, 49, 99, 249, 399, 599][i]);
+  if(withLicence){
+    const setBand = () => { const n = parseInt(q('ogn').value) || 0, b = bandForCount(Math.max(1, n));
+      q('ob').value = b.key; q('oband').innerHTML = n > 0 ? `That puts your club in the <b>${esc(b.short)}</b> band: <b>${gbp(b.price)} a year</b>.` : 'Enter your number of gymnasts to see your band.'; };
+    q('ogn').addEventListener('input', () => { setBand(); sum(); }); setBand();
+  }
   function state(){
     // Allowance for the band this order will leave the club in
     const bandKey = withLicence ? q('ob').value : curBand;
@@ -3917,11 +3925,14 @@ function orderModal(kind){
   q('oform').addEventListener('submit', async e => {
     e.preventDefault();
     const st = state(), L = lines();
+    if(withLicence && !(parseInt(q('ogn').value) > 0)){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Please enter your number of gymnasts.</p>'); return; }
+    if(withLicence && !q('odec').checked){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Please tick to confirm your numbers.</p>'); return; }
     if(!L.length){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Add something to order.</p>'); return; }
     if(st.over && !(kind === 'shop' && upgrade && st.fits)){ q('osum').insertAdjacentHTML('beforeend', '<p class="error">Please sort out the book allowance above first.</p>'); return; }
     const sb = e.target.querySelector('button[type=submit]'); sb.disabled = true; sb.textContent = 'Placing order…';
     const order = {kind, season:S.season, term:currentTermKey(), band: withLicence ? q('ob').value : null, lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0)};
     if(kind === 'shop' && upgrade && st.over) order.upgradeTo = st.target.key;
+    if(withLicence){ order.declaredGymnasts = parseInt(q('ogn').value); S.club.recGymnasts = order.declaredGymnasts; }
     let o;
     try{ o = await api.placeOrder(order); }
     catch(err){ console.error(err); sb.disabled = false; sb.textContent = 'Place order'; q('osum').insertAdjacentHTML('beforeend', '<p class="error">Couldn’t place the order. Please try again.</p>'); return; }
@@ -4643,7 +4654,7 @@ async function screenAdmin(){
   render(`<p class="eyebrow">NGL Admin</p><h1>Recreational admin</h1><div class="btn-row" style="margin:-4px 0 14px"><button class="btn ghost small" data-act="adm-refresh">Refresh</button></div>
   <div class="card"><h2>Orders awaiting payment (${waiting.length})</h2>${waiting.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Order</th><th>Club</th><th>For</th><th class="num">Total</th><th></th></tr></thead>
-    <tbody>${waiting.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${esc(orderFor(o))}</td><td class="num">${gbp(orderTotal(o))}</td>
+    <tbody>${waiting.map(o => `<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.clubName)}</td><td>${esc(orderFor(o))}${o.declaredGymnasts ? `<div class="note">${o.declaredGymnasts} gymnasts declared</div>` : ''}</td><td class="num">${gbp(orderTotal(o))}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-invoice" data-order="${esc(o.id)}">Invoice</button><button class="btn small" data-act="adm-paid" data-order="${esc(o.id)}">Mark paid</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nothing outstanding.</p>'}</div>
   <div class="card"><h2>Supplies to send (${toSend.length})</h2>${toSend.length ? `<div class="table-wrap"><table>
     <thead><tr><th>Order</th><th>Club</th><th>Items</th><th>Deliver to</th><th></th></tr></thead>
