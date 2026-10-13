@@ -3424,7 +3424,7 @@ const $view = document.getElementById('view');
 function render(html){ $view.innerHTML = '<div class="screen">' + sampleBanner() + html + '</div>'; }
 const CONTENT_TABS = ['club','run','plan','warmups','books','competition'];
 /* ---------- Sample mode: clubs without a licence explore the real Hub on a sample
-   (Weeks 1 & 2, the Ruby award book, the competition routines) loaded from the public
+   (Weeks 1 & 2, Level 1 of the award books, the competition routines) loaded from the public
    content/rec-sample.json. Everything else opens with a Club Licence. ---------- */
 const SAMPLE_URL = 'content/rec-sample.json';
 const inSample = () => signedIn && S.club && !hasAccess() && !S.isAdmin;
@@ -3443,7 +3443,7 @@ function sampleBanner(){
     <p class="eyebrow">Sample · see the full programme with a Club Licence</p>
     <h2>${esc(title)}</h2>
     <ul class="ticks">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
-    <p class="note">You’re exploring a sample: Weeks 1 &amp; 2, the Ruby award book and the competition routines. Your Club Licence opens every fortnight, all four books and all 16 levels, the family app and ordering.</p>
+    <p class="note">You’re exploring a sample: Weeks 1 &amp; 2, Level 1 of the award books and the competition routines. Your Club Licence opens every fortnight, all four books and all 16 levels, the family app and ordering.</p>
     <div class="btn-row"><button class="btn" data-tab="licence">See the full programme →</button><button class="btn ghost" data-tab="dashboard">Back to your dashboard</button></div>
   </div>`;
 }
@@ -4674,13 +4674,14 @@ function rotateFlash(code, then){
 
 const BOOK_PIECES = ['Floor','Vault','Beam','Bars','Rebound','Physical Prep'];
 function screenBooks(){
-  const bk = S.content.book, n = UI.book, L0 = (n - 1) * 4 + 1, lv = LEVELS[n - 1];
+  const bk = S.content.book, n = UI.book, L0 = (n - 1) * 4 + 1, lv = LEVELS[n - 1], smp = inSample();
   render(`
-  <div class="blockhead"><h1>Award books</h1><span class="muted">Book ${n} · ${lv.name} · Levels ${L0}–${L0 + 3}</span></div>
-  <div class="toolbar"><div class="chips"><span class="lbl">Book</span>${chips('book', LEVELS.map(l => [l.book, l.name, 'lv-' + l.key]), UI.book)}</div></div>
-  ${[0,1,2,3].map(k => { const L = L0 + k; return `
+  <div class="blockhead"><h1>Award books</h1><span class="muted">${smp ? `Sample · ${lv.name} · Level 1 across all six pieces` : `Book ${n} · ${lv.name} · Levels ${L0}–${L0 + 3}`}</span></div>
+  ${smp ? '' : `<div class="toolbar"><div class="chips"><span class="lbl">Book</span>${chips('book', LEVELS.map(l => [l.book, l.name, 'lv-' + l.key]), UI.book)}</div></div>`}
+  ${(smp ? [0] : [0,1,2,3]).map(k => { const L = L0 + k; return `
     <div class="lvl-band"><span class="dot" style="background:${lv.color}"></span><h2>Level ${L}</h2><button class="btn ghost small" data-act="sheet" data-level="${L}" style="margin-left:auto">Assessment sheet</button></div>
     <div class="bookgrid">${BOOK_PIECES.map(p => `<div class="card" style="margin:0"><h3>${p}</h3><ul class="skill-list">${(bk[p][String(L)] || []).map(x => `<li>${esc(x.skill)}</li>`).join('')}</ul></div>`).join('')}</div>`; }).join('')}
+  ${smp ? `<div class="card" style="margin-top:16px;text-align:center"><h3>Levels 2 to 16 are in the full programme</h3><p class="muted">Four books, Ruby, Pink, Teal and Indigo, with a new level every term.</p></div>` : ''}
   <p class="note" style="margin-top:16px">Gymnasts pass a level when they can do every skill on it. Assessment is in the last 2 weeks of term.</p>`);
 }
 function sheetHTML(L){
