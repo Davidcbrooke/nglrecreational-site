@@ -42,7 +42,11 @@
   .navtabs::-webkit-scrollbar{display:none;}
   .navtab{flex:0 0 auto;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--navy-3);font-weight:700;font-size:14px;cursor:pointer;}
   .navtab.active{background:var(--rec);border-color:var(--rec);color:var(--rec-ink);}
-  .navtab.locked{opacity:.55;}
+  .navtab.locked{opacity:1;}
+  .sample-tag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:#E88230;color:#fff;font-size:.68em;font-weight:800;letter-spacing:.04em;vertical-align:1px;}
+  .sample-banner{border:2px solid #E88230;background:linear-gradient(180deg,rgba(232,130,48,.10),rgba(232,130,48,.02));margin-bottom:18px;}
+  .sample-banner h2{margin:2px 0 8px;}
+  .sample-banner .eyebrow{color:#c25f10;}
 
   main{padding:18px 0 60px;}
   .screen{animation:fadein .2s ease;}
@@ -3417,8 +3421,39 @@ let signedIn = false;
 let tab = 'dashboard';
 const UI = {block:1, piece:'all', level:'all', wblock:1, book:1};
 const $view = document.getElementById('view');
-function render(html){ $view.innerHTML = '<div class="screen">' + html + '</div>'; }
+function render(html){ $view.innerHTML = '<div class="screen">' + sampleBanner() + html + '</div>'; }
 const CONTENT_TABS = ['club','run','plan','warmups','books','competition'];
+/* ---------- Sample mode: clubs without a licence explore the real Hub on a sample
+   (Weeks 1 & 2, the Ruby award book, the competition routines) loaded from the public
+   content/rec-sample.json. Everything else opens with a Club Licence. ---------- */
+const SAMPLE_URL = 'content/rec-sample.json';
+const inSample = () => signedIn && S.club && !hasAccess() && !S.isAdmin;
+const SAMPLE_POINTS = {
+  club: ['Tailor the term programme to your club', ['Build your term plan from the apparatus you actually have; the Hub suggests alternatives for missing kit', 'Fits any term from 10 to 15 weeks, with half term built in', 'Every skill tested this term is taught this term, so nothing is assessed before it is coached', 'One plan for every coach: no more writing your own each term']],
+  run: ['Tailor every class to your gymnasts', ['Coaches pick the week and the apparatus and go, on a tablet in the gym or printed', 'Every station has Ruby, Pink, Teal and Indigo versions, so mixed-ability groups train together', 'Coaching tips and set-up photos for every station', 'Links to your class rotations, so each group knows where to start']],
+  plan: ['A lesson plan that teaches exactly what is assessed', ['Six two-week blocks plus an assessment block, every term', 'Stations for Floor, Vault, Beam, Bars and Fast Track at four levels', 'Set-up photos, videos and progressions for every station', 'Print a week, an apparatus or the whole term']],
+  warmups: ['Warm-ups that build the skills', ['A 10-minute warm-up for every fortnight', 'Built from the physical preparation in the award books', 'Pulse raiser, mobility and strength, ready to run']],
+  books: ['Award books that motivate every gymnast', ['Four books, Ruby to Indigo, 16 levels: one level a term', 'Gymnasts know exactly what they are working towards', 'Assessed in the last two weeks of term, with a medal every term', 'Families follow progress in the NGL Recreational app']],
+  competition: ['Competitions built from the same skills', ['Four levels, Ruby to Indigo, matching the award books', 'Two-piece or four-piece, positive scoring, every gymnast medals', 'Gymnasts compete what they have been taught in class']]
+};
+function sampleBanner(){
+  if(!inSample() || !CONTENT_TABS.includes(tab)) return '';
+  const [title, points] = SAMPLE_POINTS[tab] || SAMPLE_POINTS.plan;
+  return `<div class="card sample-banner">
+    <p class="eyebrow">Sample · see the full programme with a Club Licence</p>
+    <h2>${esc(title)}</h2>
+    <ul class="ticks">${points.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+    <p class="note">You’re exploring a sample: Weeks 1 &amp; 2, the Ruby award book and the competition routines. Your Club Licence opens every fortnight, all four books and all 16 levels, the family app and ordering.</p>
+    <div class="btn-row"><button class="btn" data-tab="licence">See the full programme →</button><button class="btn ghost" data-tab="dashboard">Back to your dashboard</button></div>
+  </div>`;
+}
+async function loadSample(){
+  const r = await fetch(SAMPLE_URL + '?v=1', {cache:'no-cache'});
+  if(!r.ok) throw new Error('Sample not available');
+  const c = await r.json(), idx = {};
+  (c.images || []).forEach((ch, n) => Object.keys(ch).forEach(h => idx[h] = n));
+  return {...c, imgIndex: idx};
+}
 function setTop(){
   const ta = document.getElementById('topActions');
   const nav = document.getElementById('navtabs');
@@ -3427,7 +3462,7 @@ function setTop(){
     nav.hidden = false;
     const lock = !hasAccess() && !S.isAdmin;
     const tabs = ADMIN_MODE ? [] : S.club ? [['dashboard','Dashboard'],['club','Club plan'],['run','Run your class'],['books','Award books'],['competition','Competition'],['rotations','Class rotations'],['shop','Order supplies'],['orders','Orders'],['licence','Licence & pricing']] : [];
-    nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${lock && CONTENT_TABS.includes(k) ? '🔒 ' : ''}${l}</button>`).join('');
+    nav.innerHTML = tabs.map(([k,l]) => `<button class="navtab ${tab===k?'active':''} ${lock && CONTENT_TABS.includes(k) ? 'locked' : ''}" data-tab="${k}">${l}${lock && CONTENT_TABS.includes(k) ? ' <span class="sample-tag">Sample</span>' : ''}</button>`).join('');
   }else{
     ta.innerHTML = `<button class="btn ghost small" data-go="login">Club login</button>`;
     nav.hidden = true;
@@ -3439,7 +3474,10 @@ function show(){
   if(ADMIN_MODE) return S.isAdmin ? screenAdmin() : render(`<div class="card locked-card"><h2>NGL admins only</h2><p class="muted">This login isn’t an NGL admin account.</p></div>`);
   if(!S.club) return render(`<div class="card locked-card"><h2>No club on this login</h2><p class="muted">NGL admin has moved to the main NGL Admin app (Awards licences).</p></div>`);
   if(CONTENT_TABS.includes(tab)){
-    if(!hasAccess() && !S.isAdmin) return screenLocked();
+    if(inSample()){
+      UI.block = 1; UI.wblock = 1; UI.book = 1;
+      if(tab === 'club') return withContent(() => render(`<div class="flow"><h1 class="flow-h">Your club plan</h1>${planStoryHTML(true)}<button class="bigbtn wide go" data-tab="licence" style="margin-top:22px"><span class="bb-t">Build your club plan with a Club Licence →</span><span class="bb-k">About 2 minutes once you're licensed</span></button></div>`));
+    }
     return withContent(() => ({club:screenClub, run:screenRun, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
   if(tab === 'rotations'){ tab = 'dashboard'; window.open('https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html', '_blank', 'noopener'); return show(); }
@@ -3447,9 +3485,11 @@ function show(){
   ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab] ? ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab]() : screenDashboard();
 }
 async function withContent(fn){
-  if(S.content){ fn(); return; }
+  const kind = inSample() ? 'sample' : 'full';
+  if(S.content && S.contentKind === kind){ fn(); return; }
+  if(S.content && S.contentKind !== kind){ S.content = null; PLAN_CACHE = null; IMG.cache = {}; IMG.loaded = {}; }
   render(`<div class="card locked-card"><p class="muted">Loading the Recreational programme…</p></div>`);
-  try{ S.content = await api.loadContent(); fn(); }
+  try{ S.content = kind === 'sample' ? await loadSample() : await api.loadContent(); S.contentKind = kind; fn(); }
   catch(e){
     console.error(e);
     render(`<div class="card locked-card"><h2>The programme isn’t available just now</h2><p class="muted">${S.isAdmin ? 'No content has been published yet. Press “Publish latest from website” in the NGL Admin tab.' : 'Please try again in a moment. If this keeps happening, email ' + esc(CONTACT_EMAIL) + '.'}</p></div>`);
@@ -4068,7 +4108,7 @@ async function hydrateImages(root){
   const els = [...(root || document).querySelectorAll('img[data-img]:not([src])')];
   if(!els.length || !S.content || !S.content.imgIndex) return;
   const need = [...new Set(els.map(e => S.content.imgIndex[e.dataset.img]).filter(n => n !== undefined && !IMG.loaded[n]))];
-  await Promise.all(need.map(async n => { IMG.loaded[n] = true; try{ Object.assign(IMG.cache, await api.loadImgChunk(n)); }catch(e){ IMG.loaded[n] = false; } }));
+  await Promise.all(need.map(async n => { IMG.loaded[n] = true; try{ Object.assign(IMG.cache, S.contentKind === 'sample' ? ((S.content.images || [])[n] || {}) : await api.loadImgChunk(n)); }catch(e){ IMG.loaded[n] = false; } }));
   els.forEach(e => { const d = IMG.cache[e.dataset.img]; if(d) e.src = d; });
 }
 function thumbs(s, i){
@@ -4230,7 +4270,7 @@ const PLAN_STORE = {
 Object.assign(UI, {pstep:'weeks', piece:''}, (PLAN_STORE.get() || {}));
 let PLAN_CACHE = null;
 function clubPlan(){
-  const t = S.club && S.club.recTerm;
+  const t = S.contentKind === 'sample' ? null : (S.club && S.club.recTerm);
   const key = JSON.stringify(t || null) + '|' + (S.content.version || '') + '|' + S.content.plan.blocks.length;
   if(PLAN_CACHE && PLAN_CACHE.key === key) return PLAN_CACHE.plan;
   const plan = t && t.custom ? buildClubPlan(S.content, t)
@@ -4239,6 +4279,7 @@ function clubPlan(){
   PLAN_CACHE = {key, plan}; return plan;
 }
 function planNow(){
+  if(S.contentKind === 'sample') return null;
   const t = S.club && S.club.recTerm, plan = clubPlan(), blocks = plan.blocks;
   if(!t || !t.start) return null;
   if(t.custom){ const n = clubWeekNow(t, plan); return n && !n.outside && !n.half ? n : null; }
