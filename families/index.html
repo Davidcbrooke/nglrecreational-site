@@ -668,11 +668,12 @@ function buildClubPlan(content, term){
   return {settings: t, rule, blocks, coverage: byBook, removed, adapted,
     twoPiece: key4.length > 0, noBars, F, odd};
 }
+const _mon = x => { const d = new Date(x); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d; };  // weeks run Monday to Sunday
 // Which club week is it? Half-term week is skipped.
 function clubWeekNow(term, plan, today){
   const t = planDefaults(term);
   if(!t.start) return null;
-  const day = 86400000, start = new Date(t.start + 'T00:00:00'), now = today || new Date();
+  const day = 86400000, start = _mon(t.start + 'T00:00:00'), now = today || new Date();
   let wk = Math.floor((now - start) / (7 * day)) + 1;
   let half = false;
   if(t.halfTerm){
