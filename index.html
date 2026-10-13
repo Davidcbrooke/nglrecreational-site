@@ -4731,12 +4731,10 @@ async function screenAdmin(){
       <td>${on ? '<span class="tag ok">Active</span>' : c.rec ? '<span class="tag off">Off</span>' : '<span class="tag wait">Not started</span>'}</td>
       <td class="row-actions"><button class="btn ghost small" data-act="adm-status" data-club="${esc(c.id)}" data-to="${on ? 'inactive' : 'active'}">${on ? 'Switch off' : 'Switch on'}</button></td></tr>`; }).join('')}</tbody></table></div>` : '<p class="muted">No Recreational clubs yet.</p>'}</div>
   <div class="card"><h2>Publish programme content</h2>
-    <p class="muted">Publishes the copy of <b>rec-content.json</b> kept on the website (the <b>content</b> folder in GitHub) to every licensed club. When the programme changes, replace that file in GitHub, wait a minute, then press the button.</p>
+    <p class="muted">Choose <b>rec-content.json</b> from your computer and publish it to every licensed club. Keep this file on your computer only: don’t upload it to GitHub, because everything in GitHub is public.</p>
+    <input type="file" id="contentFile" accept="application/json,.json" class="input" style="margin-top:8px">
     <p class="note" id="pubNote" style="margin-top:8px"></p>
-    <button class="btn" data-act="publish-site">Publish latest from website</button>
-    <details style="margin-top:12px"><summary class="note">Or publish a file from this computer</summary>
-      <input type="file" id="contentFile" accept="application/json,.json" class="input" style="margin-top:8px">
-      <button class="btn ghost small" data-act="publish" style="margin-top:8px">Publish file</button></details></div>`);
+    <button class="btn" data-act="publish" style="margin-top:8px">Publish file</button></div>`);
 }
 
 /* =====================================================================
@@ -4866,13 +4864,12 @@ document.addEventListener('click', async e => {
     try{ await api.adminSetStatus(c, act.dataset.to); if(FIREBASE_CONFIG && c.id === S.uid) await loadClubData(S.uid); screenAdmin(); }
     catch(err){ console.error(err); act.disabled = false; act.textContent = 'Failed, retry'; }
   }
-  else if(a === 'publish' || a === 'publish-site'){
+  else if(a === 'publish'){
     const f = document.getElementById('contentFile'), n = document.getElementById('pubNote');
     if(a === 'publish' && !f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
-    act.disabled = true; n.style.color = ''; n.textContent = a === 'publish-site' ? 'Fetching rec-content.json from the website…' : 'Publishing…';
+    act.disabled = true; n.style.color = ''; n.textContent = 'Publishing…';
     try{ let c;
-      if(a === 'publish-site'){ const r = await fetch('content/rec-content.json?t=' + Date.now(), {cache:'no-store'}); if(!r.ok) throw new Error('content/rec-content.json not found on the website (' + r.status + '). Check it is uploaded to the content folder in GitHub.'); c = await r.json(); }
-      else c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
+      c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
     catch(err){ console.error(err); n.style.color = ''; n.textContent = 'Couldn’t publish: ' + err.message; }
     act.disabled = false;
   }
