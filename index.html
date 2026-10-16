@@ -3218,7 +3218,7 @@ async function loadClubData(uid){
   ]);
   S.club = clubSnap.exists() ? clubSnap.data() : null;
   S.isAdmin = !!(adminSnap && adminSnap.exists());
-  S.orders = ordersSnap.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => toDate(a.createdAt) - toDate(b.createdAt));
+  S.orders = ordersSnap.docs.map(d => ({id:d.id, ...d.data()})).filter(o => o.pathway !== 'preschool').sort((a,b) => toDate(a.createdAt) - toDate(b.createdAt));
   S.content = null;
 }
 async function claimSchoolsCode(clubName, clubId){
@@ -3331,7 +3331,7 @@ const liveApi = {
     const [c, o] = await Promise.all([fs.getDocs(fs.collection(D, 'clubs')), fs.getDocs(fs.collection(D, 'recOrders'))]);
     return {
       clubs: c.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => String(a.name).localeCompare(String(b.name))),
-      orders: o.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => toDate(b.createdAt) - toDate(a.createdAt))
+      orders: o.docs.map(d => ({id:d.id, ...d.data()})).filter(x => x.pathway !== 'preschool').sort((a,b) => toDate(b.createdAt) - toDate(a.createdAt))
     };
   },
   async adminMarkPaid(order, club){
