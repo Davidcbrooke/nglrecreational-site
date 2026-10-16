@@ -3518,7 +3518,7 @@ function pitchHTML(inside){
         <button class="btn" data-go="register">Register your club</button>
         <button class="btn ghost" data-go="login">Club login</button>
       </div>
-      <p class="note" style="margin-top:12px">Already have an NGL Schools club account? Log in with it. Recreational is a separate licence on the same account.</p>
+      <p class="note" style="margin-top:12px">Already have an NGL club account? Log in with it. Recreational is a separate licence on the same account.</p>
     </div>
     <div class="levels-art" aria-hidden="true">
       ${LEVELS.map(l => `<div class="lvtile bg-${l.key}"><small>Book ${l.book}</small>${l.name}</div>`).join('')}
@@ -3575,9 +3575,9 @@ function pitchHTML(inside){
 
   ${inside ? '' : `
   <div class="section card" style="text-align:center">
-    <h2>Licensed to BG clubs</h2>
-    <p class="muted">Clubs hold a yearly Club Licence and buy award books and medals through the Club Hub. Full pricing is in the Club Hub once you register.</p>
-    <div class="btn-row" style="justify-content:center"><button class="btn" data-go="register">Register your club</button></div>
+    <h2>Licensed to British Gymnastics clubs</h2>
+    <p class="muted">One yearly Club Licence, from £200 a year depending on how many Recreational gymnasts you have. Award books, medals and t-shirts are ordered through this hub at club prices.</p>
+    <div class="btn-row" style="justify-content:center"><button class="btn" data-go="register">Register your club</button><a class="btn ghost" href="https://club.nationalgymnasticsleague.co.uk/licences.html" target="_blank" rel="noopener">See all licence fees ↗</a></div>
   </div>`}
   <div class="foot">Questions? <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></div>`;
 }
