@@ -1,6 +1,6 @@
 // NGL Recreational Families: opens instantly and works on a weak signal.
 // Network first, so families always get the latest version when online.
-const CACHE = 'ngl-families-v2';
+const CACHE = 'ngl-families-v3';
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/families/']).catch(() => {}))); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

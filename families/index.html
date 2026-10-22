@@ -816,6 +816,14 @@ function whereAreWe(term){
   .ftabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(13,26,79,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));}
   .ftabbar[hidden]{display:none;}
   .ftab-in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(var(--ntabs,4),1fr);}
+  .cvids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .card .cvids{grid-template-columns:1fr;margin-top:10px;}
+  .cvid{position:relative;display:block;width:100%;aspect-ratio:16/9;border:0;padding:0;border-radius:12px;overflow:hidden;background:#000;cursor:pointer;}
+  .cvid img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85;}
+  .cvid-play{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:var(--rec);box-shadow:0 4px 14px rgba(0,0,0,.4);}
+  .cvid-play:after{content:'';position:absolute;left:19px;top:14px;border-style:solid;border-width:10px 0 10px 15px;border-color:transparent transparent transparent #fff;}
+  .cvid-lab{position:absolute;left:8px;bottom:8px;background:rgba(13,26,79,.85);color:#fff;font-size:12px;font-weight:800;padding:3px 8px;border-radius:999px;}
+  .cvid.playing iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
   .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 18px;}
   .pcell{border-radius:12px;padding:10px 8px;min-height:64px;border:2px solid transparent;background:var(--navy-2);color:var(--white);cursor:pointer;text-align:left;font:inherit;display:flex;flex-direction:column;justify-content:space-between;}
   .pcell b{font-size:15px;}.pcell small{font-size:11px;font-weight:700;opacity:.85;}
@@ -1080,7 +1088,7 @@ function screenWeek(){
   <section class="section">
     <p class="eyebrow">Competition</p><h2>${lv.name} routine</h2>
     <p class="muted">The NGL Recreational competition routine for ${lv.name}. Every skill in it is in your child’s award book, so what they practise in class is what they compete.</p>
-    <div class="grid4">${[['Floor', comp.floor], ['Vault', comp.vault], ['Beam', comp.beam], ['Bars', comp.bars]].map(([t, xs]) => `<div class="card" style="margin:0;border-top:6px solid ${lv.color}"><h3>${t}</h3><ol style="margin:0;padding-left:20px">${xs.map(x => `<li style="padding:3px 0">${esc(x)}${compDone.has(norm(x)) ? ' <span class="tag info">This fortnight</span>' : ''}</li>`).join('')}</ol></div>`).join('')}</div>
+    <div class="grid4">${[['Floor', comp.floor], ['Vault', comp.vault], ['Beam', comp.beam], ['Bars', comp.bars]].map(([t, xs]) => `<div class="card" style="margin:0;border-top:6px solid ${lv.color}"><h3>${t}</h3><ol style="margin:0;padding-left:20px">${xs.map(x => `<li style="padding:3px 0">${esc(x)}${compDone.has(norm(x)) ? ' <span class="tag info">This fortnight</span>' : ''}</li>`).join('')}</ol>${compVideosHTML(lv.key, t)}</div>`).join('')}</div>
   </section>
   <div class="foot">${esc(S.club.clubName)} · NGL Recreational · Questions about your child’s progress? Please ask their coach.<br><a href="#" data-go="logout">Use a different club code</a></div>`);
   hydrateImages();
@@ -1281,6 +1289,27 @@ async function loadComps(){
   CAL.list = all.filter(isRec).map(c => Object.assign(c, {_d:day(c.date)})).filter(c => c._d && c._d >= today).sort((a, b) => a._d - b._d);
   return CAL.list;
 }
+/* Competition routine videos (same YouTube videos as the NGL website) */
+const COMP_VIDEOS = {
+  ruby:   {Floor:'QUmO-2VM4jQ', Vault:'TKV4rRq4JoQ', Beam:'6Xf6tzbyuI0', Bars:'UqIItuGwqmg'},
+  pink:   {Floor:'cXcmczamdLs', Vault:'8IE9zY81g_g', Beam:'YyuTaVTMHto', Bars:'Mm_Dnm3WXzw'},
+  teal:   {Floor:'AYcnuE1zZc8', Vault:'4Lgkq3aaues', Beam:'3PhzRfogvIM', Bars:'9n-AtEJIr_U'},
+  indigo: {Floor:'Uu8si-DM_CI', Vault:'w58EYcW2Loo', Beam:'0GzVp2KSjbI', Bars:'pv8VOObrh0Q'}
+};
+const vidTile = (id, label) => id ? `<button class="cvid" data-yt="${id}" aria-label="Play ${esc(label)} routine video"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"><span class="cvid-play"></span><span class="cvid-lab">${esc(label)}</span></button>` : '';
+function compVideosHTML(lvKey, only){
+  const lv = LEVELS.find(l => l.key === lvKey), v = COMP_VIDEOS[lvKey] || {};
+  return `<div class="cvids">${['Floor','Vault','Beam','Bars'].filter(a => !only || only === a).map(a => vidTile(v[a], lv.name + ' ' + a)).join('')}</div>`;
+}
+document.addEventListener('click', e => {
+  const cl = e.target.closest('[data-complv]'); if(cl){ UI.compLv = cl.dataset.complv; screenComps(); return; }
+  const b = e.target.closest('[data-yt]'); if(!b) return;
+  const id = b.dataset.yt;
+  const w = document.createElement('div'); w.className = 'cvid playing';
+  w.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="${esc(b.getAttribute('aria-label') || 'Routine video')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  b.replaceWith(w);
+});
+
 function screenComps(){
   const rules = (S.content && S.content.competition && S.content.competition.rules) || COMP_RULES;
   const body = () => {
@@ -1295,11 +1324,16 @@ function screenComps(){
       ${c.address || c.postcode ? `<p style="margin:10px 0 0"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([c.venue, c.address, c.postcode].filter(Boolean).join(', '))}" target="_blank" rel="noopener">Map</a></p>` : ''}
     </div>`).join('');
   };
+  UI.compLv = UI.compLv || (UI.book ? LEVELS[UI.book - 1].key : 'ruby');
   const draw = () => renderTab(`
     <p class="eyebrow">NGL Recreational</p><h1>Competitions</h1>
     <p class="lead">NGL Recreational competitions use the same four colours as the award books: Ruby, Pink, Teal and Indigo. Every routine skill is in your child’s book, so they compete what they have been taught.</p>
     <section class="section"><h2>Coming up</h2>${body()}
       <p class="note">Clubs enter their gymnasts, so please ask your coach if you’d like your child to take part.</p></section>
+    <section class="section"><h2>Competition routines</h2>
+      <p class="muted">Watch every routine for each colour. Tap a video to play it.</p>
+      <div class="chips" style="margin:6px 0 12px">${LEVELS.map(l => `<button class="chip ${UI.compLv === l.key ? 'on' : ''}" data-complv="${l.key}" style="${UI.compLv === l.key ? '' : `border-color:${l.color}`}">${l.name}</button>`).join('')}</div>
+      ${compVideosHTML(UI.compLv)}</section>
     <section class="section card"><h2>How the competitions work</h2><ul class="ticks">${rules.map(r => `<li>${esc(r)}</li>`).join('')}</ul></section>
     <div class="foot">Dates come from the NGL competition calendar.</div>`);
   draw();
