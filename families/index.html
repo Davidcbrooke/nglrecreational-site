@@ -1003,6 +1003,7 @@ function screenChoose(){
 // Coaching tips, worded for parents: what the coach will say and what to look for.
 // Safety notes are for coaches only, so they are left out here.
 function parentTips(s){
+  return '';   // coaching tips switched off (Oct 2026): they didn't match the skills closely enough
   const t = s.tips; if(!t || !(t.cues || []).length) return '';
   return `<details class="tipbox"><summary>Coaching tips</summary>
     <p class="tip-row"><b>What the coach will say</b></p>
