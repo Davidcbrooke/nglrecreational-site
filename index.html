@@ -369,6 +369,8 @@
   .tipbox .tip-row b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
   .tipbox .tip-safe b{color:var(--warn);}
   .tipbox .tip-home{color:var(--muted);font-size:13px;}
+  .safetybox{border-color:rgba(255,180,84,.5);background:rgba(255,180,84,.08);}
+  .safetybox .tip-row{padding:10px 14px;}
   .fstation .tipbox{margin-top:10px;}
 
 
@@ -4391,13 +4393,18 @@ function planSetup(b, p){
   </div>`);
   hydrateImages($view);
 }
+/* Coaching tips are switched off (Oct 2026): they didn't match the skills closely enough.
+   Safety notes stay, for coaches only, when they mention a skill or piece of equipment used at that station. */
+const SAFETY_KEYS = ['handstand','cartwheel','round off','roundoff','flatback','flat back','roll','wheelbarrow','slider','wedge','wall','springboard','vault','beam','bar','trampette','tramp','hop','leap','turn','spin','bridge','walkover','handspring','half on','squat','straddle','pike','tuck','dive','swing','hang','cast','circle','block','bench','rope','partner','headstand','shoulderstand','splits','balance','bosu','salto','somersault','barani','fast track','panel'];
+function safetyRelevant(s, note){
+  const txt = (Array.isArray(s.levels) ? s.levels.join(' ') : String(s.levels || '')).toLowerCase(), n = note.toLowerCase();
+  const hits = SAFETY_KEYS.filter(k => n.includes(k));
+  return !hits.length || hits.some(k => txt.includes(k));
+}
 function tipsHTML(s){
-  return '';   // coaching tips switched off (Oct 2026): they didn't match the skills closely enough
-  const t = s.tips; if(!t || !(t.cues || []).length) return '';
-  return `<details class="tipbox"><summary>Coaching tips</summary>
-    <ul class="tip-cues">${t.cues.map(c => `<li>“${esc(c)}”</li>`).join('')}</ul>
-    ${t.watch ? `<p class="tip-row"><b>Watch for</b> ${esc(t.watch)}</p>` : ''}
-    ${t.safety ? `<p class="tip-row tip-safe"><b>Safety</b> ${esc(t.safety)}</p>` : ''}</details>`;
+  const t = s.tips, note = t && t.safety;
+  if(!note || !safetyRelevant(s, note)) return '';
+  return `<div class="tipbox safetybox"><p class="tip-row tip-safe"><b>Safety</b> ${esc(note)}</p></div>`;
 }
 function planLadder(b, p){
   render(`<div class="flow">
