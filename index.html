@@ -4395,7 +4395,7 @@ function planSetup(b, p){
 }
 /* Coaching tips are switched off (Oct 2026): they didn't match the skills closely enough.
    Safety notes stay, for coaches only, when they mention a skill or piece of equipment used at that station. */
-const SAFETY_KEYS = ['handstand','cartwheel','round off','roundoff','flatback','flat back','roll','wheelbarrow','slider','wedge','wall','springboard','vault','beam','bar','trampette','tramp','hop','leap','turn','spin','bridge','walkover','handspring','half on','squat','straddle','pike','tuck','dive','swing','hang','cast','circle','block','bench','rope','partner','headstand','shoulderstand','splits','balance','bosu','salto','somersault','barani','fast track','panel'];
+const SAFETY_KEYS = ['handstand','cartwheel','round off','roundoff','flatback','flat back','roll','wheelbarrow','slider','wedge','wall','springboard','vault','beam','bar','trampette','tramp','hop','leap','turn','spin','bridge','walkover','handspring','half on','squat','straddle','pike','tuck','dive','swing','hang','cast','circle','block','bench','rope','partner','headstand','shoulderstand','splits','balance','bosu','salto','somersault','barani','panel'];
 function safetyRelevant(s, note){
   const txt = (Array.isArray(s.levels) ? s.levels.join(' ') : String(s.levels || '')).toLowerCase(), n = note.toLowerCase();
   const hits = SAFETY_KEYS.filter(k => n.includes(k));
