@@ -815,7 +815,15 @@ function whereAreWe(term){
   const css = `
   .ftabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(13,26,79,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));}
   .ftabbar[hidden]{display:none;}
-  .ftab-in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+  .ftab-in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(var(--ntabs,4),1fr);}
+  .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 18px;}
+  .pcell{border-radius:12px;padding:10px 8px;min-height:64px;border:2px solid transparent;background:var(--navy-2);color:var(--white);cursor:pointer;text-align:left;font:inherit;display:flex;flex-direction:column;justify-content:space-between;}
+  .pcell b{font-size:15px;}.pcell small{font-size:11px;font-weight:700;opacity:.85;}
+  .pcell.done{background:var(--c);}.pcell.now{border-color:var(--white);box-shadow:0 0 0 3px rgba(255,255,255,.18);}
+  .pcell.done small:before{content:'✓ ';}
+  .kids{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;}
+  .pnow{border-radius:16px;padding:16px 18px;color:#fff;margin:6px 0 16px;}
+  .pnow h2{margin:0 0 2px;color:#fff;}.pnow p{margin:0;opacity:.95;}
   .ftab{background:none;border:0;cursor:pointer;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.02em;}
   .ftab svg{width:24px;height:24px;}
   .ftab.active{color:var(--rec);}
@@ -875,6 +883,76 @@ function splashOut(){
 const UI = {book: +store.get('book') || 0, level: +store.get('level') || 0, block: 0, tab: store.get('tab') || 'week'};
 const $view = document.getElementById('view');
 function render(h){ $view.innerHTML = '<div class="screen">' + h + '</div>'; window.scrollTo(0,0); }
+
+/* ---------- My child's progress: kept on this phone only, never sent to NGL ---------- */
+const fmtShort = iso => { try{ return new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}); }catch(e){ return iso; } };
+const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function prog(){
+  let p = null; try{ p = JSON.parse(store.get('progress') || 'null'); }catch(e){}
+  if(!p || !Array.isArray(p.kids) || !p.kids.length){ p = {kids:[{id:'k' + Date.now(), name:'', current:UI.level || 0, passed:{}}]}; p.active = p.kids[0].id; progSave(p); }
+  return p;
+}
+function progSave(p){ store.set('progress', JSON.stringify(p)); }
+function kid(p){ return p.kids.find(k => k.id === p.active) || p.kids[0]; }
+const kidName = k => k.name ? k.name : 'Your child';
+function progUse(k){   // make the rest of the app follow the chosen child
+  UI.level = k.current || 0; UI.book = k.current ? Math.ceil(k.current / 4) : 0;
+  store.set('level', UI.level || null); store.set('book', UI.book || null); UI.block = 0;
+}
+function progSummary(p){
+  return p.kids.map(k => { const lv = k.current ? LEVELS[Math.ceil(k.current / 4) - 1] : null;
+    const done = Object.keys(k.passed || {}).map(Number).sort((a, b) => a - b);
+    return `${kidName(k)} – NGL Recreational progress\n` + (lv ? `Now working on: ${lv.name} book, Level ${k.current}\n` : '') +
+      (done.length ? 'Levels passed:\n' + done.map(L => `• Level ${L} (${LEVELS[Math.ceil(L / 4) - 1].name}) – ${fmtShort(k.passed[L])}`).join('\n') : 'No levels recorded yet.'); }).join('\n\n') +
+    (S.club ? `\n\nClub: ${S.club.clubName}` : '');
+}
+function screenProgress(){
+  const p = prog(), k = kid(p), L = k.current, lv = L ? LEVELS[Math.ceil(L / 4) - 1] : null, last = L === 16 && (k.passed || {})[16];
+  renderTab(`<p class="eyebrow">${S.club ? esc(S.club.clubName) : 'NGL Recreational'}</p><h1>Progress</h1>
+  <p class="muted" style="margin-top:-4px">Keep track of the levels your child has passed, so you always know where they are, even if the award book goes missing.</p>
+  <div class="kids">${p.kids.map(x => `<button class="chip ${x.id === k.id ? 'on' : ''}" data-kid="${x.id}">${esc(kidName(x))}</button>`).join('')}<button class="chip" data-pact="addkid">+ Add a child</button></div>
+  <div class="field" style="max-width:360px"><label for="kname">Child’s first name (optional)</label><input class="input" id="kname" value="${esc(k.name || '')}" placeholder="e.g. Ella" maxlength="30" autocomplete="off"></div>
+  ${lv ? `<div class="pnow" style="background:${lv.color}"><p class="eyebrow" style="color:#fff;opacity:.9">${last ? 'All 16 levels passed' : 'Working on now'}</p><h2>${lv.name} book · Level ${L}</h2><p>${last ? 'Every NGL Recreational level is complete. Brilliant!' : 'Book ' + lv.book + ' of 4. One level a term, assessed in the last two weeks.'}</p></div>
+    ${last ? '' : `<div class="card" style="margin:0 0 16px"><h3 style="margin-top:0">Has ${esc(kidName(k).replace('Your child', 'your child'))} passed Level ${L}?</h3>
+      <div class="btn-row" style="align-items:flex-end"><div class="field" style="margin:0"><label for="pdate">Date passed</label><input class="input" type="date" id="pdate" value="${todayISO()}" max="${todayISO()}"></div>
+      <button class="btn" data-pact="pass">Yes, record Level ${L} as passed</button></div>
+      <p class="note" style="margin-top:8px">${L % 4 === 0 && L < 16 ? `That finishes the ${lv.name} book, so they’ll move on to ${LEVELS[lv.book].name}, Level ${L + 1}.` : `They’ll move on to Level ${L + 1}.`}</p></div>`}`
+  : `<div class="card" style="margin:0 0 16px"><h3 style="margin-top:0">Which level is ${esc(kidName(k).replace('Your child', 'your child'))} working on?</h3><p class="muted">Tap their level below. If you’re not sure, ask their coach.</p></div>`}
+  <h2>All 16 levels</h2><p class="muted" style="margin-top:-4px">Tap a level to mark it passed, change the date, or set it as the level they’re working on.</p>
+  ${LEVELS.map(b => `<p class="eyebrow" style="color:${b.color};margin:10px 0 0">Book ${b.book} · ${b.name}</p><div class="pgrid">${[0,1,2,3].map(i => { const n = (b.book - 1) * 4 + 1 + i, d = (k.passed || {})[n];
+    return `<button class="pcell ${d ? 'done' : ''} ${n === L && !last ? 'now' : ''}" style="--c:${b.color}" data-plevel="${n}"><b>Level ${n}</b><small>${d ? fmtShort(d) : n === L ? 'Working on now' : ''}</small></button>`; }).join('')}</div>`).join('')}
+  <div class="card"><h3 style="margin-top:0">Keep a copy</h3><p class="muted">Progress is saved on this phone only. NGL never sees it. Copy a summary to keep it somewhere safe, or to send to yourself.</p>
+    <div class="btn-row"><button class="btn ghost small" data-pact="copy">Copy summary</button><a class="btn ghost small" href="mailto:?subject=${encodeURIComponent('NGL Recreational progress')}&body=${encodeURIComponent(progSummary(p))}">Email it to myself</a>${p.kids.length > 1 ? '<button class="btn ghost small" data-pact="delkid">Remove this child</button>' : ''}</div><p class="note" id="pnote"></p></div>
+  <div class="foot">Questions about your child’s progress? Please ask their coach.</div>`);
+  const nm = document.getElementById('kname');
+  if(nm) nm.addEventListener('change', () => { const q = prog(); kid(q).name = nm.value.trim().slice(0, 30); progSave(q); screenProgress(); });
+}
+function levelSheet(n){
+  const p = prog(), k = kid(p), d = (k.passed || {})[n], b = LEVELS[Math.ceil(n / 4) - 1];
+  modal(`<p class="eyebrow" style="color:${b.color}">${b.name} book</p><h2 style="margin-top:0">Level ${n}</h2>
+    <div class="field"><label for="ldate">${d ? 'Passed on' : 'Date passed'}</label><input class="input" type="date" id="ldate" value="${d || todayISO()}" max="${todayISO()}"></div>
+    <div class="btn-row"><button class="btn" data-pact="setpass" data-n="${n}" data-close>${d ? 'Save date' : 'Mark as passed'}</button>
+    ${d ? `<button class="btn ghost" data-pact="unpass" data-n="${n}" data-close>Not passed</button>` : ''}
+    ${k.current !== n ? `<button class="btn ghost" data-pact="setnow" data-n="${n}" data-close>Working on this level now</button>` : ''}
+    <button class="btn ghost" data-close>Cancel</button></div>`);
+}
+document.addEventListener('click', e => {
+  const t = e.target;
+  const kd = t.closest('[data-kid]'); if(kd){ const p = prog(); p.active = kd.dataset.kid; progSave(p); progUse(kid(p)); screenProgress(); return; }
+  const pl = t.closest('[data-plevel]'); if(pl){ levelSheet(+pl.dataset.plevel); return; }
+  const a = t.closest('[data-pact]'); if(!a) return;
+  const p = prog(), k = kid(p); k.passed = k.passed || {};
+  const act = a.dataset.pact, n = +a.dataset.n;
+  if(act === 'pass'){ const d = (document.getElementById('pdate') || {}).value || todayISO(); k.passed[k.current] = d; if(k.current < 16) k.current += 1; }
+  else if(act === 'setpass'){ const d = (document.getElementById('ldate') || {}).value || todayISO(); k.passed[n] = d; if(k.current === n && n < 16) k.current = n + 1; if(!k.current) k.current = Math.min(16, n + 1); }
+  else if(act === 'unpass'){ delete k.passed[n]; }
+  else if(act === 'setnow'){ k.current = n; }
+  else if(act === 'addkid'){ const nk = {id:'k' + Date.now(), name:'', current:0, passed:{}}; p.kids.push(nk); p.active = nk.id; }
+  else if(act === 'delkid'){ if(!confirm('Remove ' + kidName(k) + ' from this phone?')) return; p.kids = p.kids.filter(x => x.id !== k.id); p.active = p.kids[0].id; }
+  else if(act === 'copy'){ const txt = progSummary(p); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => { const n = document.getElementById('pnote'); if(n) n.textContent = 'Summary copied.'; }).catch(() => modal(`<h2 style="margin-top:0">Progress summary</h2><textarea class="input" style="min-height:200px">${esc(txt)}</textarea><div class="btn-row"><button class="btn" data-close>Close</button></div>`)); return; }
+  progSave(p); progUse(kid(p));
+  setTimeout(() => { if(UI.tab === 'progress') screenProgress(); }, 0);
+});
 
 function screenCode(msg){
   tabbar(false);
@@ -968,7 +1046,7 @@ function screenWeek(){
   renderTab(`
   <div class="fhead" style="border-color:${lv.color}">
     <div><p class="eyebrow" style="color:${lv.color}">${esc(S.club.clubName)}</p>
-    <h1 style="margin:0">${lv.name} · Level ${L}</h1></div>
+    <h1 style="margin:0">${(k => k.name ? esc(k.name) + ' · ' : '')(kid(prog()))}${lv.name} · Level ${L}</h1></div>
     <button class="btn ghost small" data-go="choose">Change book or level</button>
   </div>
 
@@ -1035,6 +1113,7 @@ const ICONS = {
   programme:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 8h6"/></svg>',
   levels:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4v-5h4v-5h4V5h4"/></svg>',
   comps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v6a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8"/></svg>',
+  progress:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/><path d="m9.5 9 1.8 1.8L14.8 7"/></svg>',
   code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/></svg>'
 };
 function tabbar(show){
@@ -1042,7 +1121,8 @@ function tabbar(show){
   if(!bar){ bar = document.createElement('nav'); bar.id = 'ftabbar'; bar.className = 'ftabbar'; document.body.appendChild(bar); }
   bar.hidden = !show; document.body.classList.toggle('has-tabbar', !!show);
   if(!show) return;
-  const tabs = [S.club ? ['week','This fortnight'] : ['code','Club code'], ['programme','Programme'], ['levels','Levels'], ['comps','Competitions']];
+  const tabs = [S.club ? ['week','This fortnight'] : ['code','Club code'], ...(S.club ? [['progress','Progress']] : []), ['programme','Programme'], ['levels','Levels'], ['comps','Competitions']];
+  bar.style.setProperty('--ntabs', tabs.length);
   bar.innerHTML = `<div class="ftab-in">${tabs.map(([k, l]) => `<button class="ftab ${UI.tab === k ? 'active' : ''}" ${k === 'code' ? 'data-go="code"' : `data-ftab="${k}"`}>${ICONS[k]}<span>${l}</span></button>`).join('')}</div>`;
 }
 function renderTab(h){ render(h); tabbar(true); installNudge(); }
@@ -1086,9 +1166,9 @@ document.addEventListener('click', async e => {
   if(c) c.remove();
 });
 function screenMain(){
-  if(!S.club && (UI.tab === 'week' || !UI.tab)) UI.tab = 'programme';
+  if(!S.club && (UI.tab === 'week' || UI.tab === 'progress' || !UI.tab)) UI.tab = 'programme';
   if(S.club && UI.tab === 'week' && !(UI.book && UI.level)) return screenChoose();
-  ({week:screenWeek, programme:screenProgramme, levels:screenLevels, comps:screenComps})[UI.tab]();
+  ({week:screenWeek, progress:screenProgress, programme:screenProgramme, levels:screenLevels, comps:screenComps})[UI.tab]();
 }
 function classShape(){
   const t = S.club && S.club.term && S.club.term.custom ? S.club.term : null;
@@ -1236,7 +1316,7 @@ function modal(html){
 document.addEventListener('click', e => {
   const t = e.target;
   const bk = t.closest('[data-book]'); if(bk){ UI.book = +bk.dataset.book; UI.level = 0; store.set('book', UI.book); screenChoose(); return; }
-  const lvl = t.closest('[data-level]'); if(lvl){ UI.level = +lvl.dataset.level; store.set('level', UI.level); UI.block = 0; UI.tab = 'week'; store.set('tab', 'week'); screenMain(); return; }
+  const lvl = t.closest('[data-level]'); if(lvl){ UI.level = +lvl.dataset.level; store.set('level', UI.level); { const p = prog(); kid(p).current = UI.level; progSave(p); } UI.block = 0; UI.tab = 'week'; store.set('tab', 'week'); screenMain(); return; }
   if(t.closest('[data-inst-open]')){ showInstallCard(); return; }
   const ft = t.closest('[data-ftab]'); if(ft){ UI.tab = ft.dataset.ftab; store.set('tab', UI.tab); screenMain(); return; }
   const bl = t.closest('[data-block]'); if(bl){ UI.block = +bl.dataset.block; screenMain(); return; }
@@ -1255,6 +1335,7 @@ document.addEventListener('click', e => {
 })();
 function keepCodeInUrl(code){ try{ const u = new URL(location.href); if(u.searchParams.get('code') !== code){ u.searchParams.set('code', code); history.replaceState(null, '', u); } }catch(e){} }
 async function start(){
+  { let p = null; try{ p = JSON.parse(store.get('progress') || 'null'); }catch(e){} if(p && p.kids && p.kids.length){ const k = kid(p); if(k.current) progUse(k); } }
   const code = new URLSearchParams(location.search).get('code') || store.get('code');
   if(code){
     try{
