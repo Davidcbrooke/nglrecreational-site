@@ -4061,11 +4061,11 @@ function showInvoice(o, club){
     <p class="note" id="invMailNote" style="margin:10px 0 0;min-height:1em"></p>`);
   m.querySelector('.modal').classList.add('modal-wide');
 }
-// Shrink any sheet that would spill onto a second page (A4, 8mm margins).
+// Shrink any sheet that would spill onto a second page (A4; landscape has a 16mm top margin for binding).
 function fitPages(pa, landscape){
   const pages = pa.querySelectorAll('.onepage');
   if(!pages.length) return;
-  const mm = 96 / 25.4, W = (landscape ? 281 : 194) * mm, H = (landscape ? 192 : 279) * mm;
+  const mm = 96 / 25.4, W = (landscape ? 281 : 194) * mm, H = (landscape ? 184 : 279) * mm;
   pa.style.cssText = `display:block;position:absolute;left:-10000px;top:0;width:${W}px;`;
   pages.forEach(pg => { pg.style.zoom = ''; const h = pg.scrollHeight; if(h > H * 0.95) pg.style.zoom = (H * 0.95 / h).toFixed(3); });
   pa.style.cssText = '';
@@ -4075,7 +4075,7 @@ async function printHTML(html, landscape){
   pa.innerHTML = html;
   let st = document.getElementById('pageStyle');
   if(!st){ st = document.createElement('style'); st.id = 'pageStyle'; document.head.appendChild(st); }
-  st.textContent = `@media print{@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:8mm;}}`;
+  st.textContent = `@media print{@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:${landscape ? '16mm 8mm 8mm 8mm' : '8mm'};}}`;   // landscape sheets get a 16mm top margin for binding
   if(pa.querySelector('img[data-img]')){
     const n = document.createElement('div'); n.className = 'print-wait'; n.textContent = 'Preparing photos for printing…'; document.body.appendChild(n);
     try{ await hydrateImages(pa); await Promise.all([...pa.querySelectorAll('img')].map(i => i.decode ? i.decode().catch(() => {}) : null)); }
