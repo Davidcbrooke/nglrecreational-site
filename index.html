@@ -2905,6 +2905,33 @@ function stationCps(s){
   Object.keys(s.assess || {}).forEach(c => (s.assess[c] || []).forEach(y => out.push(y.p + '|' + y.L + '|' + y.s)));
   return out;
 }
+async function showLiveVersion(){
+  const el = document.getElementById('liveVer'); if(!el) return;
+  try{
+    const m = FIREBASE_CONFIG ? await api.contentMeta() : {version: (window.DEMO_CONTENT || {}).version || ''};
+    S.liveVersion = m && m.version || '';
+    const when = m && m.updatedAt && m.updatedAt.toDate ? ', published ' + fmtDate(m.updatedAt.toDate()) : '';
+    el.innerHTML = m ? `Live version: <b>${esc(S.liveVersion || 'not set')}</b>${esc(when)}` : 'Live version: nothing published yet';
+  }catch(err){ console.error(err); el.textContent = 'Live version: couldn’t check'; }
+}
+function contentCheck(c){
+  // Programme check before publishing: every award-book skill needs a teaching station,
+  // and a star may only sit in its own book's column or the next one along.
+  const norm = (P, x) => String(x || '').replace(P === 'Beam' ? /\s*-\s*[\w ]*beam\s*$/i : /$^/, '').trim().toLowerCase();
+  const BOOKS = ['Ruby','Pink','Teal','Indigo'], taught = new Set(), far = [];
+  ((c.plan && c.plan.blocks) || []).forEach(b => (b.pieces || []).forEach(p => (p.stations || []).forEach(s =>
+    Object.keys(s.assess || {}).forEach(col => (s.assess[col] || []).forEach(y => {
+      const bk = Math.ceil(+y.L / 4) - 1;
+      if(Math.abs(bk - +col) >= 2) far.push(`${b.weeks} ${p.piece} station ${s.n}: ${y.p} L${y.L} (${BOOKS[bk]}) in ${BOOKS[+col]}`);
+      if(!b.assessment) taught.add(y.p + '|' + y.L + '|' + norm(y.p, y.s));
+    })))));
+  const warm = JSON.stringify(c.warmups || []).toLowerCase(), untaught = [];
+  Object.keys(c.book || {}).forEach(P => Object.keys(c.book[P]).forEach(L => (c.book[P][L] || []).forEach(x => {
+    const ok = P === 'Physical Prep' ? warm.includes(String(x.skill).toLowerCase()) : taught.has(P + '|' + L + '|' + norm(P, x.skill));
+    if(!ok) untaught.push(`${P} L${L}: ${x.skill}`);
+  })));
+  return {untaught, far};
+}
 function buildClubPlan(content, term){
   const t = planDefaults(term), rule = CLASS_RULES[t.classLen] || CLASS_RULES[60];
   const src = content.plan.blocks, teach = src.filter(b => !b.assessment), assessB = src.find(b => b.assessment);
@@ -3300,6 +3327,11 @@ const liveApi = {
     snaps.forEach((s, i) => { if(s.exists()) c[keys[i]] = JSON.parse(s.data().json); });
     if(!c.plan) throw new Error('No content published yet');
     return c;
+  },
+  async contentMeta(){
+    const {fs, D} = await fb();
+    const meta = await fs.getDoc(fs.doc(D, 'recContent', 'meta'));
+    return meta.exists() ? meta.data() : null;
   },
   async loadImgChunk(n){
     const {fs, D} = await fb();
@@ -4780,8 +4812,10 @@ async function screenAdmin(){
   <div class="card"><h2>Publish programme content</h2>
     <p class="muted">Choose <b>rec-content.json</b> from your computer and publish it to every licensed club. Keep this file on your computer only: don’t upload it to GitHub, because everything in GitHub is public.</p>
     <input type="file" id="contentFile" accept="application/json,.json" class="input" style="margin-top:8px">
+    <p class="note" id="liveVer" style="margin-top:8px">Live version: checking…</p>
     <p class="note" id="pubNote" style="margin-top:8px"></p>
     <button class="btn" data-act="publish" style="margin-top:8px">Publish file</button></div>`);
+  showLiveVersion();
 }
 
 /* =====================================================================
@@ -4916,7 +4950,19 @@ document.addEventListener('click', async e => {
     if(a === 'publish' && !f.files[0]){ n.textContent = 'Choose rec-content.json first.'; return; }
     act.disabled = true; n.style.color = ''; n.textContent = 'Publishing…';
     try{ let c;
-      c = JSON.parse(await f.files[0].text()); await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
+      c = JSON.parse(await f.files[0].text());
+      const chk = contentCheck(c);
+      if(c.basedOn && S.liveVersion && S.liveVersion !== c.basedOn && S.liveVersion !== c.version)
+        chk.base = `This file was built on version ${c.basedOn}, but version ${S.liveVersion} is live. Publishing it would undo the changes made in ${S.liveVersion}.`;
+      const issues = chk.untaught.length + chk.far.length + (chk.base ? 1 : 0);
+      if(issues && act.dataset.armed !== f.files[0].name + f.files[0].size){
+        act.dataset.armed = f.files[0].name + f.files[0].size; act.disabled = false; act.textContent = 'Publish anyway';
+        n.style.color = 'var(--bad, #c0392b)';
+        n.innerHTML = `<b>Check before publishing.</b>${chk.base ? '<br>' + esc(chk.base) : ''}${chk.untaught.length ? `<br>${chk.untaught.length} award-book skill${chk.untaught.length > 1 ? 's are' : ' is'} not taught at any station:<br>• ${chk.untaught.slice(0, 40).map(esc).join('<br>• ')}` : ''}${chk.far.length ? `<br>${chk.far.length} star${chk.far.length > 1 ? 's sit' : ' sits'} two or more books away from the skill's own book:<br>• ${chk.far.slice(0, 40).map(esc).join('<br>• ')}` : ''}<br>Fix the file and choose it again, or tap Publish anyway.`;
+        return;
+      }
+      delete act.dataset.armed;
+      await api.adminPublish(c, msg => { n.textContent = msg; }); S.content = null; n.style.color = 'var(--ok)'; n.textContent = FIREBASE_CONFIG ? '✓ Published version ' + (c.version || '') + '. Licensed clubs will see it next time they open the Hub.' : 'File checked (version ' + (c.version || '') + '). Preview mode: nothing is published from here. Do this on nglrecreational.co.uk once it’s live.'; }
     catch(err){ console.error(err); n.style.color = ''; n.textContent = 'Couldn’t publish: ' + err.message; }
     act.disabled = false;
   }
