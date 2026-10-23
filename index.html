@@ -261,6 +261,17 @@
   .sheet.compact .brand td{border-color:#d5d9e6;font-size:10.5px;padding:4px 6px;}
   .sheet .brand .ph-stn{width:24px;text-align:center;background:#0a1440 !important;color:#fff !important;}
   .sheet.compact .brand .st{border-left:3px solid;border-radius:3px;padding:1px 4px;margin-top:3px;font-weight:700;}
+  .sheet .tp{position:relative;height:184mm;background:#0a1440;color:#fff;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .sheet .tp-bar{display:flex;height:6mm;flex:none}.sheet .tp-bar i{flex:1}
+  .sheet .tp-in{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:10mm 16mm;background:radial-gradient(120mm 80mm at 50% 40%,rgba(232,130,48,.22),transparent 70%);}
+  .sheet .tp-logo{height:34mm;width:auto;margin-bottom:8mm}
+  .sheet .tp-kick{font-size:13px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#E88230}
+  .sheet .tp-title{font-size:40px;font-weight:900;line-height:1.1;margin:3mm 0 2mm;color:#fff}
+  .sheet .tp-dates{font-size:15px;color:#b7c1e6;font-weight:700}
+  .sheet .tp-club{margin-top:9mm;font-size:30px;font-weight:900;color:#fff;border-top:2px solid rgba(255,255,255,.25);border-bottom:2px solid rgba(255,255,255,.25);padding:4mm 12mm}
+  .sheet .tp-books{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8mm}
+  .sheet .tp-books span{color:#fff;font-weight:800;font-size:12px;padding:5px 12px;border-radius:999px}
+  .sheet .tp-foot{display:flex;justify-content:space-between;gap:10mm;padding:5mm 10mm;background:#E88230;color:#2a1405;font-size:11px;font-weight:700;flex:none}
   .sheet .ph-foot{display:flex;justify-content:space-between;font-size:8.5px;color:#555;margin-top:5px;}
 
 
@@ -4449,7 +4460,30 @@ function planPrintHTML(scope, arg){
   else if(scope === 'week'){ const [b, wk] = weekToBlock(+arg); (wk === 'A' ? WEEK_A : WEEK_B).forEach(c => { const p = b.pieces.find(x => x.code === c); if(p) list.push([b, p]); }); }
   else { const b = blocks.find(x => x.n === UI.block) || blocks[0];
     (scope === 'fortnight' ? order(b) : b.pieces.filter(p => p.code === UI.piece)).forEach(p => list.push([b, p])); }
-  return `<div class="sheet compact">${list.map(([b, p], k) => pieceSheetHTML(b, p, k === 0)).join('')}</div>`;
+  const cover = scope === 'term' || scope === 'termPiece';
+  return `<div class="sheet compact">${cover ? titlePageHTML(scope, arg) : ''}${list.map(([b, p], k) => pieceSheetHTML(b, p, k === 0 && !cover)).join('')}</div>`;
+}
+// Branded title page for bound term plans
+function titlePageHTML(scope, arg){
+  const logo = (document.querySelector('.logo img') || {}).src || '/icons/rec-logo.png';
+  const t = S.club && S.club.recTerm;
+  const start = t && t.start ? new Date(t.start + 'T00:00:00') : null;
+  const end = start ? new Date(start.getTime() + ((t.weeks || 14) * 7 - 3) * 86400000) : null;
+  const dates = start ? start.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) + ' – ' + end.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) : '';
+  const what = scope === 'termPiece' ? (PIECE_NAMES[arg] || 'Apparatus') + ' lesson plans' : 'Term lesson plans';
+  const books = LEVELS.filter((l, i) => inGroup(i));
+  return `<div class="onepage brand tp">
+    <div class="tp-bar">${['#E8559A','#F8D438','#E88230','#0071B3','#01AFB8','#3BAA4A','#7A4C9E'].map(c => `<i style="background:${c}"></i>`).join('')}</div>
+    <div class="tp-in">
+      <img class="tp-logo" src="${logo}" alt="NGL Recreational">
+      <div class="tp-kick">NGL Recreational Awards Scheme</div>
+      <div class="tp-title">${esc(what)}</div>
+      ${dates ? `<div class="tp-dates">${esc(dates)}${t.weeks ? ' · ' + t.weeks + ' weeks' : ''}</div>` : ''}
+      <div class="tp-club">${esc(S.club ? S.club.name : '')}</div>
+      <div class="tp-books">${books.map(l => `<span style="background:${l.color}">Book ${l.book} · ${l.name}</span>`).join('')}</div>
+    </div>
+    <div class="tp-foot"><span>Lesson plans for Floor, Vault, Beam, Bars and Fast Track, linked to the NGL Recreational award books and competitions.</span><span>nglrecreational.co.uk</span></div>
+  </div>`;
 }
 
 function fortnightButtons(key, now){
