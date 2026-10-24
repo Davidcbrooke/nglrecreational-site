@@ -3465,6 +3465,8 @@ const api = FIREBASE_CONFIG ? liveApi : demoApi;
    ===================================================================== */
 let signedIn = false;
 let tab = 'dashboard';
+/* A link like nglrecreational.co.uk/#competition opens that section once the club is signed in. */
+const START_TAB = ['books','competition','run','plan','club','warmups'].includes((location.hash || '').slice(1)) ? location.hash.slice(1) : '';
 const UI = {block:1, piece:'all', level:'all', wblock:1, book:1};
 const $view = document.getElementById('view');
 function render(html){ $view.innerHTML = '<div class="screen">' + sampleBanner() + html + '</div>'; }
@@ -3649,7 +3651,7 @@ function screenLogin(msg){
     const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; btn.textContent = 'Signing in…';
     const r = await api.signIn(document.getElementById('em').value.trim(), document.getElementById('pw').value);
     btn.disabled = false; btn.textContent = 'Sign in';
-    if(r.ok){ signedIn = true; tab = S.club ? 'dashboard' : 'admin'; show(); }
+    if(r.ok){ signedIn = true; tab = S.club ? (START_TAB || 'dashboard') : 'admin'; show(); }
     else document.getElementById('err').textContent = r.reason || 'Sign-in failed.';
   });
 }
@@ -4971,7 +4973,7 @@ document.addEventListener('click', async e => {
 (async () => {
   let restored = false;
   try{ restored = await api.restore(); }catch(e){ console.error(e); }
-  if(restored){ signedIn = true; tab = 'dashboard'; show(); }
+  if(restored){ signedIn = true; tab = START_TAB || 'dashboard'; show(); }
   else{
     const go = new URLSearchParams(location.search).get('go');
     if(ADMIN_MODE) screenLogin(); else if(go === 'register') screenRegister(); else if(go === 'login') screenLogin(); else screenLanding();
