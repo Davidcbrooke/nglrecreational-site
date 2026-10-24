@@ -4982,5 +4982,44 @@ document.addEventListener('click', async e => {
 
 </script>
 <script src="book-preview.js?v=1"></script>
+<!-- Add to Home Screen: a small card offering to install this hub as an app -->
+<style>
+.a2hs{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2147483000;width:min(420px,calc(100% - 24px));background:#fff;color:#16213a;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.35);padding:14px 16px 14px 14px;font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:none}
+.a2hs.on{display:block;animation:a2hsIn .25s ease}
+@keyframes a2hsIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.a2hs .h{display:flex;gap:12px;align-items:center}
+.a2hs img{width:52px;height:52px;border-radius:12px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.a2hs .h b{display:block;font-size:16px}.a2hs li b{display:inline;font-size:inherit}
+.a2hs p{margin:2px 0 0;color:#5d6782;font-size:13.5px}
+.a2hs ol{margin:10px 0 0;padding-left:22px;font-size:14px}.a2hs ol li{margin:3px 0}
+.a2hs .r{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.a2hs button{font:inherit;font-weight:700;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid #d6dbe6;background:#fff;color:#16213a}
+.a2hs button.go{background:#E88230;border-color:#E88230;color:#2a1405}
+.a2hs .x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:20px;line-height:1;color:#8a90a6;padding:4px}
+</style>
+<div class="a2hs" id="a2hs" role="dialog" aria-label="Add Recreational Hub to your Home Screen"></div>
+<script>
+(function(){
+  var NAME = 'Recreational Hub', ICON = '/icons/icon-192.png', KEY = 'a2hs-' + 'rechub';
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if(standalone) return;
+  try{ var t = +localStorage.getItem(KEY) || 0; if(Date.now() - t < 14 * 86400000) return; }catch(e){}
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var safari = /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios|chrome/i.test(navigator.userAgent);
+  var el = document.getElementById('a2hs'), evt = null;
+  function hide(){ el.classList.remove('on'); try{ localStorage.setItem(KEY, String(Date.now())); }catch(e){} }
+  function show(html){ el.innerHTML = '<button class="x" aria-label="Not now">×</button>' + html; el.classList.add('on');
+    el.querySelector('.x').onclick = hide; var n = el.querySelector('.no'); if(n) n.onclick = hide;
+    var g = el.querySelector('.go'); if(g) g.onclick = function(){ if(!evt) return hide(); evt.prompt(); evt.userChoice.finally(function(){ evt = null; hide(); }); }; }
+  var head = '<div class="h"><img src="' + ICON + '" alt=""><div><b>Add ' + NAME + ' to your Home Screen</b><p>It opens like an app, full screen, with this same login.</p></div></div>';
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evt = e; setTimeout(function(){ show(head + '<div class="r"><button class="no">Not now</button><button class="go">Install</button></div>'); }, 2500); });
+  if(ios && safari) setTimeout(function(){
+    var share = '<svg width="14" height="16" viewBox="0 0 14 18" style="vertical-align:-2px" aria-label="Share"><path d="M7 1v11M3 5l4-4 4 4M1 9v8h12V9" fill="none" stroke="#0a84ff" stroke-width="1.8"/></svg>';
+    show(head + '<ol><li>Tap the Share button ' + share + (/ipad/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1 && !/iphone/i.test(navigator.userAgent) ? ' at the top of Safari' : ' at the bottom of Safari') + '</li><li>Scroll down and tap <b>Add to Home Screen</b></li><li>Tap <b>Add</b></li></ol><div class="r"><button class="no">Got it</button></div>');
+  }, 2500);
+  window.addEventListener('appinstalled', hide);
+})();
+</script>
+
 </body>
 </html>
