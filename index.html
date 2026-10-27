@@ -3074,11 +3074,12 @@ const FIREBASE_CONFIG = {
 const SITE_URL = 'https://nglrecreational.co.uk';
 const CONTACT_EMAIL = 'admin@nationalgymnasticsleague.co.uk';
 const INVOICE = {
-  businessName: 'National Gymnastics League',
+  businessName: 'SAADI Gymnastics Ltd trading as National Gymnastics League',
   addressLines: ['66 Waveney Road', 'Harpenden', 'Hertfordshire', 'AL5 4QZ'],
   email: CONTACT_EMAIL,
   termsDays: 14,
-  vatNote: 'No VAT charged: National Gymnastics League is not VAT registered.',   // clear this when VAT_RATE is set
+  vatNote: '',   // VAT is shown as its own line on licence fees
+  get vatNumber(){ return VAT_NUMBER; },
   bank: { accountName: 'National Gymnastics League', sortCode: '60-84-64', accountNumber: '93416867' }
 };
 /* Invoice emails use the same EmailJS service and template as NGL Schools
@@ -3129,7 +3130,6 @@ const PRICES = [
   {kind:'tshirt', name:'NGL children’s t-shirt',   price:12, rrp:'£17 to £20', note:''},
   {kind:'cert',   name:'Attendance certificate',   price:0.10, rrp:'',      note:'Every 10 sessions, from 10 to 120'}
 ];
-const VAT_RATE = 0;   // NGL is not VAT registered yet. When it is, set 0.2 and VAT is added to every invoice.
 const TERMS = [
   {key:'autumn', label:'Autumn term'},
   {key:'spring', label:'Spring term'},
@@ -3171,11 +3171,16 @@ function licenceExpiry(rec, now = new Date()){
 }
 const clubFee = band => (CLUB_BANDS.find(x => x.key === band) || CLUB_BANDS[0]).price;
 const shopItem = k => PRICES.find(x => x.kind === k);
-// Adds a VAT line when NGL is VAT registered
+/* VAT: NGL trades as part of SAADI Gymnastics Ltd. VAT at 20% applies to licence fees only
+   (not books, medals, certificates, t-shirts or postage). VAT is added once VAT_NUMBER is filled in. */
+const VAT_NUMBER = '';   // SAADI Gymnastics Ltd VAT registration number, e.g. 'GB 123 4567 89'
+const VAT_RATE = VAT_NUMBER ? 0.2 : 0;
+const VAT_KINDS = ['club', 'licence', 'pack', 'discount'];
 function withVat(lines){
-  if(!VAT_RATE) return lines;
-  const net = lines.reduce((a, l) => a + l.qty * l.unit, 0);
-  return [...lines, {kind:'vat', desc:`VAT at ${Math.round(VAT_RATE * 100)}%`, qty:1, unit:Math.round(net * VAT_RATE * 100) / 100}];
+  if(!VAT_RATE || (lines || []).some(l => l.kind === 'vat')) return lines;
+  const net = lines.filter(l => VAT_KINDS.includes(l.kind)).reduce((a, l) => a + l.qty * l.unit, 0);
+  if(net <= 0) return lines;
+  return [...lines, {kind:'vat', desc:`VAT at ${Math.round(VAT_RATE * 100)}% on licence fees`, qty:1, unit:Math.round(net * VAT_RATE * 100) / 100}];
 }
 /* Book allowance: books in the order that started or renewed the licence, and every order since. */
 function bookAllowance(club, orders){
@@ -4053,7 +4058,7 @@ function invoiceHTML(o, club){
     <div class="inv-top"><div class="inv-brand">National Gymnastics League<small>NGL RECREATIONAL</small></div>
       <div class="inv-title"><div class="inv-h">INVOICE</div><div class="inv-no">${esc(o.id)}</div>${paid ? '<div class="inv-paid">PAID</div>' : ''}</div></div>
     <div class="inv-cols">
-      <div><div class="inv-label">From</div><b>${esc(INVOICE.businessName)}</b><br>${INVOICE.addressLines.map(esc).join('<br>')}<br>${esc(INVOICE.email)}</div>
+      <div><div class="inv-label">From</div><b>${esc(INVOICE.businessName)}</b><br>${INVOICE.addressLines.map(esc).join('<br>')}<br>${esc(INVOICE.email)}${INVOICE.vatNumber ? '<br>VAT no. ' + esc(INVOICE.vatNumber) : ''}</div>
       <div><div class="inv-label">Bill to</div><b>${esc(club.name || o.clubName || '')}</b><br>${club.contact ? esc(club.contact) + '<br>' : ''}${club.email ? esc(club.email) + '<br>' : ''}${club.bgNumber ? 'BG club no. ' + esc(club.bgNumber) : ''}</div>
       ${o.delivery ? `<div><div class="inv-label">Deliver to</div>${esc(o.delivery).replace(/\n/g, '<br>')}</div>` : ''}
       <div><div class="inv-label">Invoice date</div>${fmtDate(issued)}<div class="inv-label" style="margin-top:10px">Payment due</div>${fmtDate(due)}</div>
