@@ -35,6 +35,8 @@
   .logo-mark{font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1;}
   .logo-mark small{display:block;font-size:11px;letter-spacing:.22em;color:var(--rec);font-weight:800;margin-top:3px;}
   .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.topbar-row .fhub{margin-left:auto}.topbar-row .fhub + .top-actions{margin-left:0}
+.fhub{display:inline-flex;align-items:center;gap:5px;color:#fff;text-decoration:none;font:700 13.5px/1 Roboto,system-ui,sans-serif;padding:8px 12px 8px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);white-space:nowrap;flex:none}.fhub svg{width:16px;height:16px;flex:none}.fhub:hover{background:rgba(255,255,255,.2)}
   @media(max-width:600px){.top-actions .pill{display:none;}}
   .pill{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:var(--rec);color:var(--rec-ink);white-space:nowrap;}
 
@@ -550,6 +552,7 @@
   <header class="topbar"><div class="topbar-strap">Recreational Awards Scheme · Families</div><div class="topbar-in">
     <div class="wrap topbar-row">
       <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><img src="/icons/rec-logo.png" alt="NGL Recreational"></a>
+      <a class="fhub" id="fhubBtn" href="https://club.nationalgymnasticsleague.co.uk/family/" aria-label="Back to the NGL Family Hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Family Hub</a>
       <div class="top-actions" id="topActions"></div>
     </div>
   </div></header>
@@ -1370,6 +1373,9 @@ document.addEventListener('click', e => {
 (async () => {
   await start();   // the shared NGL opening animation is added by the build
 })();
+/* "Family Hub" button: take the family's Recreational code with them so the hub adds this app automatically */
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#fhubBtn'); if(!b) return;
+  try{ const c = (S && S.code) || store.get('code'); if(c) b.href = 'https://club.nationalgymnasticsleague.co.uk/family/?code=' + encodeURIComponent(String(c).toUpperCase()); }catch(_){} });
 function keepCodeInUrl(code){ try{ const u = new URL(location.href); if(u.searchParams.get('code') !== code){ u.searchParams.set('code', code); history.replaceState(null, '', u); } }catch(e){} }
 async function start(){
   { let p = null; try{ p = JSON.parse(store.get('progress') || 'null'); }catch(e){} if(p && p.kids && p.kids.length){ const k = kid(p); if(k.current) progUse(k); } }
