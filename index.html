@@ -3173,7 +3173,7 @@ const clubFee = band => (CLUB_BANDS.find(x => x.key === band) || CLUB_BANDS[0]).
 const shopItem = k => PRICES.find(x => x.kind === k);
 /* VAT: NGL trades as part of SAADI Gymnastics Ltd. VAT at 20% applies to licence fees only
    (not books, medals, certificates, t-shirts or postage). VAT is added once VAT_NUMBER is filled in. */
-const VAT_NUMBER = '';   // SAADI Gymnastics Ltd VAT registration number, e.g. 'GB 123 4567 89'
+const VAT_NUMBER = 'GB 255 4614 03';   // SAADI Gymnastics Ltd VAT registration number
 const VAT_RATE = VAT_NUMBER ? 0.2 : 0;
 const VAT_KINDS = ['club', 'licence', 'pack', 'discount'];
 function withVat(lines){
