@@ -3533,7 +3533,7 @@ function show(){
     }
     return withContent(() => ({club:screenClub, run:screenRun, plan:screenPlan, warmups:screenWarmups, books:screenBooks, competition:screenCompetition})[tab]());
   }
-  if(tab === 'rotations'){ tab = 'dashboard'; window.open('https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html', '_blank', 'noopener'); return show(); }
+  if(tab === 'rotations'){ tab = 'dashboard'; window.open('https://club.nationalgymnasticsleague.co.uk/rotation-planner/', '_blank', 'noopener'); return show(); }
   if(tab === 'shop' && !hasAccess()) return screenLocked();
   ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab] ? ({dashboard:screenDashboard, orders:screenOrders, licence:screenLicence, shop:screenShop})[tab]() : screenDashboard();
 }
@@ -3741,7 +3741,7 @@ function screenDashboard(){
       <button class="card" data-tab="books" style="text-align:left;cursor:pointer"><h3>Award books</h3><p class="muted" style="margin:0">Skills by level and assessment sheets.</p></button>
       <button class="card" data-tab="competition" style="text-align:left;cursor:pointer"><h3>Competition</h3><p class="muted" style="margin:0">Ruby to Indigo routines and rules.</p></button>
     </div>
-    <a class="card cp-dash" href="https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit"><p class="eyebrow">Free for every club</p><h2>Class rotations</h2>
+    <a class="card cp-dash" href="https://club.nationalgymnasticsleague.co.uk/rotation-planner/" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit"><p class="eyebrow">Free for every club</p><h2>Class rotations</h2>
       <p class="muted" style="margin:0">The NGL Rotation Planner, with your Recreational groups and rotations filled in from your club plan. Sign in with this same club login.</p></a>
     ${familyCard()}`;
   }else if(lapsed && !waiting.some(o => o.band)){
@@ -4577,7 +4577,7 @@ function screenWarmups(){
    The order comes from the club's Rotation Planner (Recreational classes);
    without it the coach picks where the group starts.
    ===================================================================== */
-const ROTA_URL = 'https://davidcbrooke.github.io/GYMNASTICS-RESULTS/NGL_Rotation_Planner.html';
+const ROTA_URL = 'https://club.nationalgymnasticsleague.co.uk/rotation-planner/';
 const GROUP_COLS = [['Orange','#F28C28'],['Yellow','#F5C518'],['Blue','#2F80ED'],['Red','#E5383B'],['Green','#2EAD5B'],['Purple','#8E44AD']];
 const PIECE_COL = {FF:'#4a90d9', BF:'#01AFB8', VT:'#5cb85c', BM:'#e8914f', BA:'#7b68ee', FT:'#d9534f'};
 const RUN_STORE = {
