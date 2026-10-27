@@ -19,7 +19,7 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
-  body{background:var(--navy);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  body{background:var(--navy);color:var(--white);font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
   button,input,select{font:inherit;color:inherit;}
   a{color:var(--rec);}
   .wrap{max-width:1100px;margin:0 auto;padding:0 16px;}
@@ -239,7 +239,7 @@
 
   /* ---------- Branded print sheets ---------- */
   .print-wait{position:fixed;left:50%;top:20px;transform:translateX(-50%);z-index:100;background:var(--rec);color:var(--rec-ink);font-weight:800;padding:10px 16px;border-radius:999px;}
-  .sheet .brand{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .sheet .brand{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
   .sheet .ph-head{display:flex;align-items:center;gap:14px;background:#0a1440;color:#fff;border-radius:8px;padding:8px 14px;border-bottom:4px solid #E88230;margin-bottom:6px;}
   .sheet .ph-logo{height:34px;width:auto;display:block;}
   .sheet .ph-title{flex:1;min-width:0;}
@@ -369,7 +369,7 @@
 
 
   /* ---------- QR poster and flyers (print) ---------- */
-  .qposter{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#0a1440;}
+  .qposter{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:#0a1440;}
   .qp{background:#fff;border:3px solid #0a1440;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
   .qp.a4{height:270mm;}
   .qp.a5{height:132mm;}
@@ -507,9 +507,11 @@
   .dphoto{flex:0 0 auto;width:74px;height:74px;border-radius:12px;overflow:hidden;border:0;padding:0;background:var(--navy-2);cursor:pointer;}
   .dphoto img{width:100%;height:100%;object-fit:cover;display:block;}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="nglSplash" role="status" aria-label="Loading NGL Families"><img class="nsl" alt="NGL Families"><div class="nsm"></div><div class="nsh">One connected framework for British Gymnastics clubs: training, awards, competitions and club support, across seven pathways spanning every age and ability.</div><div class="nsg"></div><div class="nsb"><b></b></div><div class="nsx">Exclusively for British Gymnastics clubs</div></div><style>#nglSplash{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(circle at 50% 35%,#2a245f 0%,#0a1440 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .45s ease,transform .45s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+<div id="nglSplash" role="status" aria-label="Loading NGL Families"><img class="nsl" alt="NGL Families"><div class="nsm"></div><div class="nsh">One connected framework for British Gymnastics clubs: training, awards, competitions and club support, across seven pathways spanning every age and ability.</div><div class="nsg"></div><div class="nsb"><b></b></div><div class="nsx">Exclusively for British Gymnastics clubs</div></div><style>#nglSplash{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(circle at 50% 35%,#2a245f 0%,#0a1440 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .45s ease,transform .45s ease;font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
 #nglSplash.out{opacity:0;transform:scale(1.04);pointer-events:none}
 #nglSplash .nsl{width:min(240px,62vw);height:auto;min-height:40px;opacity:0;transform:scale(.7);animation:nslPop .6s cubic-bezier(.2,1.4,.4,1) .15s forwards}
 #nglSplash .nsl-t{color:#fff;font-weight:900;font-size:34px;letter-spacing:.02em}
