@@ -3623,7 +3623,7 @@ function pitchHTML(inside){
   ${inside ? '' : `
   <div class="section card" style="text-align:center">
     <h2>Licensed to British Gymnastics clubs</h2>
-    <p class="muted">One yearly Club Licence, from £200 a year depending on how many Recreational gymnasts you have. Award books, medals and t-shirts are ordered through this hub at club prices.</p>
+    <p class="muted">One yearly Club Licence, from £200 a year + VAT, depending on how many Recreational gymnasts you have. Award books, medals and t-shirts are ordered through this hub at club prices.</p>
     <div class="btn-row" style="justify-content:center"><button class="btn" data-go="register">Register your club</button><a class="btn ghost" href="https://club.nationalgymnasticsleague.co.uk/licences.html" target="_blank" rel="noopener">See all licence fees ↗</a></div>
   </div>`}
   <div class="foot">Questions? <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></div>`;
@@ -3839,7 +3839,7 @@ function screenLocked(){
 }
 
 function screenLicence(){
-  const vat = VAT_RATE ? ' + VAT' : '';
+  const vat = ' + VAT';   // licence fees are shown excluding VAT
   render(`
   <p class="eyebrow">Licence &amp; pricing</p><h1>NGL Recreational licensing</h1>
   <div class="card">
@@ -3849,6 +3849,7 @@ function screenLicence(){
       <thead><tr><th>Club size</th><th class="num">Per year</th><th class="num">Award books per licence year</th></tr></thead>
       <tbody>${CLUB_BANDS.map(b => `<tr ${S.club.rec && S.club.rec.band === b.key ? 'style="background:rgba(232,130,48,.12)"' : ''}><td>${b.label}</td><td class="num"><b>${gbp(b.price)}</b>${vat}</td><td class="num">${b.books == null ? 'No limit' : 'Up to ' + b.books}</td></tr>`).join('')}</tbody>
     </table></div>
+    <p class="note" style="margin-top:10px">Licence fees are shown excluding VAT, which is added at 20%.</p>
     <p class="note" style="margin-top:10px"><b>Running more than one NGL pathway?</b> You get 5% off every pathway licence except your most expensive one.</p>
     <p class="note" style="margin-top:6px">Growing? If you need more books than your band allows, upgrade to the next band at any time. You pay the difference between the two bands for the months left on your licence, and your renewal date stays the same.</p>
   </div>
@@ -3975,7 +3976,7 @@ function orderModal(kind){
   const bandForCount = n => CLUB_BANDS.find((b, i) => i === CLUB_BANDS.length - 1 || n <= [24, 49, 99, 249, 399, 599][i]);
   if(withLicence){
     const setBand = () => { const n = parseInt(q('ogn').value) || 0, b = bandForCount(Math.max(1, n));
-      q('ob').value = b.key; q('oband').innerHTML = n > 0 ? `That puts your club in the <b>${esc(b.short)}</b> band: <b>${gbp(b.price)} a year</b>.` : 'Enter your number of gymnasts to see your band.'; };
+      q('ob').value = b.key; q('oband').innerHTML = n > 0 ? `That puts your club in the <b>${esc(b.short)}</b> band: <b>${gbp(b.price)} a year + VAT</b>.` : 'Enter your number of gymnasts to see your band.'; };
     q('ogn').addEventListener('input', () => { setBand(); sum(); }); setBand();
   }
   function state(){
