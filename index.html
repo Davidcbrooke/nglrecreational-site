@@ -5019,6 +5019,12 @@ document.addEventListener('click', async e => {
     var g = el.querySelector('.go'); if(g) g.onclick = function(){ if(!evt) return hide(); evt.prompt(); evt.userChoice.finally(function(){ evt = null; hide(); }); }; }
   var head = '<div class="h"><img src="' + ICON + '" alt=""><div><b>Add ' + NAME + ' to your Home Screen</b><p>It opens like an app, full screen, with this same login.</p></div></div>';
   window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evt = e; setTimeout(function(){ show(head + '<div class="r"><button class="no">Not now</button><button class="go">Install</button></div>'); }, 2500); });
+  // iPhone/iPad in Chrome, Edge or Firefox: Share is in the address bar. In-app browsers (Facebook, Instagram, Google) can't add, so suggest Safari.
+  if(ios && !safari) setTimeout(function(){
+    var share2 = '<svg width="14" height="16" viewBox="0 0 14 18" style="vertical-align:-2px" aria-label="Share"><path d="M7 1v11M3 5l4-4 4 4M1 9v8h12V9" fill="none" stroke="#0a84ff" stroke-width="1.8"/></svg>';
+    if(/crios|fxios|edgios/i.test(navigator.userAgent)) show(head + '<ol><li>Tap the Share button ' + share2 + ' in the address bar at the top</li><li>Tap <b>Add to Home Screen</b> (scroll down or tap <b>More</b> if you can’t see it)</li><li>Tap <b>Add</b></li></ol><div class="r"><button class="no">Got it</button></div>');
+    else show(head + '<ol><li>Open this page in <b>Safari</b> (tap ••• or the compass, then <b>Open in Safari</b>)</li><li>Tap the Share button ' + share2 + ', then <b>Add to Home Screen</b></li></ol><div class="r"><button class="no">Got it</button></div>');
+  }, 2500);
   if(ios && safari) setTimeout(function(){
     var share = '<svg width="14" height="16" viewBox="0 0 14 18" style="vertical-align:-2px" aria-label="Share"><path d="M7 1v11M3 5l4-4 4 4M1 9v8h12V9" fill="none" stroke="#0a84ff" stroke-width="1.8"/></svg>';
     show(head + '<ol><li>Tap the Share button ' + share + (/ipad/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1 && !/iphone/i.test(navigator.userAgent) ? ' at the top of Safari' : ' at the bottom of Safari') + '</li><li>Scroll down and tap <b>Add to Home Screen</b></li><li>Tap <b>Add</b></li></ol><div class="r"><button class="no">Got it</button></div>');
