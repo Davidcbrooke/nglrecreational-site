@@ -38,6 +38,8 @@
 .topbar-row .fhub{margin-left:auto}.topbar-row .fhub + .top-actions{margin-left:0}
 .fhub{display:inline-flex;align-items:center;gap:5px;color:#fff;text-decoration:none;font:700 13.5px/1 Roboto,system-ui,sans-serif;padding:8px 12px 8px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);white-space:nowrap;flex:none}.fhub svg{width:16px;height:16px;flex:none}.fhub:hover{background:rgba(255,255,255,.2)}
   @media(max-width:600px){.top-actions .pill{display:none;}}
+  .halfterm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#C8202F;color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 14px;font-size:15px;}
+  .halfterm b{background:#fff;color:#C8202F;border-radius:999px;padding:4px 12px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:900;}
   .pill{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:var(--rec);color:var(--rec-ink);white-space:nowrap;}
 
   .navtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0 12px;}
@@ -693,7 +695,7 @@ function clubWeekNow(term, plan, today){
     return {block: b.n, week: b.odd ? 'A' : ((w - 1) % 2 === 0 ? 'A' : 'B')};
   };
   // Half term: show the first teaching week after the break (the same week number, as the break isn't counted)
-  if(half) return Object.assign({wk, W:t.weeks, half:true}, at(Math.min(wk, t.weeks)));
+  if(half){ const back = new Date(_mon(t.halfTerm + 'T00:00:00').getTime() + 7 * day); return Object.assign({wk, W:t.weeks, half:true, back}, at(Math.min(wk, t.weeks))); }
   return Object.assign({wk, W:t.weeks}, at(wk));
 }
 
@@ -808,7 +810,7 @@ function whereAreWe(term){
   if(term.custom){
     const now = clubWeekNow(term, plan);
     if(now.outside) return {block: now.wk < 1 ? 1 : blocks[blocks.length - 1].n, note: now.wk < 1 ? 'Term hasn’t started yet. Here’s what the first fortnight will look like.' : 'This term has finished. Your club will update the dates for next term.'};
-    if(now.half) return {block: now.block, note: `It’s half term. Here’s what comes next: week ${now.wk} of ${now.W}.`};
+    if(now.half) return {block: now.block, half:true, back: now.back, note: `Here’s what comes next: week ${now.wk} of ${now.W}.`};
     return {block: now.block, note: `Week ${now.wk} of ${now.W}.`};
   }
   const assessIdx = blocks.findIndex(b => b.assessment);
@@ -1072,7 +1074,7 @@ function screenWeek(){
   </div>
 
   <section class="section" style="margin-top:18px">
-    <p class="eyebrow">${current ? 'This fortnight' : 'Looking ahead'}</p>
+    ${current && pos.half ? `<div class="halfterm"><b>Half term</b><span>No classes this week. Classes restart ${esc(fmtDay(pos.back))}.</span></div><p class="eyebrow">After half term</p>` : `<p class="eyebrow">${current ? 'This fortnight' : 'Looking ahead'}</p>`}
     <h2>${esc(b.assessment ? 'Assessment' : b.weeks)}${b.assessment ? '' : ': ' + esc(b.pieces.map(p => p.theme).slice(0, 3).join(', ')) + '…'}</h2>
     <p class="muted">${current ? esc(pos.note) : 'You’re looking at a different block. '}${b.assessment ? ' Your child is being assessed on their award-book level, so stations are a mix of everything they’ve practised.' : ''}</p>
     <div class="chips" style="margin:8px 0 14px">${blocks.map(x => `<button class="chip ${x.n === UI.block ? 'on' : ''}" data-block="${x.n}">${x.n === pos.block ? '● ' : ''}${x.assessment ? 'Assessment' : esc(x.weeks)}</button>`).join('')}</div>
