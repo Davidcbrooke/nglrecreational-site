@@ -686,12 +686,15 @@ function clubWeekNow(term, plan, today){
     if(wk === hw) half = true; else if(wk > hw) wk -= 1;
   }
   if(wk < 1 || wk > t.weeks) return {wk, W:t.weeks, outside:true};
-  if(half) return {wk, W:t.weeks, half:true};
   const blocks = plan.blocks;
-  if(wk > t.weeks - 2) return {wk, W:t.weeks, block: blocks[blocks.length - 1].n, week: wk === t.weeks - 1 ? 'A' : 'B'};
-  const k = Math.floor((wk - 1) / 2);
-  const b = blocks[Math.min(k, blocks.length - 2)];
-  return {wk, W:t.weeks, block: b.n, week: b.odd ? 'A' : ((wk - 1) % 2 === 0 ? 'A' : 'B')};
+  const at = w => {
+    if(w > t.weeks - 2) return {block: blocks[blocks.length - 1].n, week: w === t.weeks - 1 ? 'A' : 'B'};
+    const b = blocks[Math.min(Math.floor((w - 1) / 2), blocks.length - 2)];
+    return {block: b.n, week: b.odd ? 'A' : ((w - 1) % 2 === 0 ? 'A' : 'B')};
+  };
+  // Half term: show the first teaching week after the break (the same week number, as the break isn't counted)
+  if(half) return Object.assign({wk, W:t.weeks, half:true}, at(Math.min(wk, t.weeks)));
+  return Object.assign({wk, W:t.weeks}, at(wk));
 }
 
 /* =====================================================================
@@ -805,7 +808,7 @@ function whereAreWe(term){
   if(term.custom){
     const now = clubWeekNow(term, plan);
     if(now.outside) return {block: now.wk < 1 ? 1 : blocks[blocks.length - 1].n, note: now.wk < 1 ? 'Term hasn’t started yet. Here’s what the first fortnight will look like.' : 'This term has finished. Your club will update the dates for next term.'};
-    if(now.half) return {block: UI.block || 1, note: 'It’s half term. Here’s what comes next.'};
+    if(now.half) return {block: now.block, note: `It’s half term. Here’s what comes next: week ${now.wk} of ${now.W}.`};
     return {block: now.block, note: `Week ${now.wk} of ${now.W}.`};
   }
   const assessIdx = blocks.findIndex(b => b.assessment);
