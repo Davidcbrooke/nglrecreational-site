@@ -3124,7 +3124,7 @@ const OTHER_PATHWAY_PRICES = {
 function otherLicencePrices(club, now = new Date()){
   return Object.keys(OTHER_PATHWAY_PRICES).map(k => {
     const lic = club && club[k];
-    if(!lic || lic.status !== 'active' || (lic.expires && toDate(lic.expires) < now)) return 0;
+    if(!lic || lic.trial || lic.status !== 'active' || (lic.expires && toDate(lic.expires) < now)) return 0;
     return OTHER_PATHWAY_PRICES[k][lic.band] || 0;
   }).filter(Boolean);
 }
