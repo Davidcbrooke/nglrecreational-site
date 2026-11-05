@@ -138,6 +138,20 @@
   .toolbar{display:flex;flex-direction:column;gap:10px;margin:0 0 18px;}
   .chips{display:flex;gap:6px;flex-wrap:wrap;}
   .chips .lbl{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;align-self:center;margin-right:4px;min-width:62px;}
+  .pick4{max-width:560px}.pick4 .lvtile{border:0;cursor:pointer;text-align:left;font-family:inherit}.lvtile.picked{outline:4px solid #fff;outline-offset:2px}
+  .grp-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:560px}
+  .grp-tile{border:0;border-radius:16px;min-height:82px;font-weight:900;font-size:20px;line-height:1;font-family:inherit;color:#fff;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .grp-tile.picked{outline:4px solid #fff;outline-offset:2px}
+  .rhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .rh-chips{display:flex;gap:8px;flex-wrap:wrap}.rh-chip{font-weight:900;font-size:15px;padding:8px 14px;border-radius:999px;color:#fff}
+  .rlist{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .rcard{border-radius:16px;overflow:hidden;background:var(--navy-3);border:1px solid var(--line)}
+  .rcard.now{box-shadow:0 0 0 3px #fff}
+  .rbar{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:17px}.rbar b{font-size:19px;font-weight:900}
+  .rtime{font-weight:800;opacity:.9;min-width:62px}.rloc{opacity:.85;font-size:13px}.rdur{margin-left:auto;font-size:13px;opacity:.85;font-weight:700}
+  .rnow{background:#fff;color:#c0392b;font-weight:900;font-size:12px;padding:3px 9px;border-radius:999px;letter-spacing:.06em}
+  .rbody{padding:4px 14px 12px}.rbody summary{cursor:pointer;font-weight:800;padding:8px 0;color:var(--muted)}
+  .rsetup{margin:6px 0}.rtheme{margin:0 0 6px;color:var(--muted);font-size:14px}
   .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--navy-2);font-weight:700;font-size:13px;cursor:pointer;}
   .chip.on{background:var(--white);color:var(--navy);border-color:var(--white);}
   .chip.lv-ruby.on{background:var(--ruby);border-color:var(--ruby);color:#fff;}
@@ -773,6 +787,12 @@ const live = {
     const {fs, D} = await fb();
     const s = await fs.getDoc(fs.doc(D, 'recShared', S.club.key, 'docs', 'img' + n));
     return s.exists() ? JSON.parse(s.data().json) : {};
+  },
+  async loadRota(){
+    if(!S.club || !S.club.clubId) return null;
+    const {fs, D} = await fb();
+    const s = await fs.getDoc(fs.doc(D, 'rotaLive', S.club.clubId));
+    return s.exists() && s.data().json ? JSON.parse(s.data().json) : null;
   }
 };
 const demo = {
@@ -785,7 +805,8 @@ const demo = {
     (c.images || []).forEach((ch, n) => Object.keys(ch).forEach(h => idx[h] = n));
     return {...c, imgIndex: idx};
   },
-  async loadImgChunk(n){ return (window.DEMO_CONTENT.images || [])[n] || {}; }
+  async loadImgChunk(n){ return (window.DEMO_CONTENT.images || [])[n] || {}; },
+  async loadRota(){ return window.DEMO_ROTA || null; }
 };
 const api = FIREBASE_CONFIG ? live : demo;
 
@@ -902,7 +923,7 @@ function splashOut(){
 }
 
 /* ---------- UI ---------- */
-const UI = {book: +store.get('book') || 0, level: +store.get('level') || 0, block: 0, tab: store.get('tab') || 'week'};
+const UI = {book: +store.get('book') || 0, level: +store.get('level') || 0, colour: +store.get('colour') || 0, block: 0, tab: store.get('tab') || 'week', day: null, cls: null};
 const $view = document.getElementById('view');
 function render(h){ $view.innerHTML = '<div class="screen">' + h + '</div>'; window.scrollTo(0,0); }
 
@@ -1000,20 +1021,22 @@ function screenCode(msg){
       S.code = code; S.club = r.club; store.set('code', code); keepCodeInUrl(code);
       S.content = await api.loadContent(r.club.key); S.plan = null;
       UI.block = 0;
-      UI.tab = 'week'; UI.book && UI.level ? screenMain() : screenChoose();
+      UI.tab = 'week'; S.rota = undefined; UI.book && UI.colour ? screenMain() : screenChoose();
     }catch(err){ console.error(err); btn.disabled = false; btn.textContent = 'Continue'; document.getElementById('err').textContent = 'We couldn’t load the programme just now. Please try again.'; }
   });
 }
 
+const GROUP_COLOURS = [['Orange','#F28C28'],['Yellow','#F5C518'],['Blue','#2F80ED'],['Red','#E5383B'],['Green','#2EAD5B'],['Purple','#8E44AD']];
 function screenChoose(){
-  renderTab(`<p class="eyebrow">${esc(S.club.clubName)}</p><h1>Which book is your child on?</h1>
-  <p class="lead">It’s the colour on the front of their NGL Recreational award book.</p>
-  <div class="levels-art" style="max-width:520px">${LEVELS.map(l => `<button class="lvtile bg-${l.key}" data-book="${l.book}" style="border:${UI.book === l.book ? '3px solid #fff' : '0'};cursor:pointer;text-align:left"><small>Book ${l.book}</small>${l.name}</button>`).join('')}</div>
-  ${UI.book ? `<h2 style="margin-top:24px">Which level are they working on this term?</h2>
-  <div class="chips">${[0,1,2,3].map(k => { const L = (UI.book - 1) * 4 + 1 + k; return `<button class="chip ${UI.level === L ? 'on' : ''}" data-level="${L}" style="font-size:16px;padding:10px 16px">Level ${L}</button>`; }).join('')}</div>
-  <p class="note" style="margin-top:8px">One level a term, assessed in the last two weeks of term. Ask your coach if you’re not sure.</p>` : ''}`);
+  const lv = UI.book ? LEVELS[UI.book - 1] : null;
+  renderTab(`<p class="eyebrow">${esc(S.club.clubName)}</p>
+  <h1>1. Which book?</h1>
+  <p class="lead" style="margin-top:-4px">The colour on the front of your child’s award book.</p>
+  <div class="levels-art pick4">${LEVELS.map(l => `<button class="lvtile bg-${l.key} ${UI.book === l.book ? 'picked' : ''}" data-book="${l.book}"><small>Book ${l.book}</small>${l.name}</button>`).join('')}</div>
+  ${UI.book ? `<h1 style="margin-top:26px">2. Which colour group?</h1>
+  <p class="lead" style="margin-top:-4px">The colour group your child is in for their class. Ask their coach if you’re not sure.</p>
+  <div class="grp-pick">${GROUP_COLOURS.map(([n, c], i) => `<button class="grp-tile ${UI.colour === i + 1 ? 'picked' : ''}" data-colour="${i + 1}" style="background:${c}">${n}</button>`).join('')}</div>` : ''}`);
 }
-
 // Coaching tips, worded for parents: what the coach will say and what to look for.
 // Safety notes are for coaches only, so they are left out here.
 function parentTips(s){
@@ -1070,7 +1093,7 @@ function screenWeek(){
   <div class="fhead" style="border-color:${lv.color}">
     <div><p class="eyebrow" style="color:${lv.color}">${esc(S.club.clubName)}</p>
     <h1 style="margin:0">${(k => k.name ? esc(k.name) + ' · ' : '')(kid(prog()))}${lv.name} · Level ${L}</h1></div>
-    <button class="btn ghost small" data-go="choose">Change book or level</button>
+    <button class="btn ghost small" data-ftab="week">Back to rotations</button>
   </div>
 
   <section class="section" style="margin-top:18px">
@@ -1144,7 +1167,7 @@ function tabbar(show){
   if(!bar){ bar = document.createElement('nav'); bar.id = 'ftabbar'; bar.className = 'ftabbar'; document.body.appendChild(bar); }
   bar.hidden = !show; document.body.classList.toggle('has-tabbar', !!show);
   if(!show) return;
-  const tabs = [S.club ? ['week','This fortnight'] : ['code','Club code'], ...(S.club ? [['progress','Progress']] : []), ['programme','Programme'], ['levels','Levels'], ['comps','Competitions']];
+  const tabs = [S.club ? ['week','Rotations'] : ['code','Club code'], ...(S.club ? [['progress','Progress']] : []), ['programme','Programme'], ['levels','Levels'], ['comps','Competitions']];
   bar.style.setProperty('--ntabs', tabs.length);
   bar.innerHTML = `<div class="ftab-in">${tabs.map(([k, l]) => `<button class="ftab ${UI.tab === k ? 'active' : ''}" ${k === 'code' ? 'data-go="code"' : `data-ftab="${k}"`}>${ICONS[k]}<span>${l}</span></button>`).join('')}</div>`;
 }
@@ -1188,10 +1211,101 @@ document.addEventListener('click', async e => {
   else if(a === 'no') store.set('installNo', Date.now());
   if(c) c.remove();
 });
+
+/* =====================================================================
+   ROTATIONS: book + colour group -> today's rotations, with the set-up
+   for each piece this fortnight at that book's level
+   ===================================================================== */
+const REC_KEYS_F = [['FORWARD','FF'],['BACKWARD','BF'],['VAULT','VT'],['BEAM','BM'],['BAR','BA'],['FAST','FT'],['TRACK','FT'],['TRAMP','FT']];
+function pieceCode(loc, rota){
+  const m = rota && rota.rec && rota.rec.map;
+  if(m){ const k = Object.keys(m).find(k => !['warm','cool'].includes(k) && m[k] === loc); if(k) return k; }
+  const u = String(loc || '').toUpperCase(); const f = REC_KEYS_F.find(([w]) => u.includes(w)); return f ? f[1] : null;
+}
+function rotaWeekLetter(term){
+  const t = term || {}; if(!t.start) return 'A';
+  const day = 86400000, mon = x => { const d = new Date(x); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d; };
+  const start = mon(t.start + 'T00:00:00'); let wk = Math.floor((new Date() - start) / (7 * day)) + 1;
+  if(t.halfTerm){ const hw = Math.floor((new Date(t.halfTerm + 'T00:00:00') - start) / (7 * day)) + 1; if(wk >= hw) wk -= (wk === hw ? 0 : 1); }
+  const W = +t.weeks || 14;
+  if(wk < 1) return 'A';
+  if(wk > W - 2) return wk === W - 1 ? 'A' : 'B';
+  return (wk - 1) % 2 === 0 ? 'A' : 'B';
+}
+const DAYS_F = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const fmtT = m => { const h = Math.floor(m / 60), mm = String(Math.round(m % 60)).padStart(2, '0'); return (h % 12 || 12) + ':' + mm + (h < 12 ? 'am' : 'pm'); };
+const lightHex = h => { if(!h || h[0] !== '#') return false; const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16); return (r*299 + g*587 + b*114) / 1000 > 165; };
+// this colour group's sessions, split into classes (each class starts with a warm-up)
+function groupClasses(rota, gi){
+  const g = (rota.groups || []).find(x => x.id === 'rec_' + gi) || (rota.groups || []).find(x => x.section === 'recreational' && String(x.name).toLowerCase() === GROUP_COLOURS[gi][0].toLowerCase());
+  if(!g) return {};
+  const out = {};
+  DAYS_F.forEach(day => {
+    const ss = ((rota.sessions || {})[day] || {})[g.id] || [];
+    if(!ss.length) return;
+    const sorted = ss.slice().sort((a, b) => a.start_min - b.start_min), classes = [];
+    sorted.forEach(x => { const last = classes[classes.length - 1]; const prev = last && last[last.length - 1];
+      if(!last || /warm/i.test(x.title || '') || x.start_min > prev.start_min + prev.duration + 1) classes.push([x]); else last.push(x); });
+    out[day] = classes;
+  });
+  return out;
+}
+async function screenRotations(){
+  const lv = LEVELS[UI.book - 1], col = UI.book - 1, gi = UI.colour - 1, [gName, gHex] = GROUP_COLOURS[gi];
+  const L = UI.level && Math.ceil(UI.level / 4) === UI.book ? UI.level : 0;
+  if(S.rota === undefined){ renderTab(`<p class="muted" style="padding:40px 0;text-align:center">Loading your rotations…</p>`); try{ S.rota = await api.loadRota(); }catch(e){ console.warn(e); S.rota = null; } }
+  S.plan = S.plan || familyPlan();
+  const pos = whereAreWe(S.club.term), b = S.plan.blocks.find(x => x.n === pos.block) || S.plan.blocks[0];
+  const week = rotaWeekLetter(S.club.term);
+  const head = `<div class="rhead" style="--g:${gHex};--b:${lv.color}">
+      <div class="rh-chips"><span class="rh-chip" style="background:${lv.color}">${lv.name} book</span><span class="rh-chip" style="background:${gHex};color:${lightHex(gHex) ? '#1a1a1a' : '#fff'}">${gName} group</span></div>
+      <button class="btn ghost small" data-go="choose">Change</button></div>`;
+  const piecesHTML = (code, extra) => { const p = b.pieces.find(x => x.code === code); if(!p) return '';
+    return `${p.setup ? `<p class="rsetup"><b>Set-up:</b> ${esc(p.setup)}</p>` : ''}<p class="rtheme">${esc(p.theme || '')}</p><div class="fstations">${stationBlock(p, col, L)}</div>`; };
+  const cls = S.rota ? groupClasses(S.rota, gi) : {};
+  const days = DAYS_F.filter(d => cls[d]);
+  if(!days.length){
+    // no rotations from the planner: show this fortnight's pieces in order
+    const order = week === 'A' ? ['FF','VT','BM','BF','BA','FT'] : ['BF','BA','FT','FF','VT','BM'];
+    renderTab(`${head}<p class="eyebrow" style="margin-top:16px">${b.assessment ? 'Assessment' : esc(b.weeks)} · Rotation Week ${week}</p>
+      <h1 style="margin-top:0">This fortnight</h1>
+      <p class="muted">Your club hasn’t shared its class rotations yet, so here is every piece your child will work on this fortnight.</p>
+      ${order.map(c => b.pieces.find(p => p.code === c)).filter(Boolean).map(p => `<article class="rcard"><div class="rbar" style="background:${lv.color}"><b>${esc(p.piece)}</b></div><div class="rbody">${piecesHTML(p.code)}</div></article>`).join('')}
+      ${moreLink()}`);
+    hydrateImages(); return;
+  }
+  const today = DAYS_F[new Date().getDay()];
+  if(!UI.day || !cls[UI.day]) UI.day = days.includes(today) ? today : days.find(d => DAYS_F.indexOf(d) > DAYS_F.indexOf(today)) || days[0];
+  const list = cls[UI.day], now = new Date().getHours() * 60 + new Date().getMinutes();
+  if(UI.cls == null || !list[UI.cls]){ const i = list.findIndex(c => now < c[c.length - 1].start_min + c[c.length - 1].duration); UI.cls = UI.day === today && i >= 0 ? i : 0; }
+  const c = list[UI.cls], isToday = UI.day === today;
+  const locs = (S.rota.locations || []);
+  const locCol = n => { const l = locs.find(x => x.name === n); return l ? l.colour : '#555'; };
+  renderTab(`${head}
+    ${days.length > 1 ? `<div class="chips" style="margin:14px 0 4px">${days.map(d => `<button class="chip ${d === UI.day ? 'on' : ''}" data-rday="${d}">${d === today ? 'Today' : d}</button>`).join('')}</div>` : ''}
+    ${list.length > 1 ? `<p class="eyebrow" style="margin:14px 0 6px">Which class?</p><div class="chips">${list.map((x, i) => `<button class="chip ${i === UI.cls ? 'on' : ''}" data-rcls="${i}">${fmtT(x[0].start_min)}</button>`).join('')}</div>` : ''}
+    <p class="eyebrow" style="margin-top:18px">${isToday ? 'Today' : esc(UI.day)} · ${fmtT(c[0].start_min)} class · Rotation Week ${week}</p>
+    <h1 style="margin-top:0">${gName} group rotations</h1>
+    <div class="rlist">${c.map(x => {
+      const loc = week === 'B' && x.locationB ? x.locationB : x.location, code = pieceCode(loc, S.rota), lc = locCol(loc);
+      const on = isToday && now >= x.start_min && now < x.start_min + x.duration;
+      const label = /warm/i.test(x.title || '') ? 'Warm-up' : /cool/i.test(x.title || '') ? 'Cool-down' : '';
+      const body = code ? piecesHTML(code) : '';
+      return `<article class="rcard ${on ? 'now' : ''}">
+        <div class="rbar" style="background:${lc};color:${lightHex(lc) ? '#1a1a1a' : '#fff'}"><span class="rtime">${fmtT(x.start_min)}</span><b>${esc(label || (code ? (b.pieces.find(p => p.code === code) || {}).piece || loc : loc))}</b>${label ? `<span class="rloc">${esc(loc)}</span>` : ''}${on ? '<span class="rnow">NOW</span>' : ''}<span class="rdur">${x.duration} min</span></div>
+        ${body ? `<details class="rbody" ${on || (!isToday && false) ? 'open' : ''}><summary>See the set-up and skills</summary>${body}</details>` : ''}
+      </article>`; }).join('')}</div>
+    ${moreLink()}`);
+  hydrateImages();
+}
+function moreLink(){ return `<div class="card" style="margin-top:20px"><h3 style="margin-top:0">Award book and competition</h3><p class="muted">The skills on your child’s Level assessment and their ${esc(LEVELS[UI.book - 1].name)} competition routine.</p><button class="btn ghost small" data-go="fortnight">See the full fortnight</button></div>
+  <div class="foot">${esc(S.club.clubName)} · NGL Recreational · Questions? Please ask your child’s coach.<br><a href="#" data-go="logout">Use a different club code</a></div>`; }
+
 function screenMain(){
   if(!S.club && (UI.tab === 'week' || UI.tab === 'progress' || !UI.tab)) UI.tab = 'programme';
-  if(S.club && UI.tab === 'week' && !(UI.book && UI.level)) return screenChoose();
-  ({week:screenWeek, progress:screenProgress, programme:screenProgramme, levels:screenLevels, comps:screenComps})[UI.tab]();
+  if(S.club && UI.tab === 'week' && !(UI.book && UI.colour)) return screenChoose();
+  if(S.club && UI.tab === 'fortnight' && !(UI.book && UI.level)){ UI.level = (UI.book - 1) * 4 + 1; }
+  ({week:screenRotations, fortnight:screenWeek, progress:screenProgress, programme:screenProgramme, levels:screenLevels, comps:screenComps})[UI.tab]();
 }
 function classShape(){
   const t = S.club && S.club.term && S.club.term.custom ? S.club.term : null;
@@ -1364,7 +1478,10 @@ function modal(html){
 
 document.addEventListener('click', e => {
   const t = e.target;
-  const bk = t.closest('[data-book]'); if(bk){ UI.book = +bk.dataset.book; UI.level = 0; store.set('book', UI.book); screenChoose(); return; }
+  const bk = t.closest('[data-book]'); if(bk){ UI.book = +bk.dataset.book; if(UI.level && Math.ceil(UI.level / 4) !== UI.book) UI.level = 0; store.set('book', UI.book); screenChoose(); return; }
+  const gc = t.closest('[data-colour]'); if(gc){ UI.colour = +gc.dataset.colour; store.set('colour', UI.colour); UI.tab = 'week'; store.set('tab', 'week'); UI.cls = null; screenMain(); return; }
+  const rd = t.closest('[data-rday]'); if(rd){ UI.day = rd.dataset.rday; UI.cls = null; screenRotations(); return; }
+  const rc = t.closest('[data-rcls]'); if(rc){ UI.cls = +rc.dataset.rcls; screenRotations(); return; }
   const lvl = t.closest('[data-level]'); if(lvl){ UI.level = +lvl.dataset.level; store.set('level', UI.level); { const p = prog(); kid(p).current = UI.level; progSave(p); } UI.block = 0; UI.tab = 'week'; store.set('tab', 'week'); screenMain(); return; }
   if(t.closest('[data-inst-open]')){ showInstallCard(); return; }
   const ft = t.closest('[data-ftab]'); if(ft){ UI.tab = ft.dataset.ftab; store.set('tab', UI.tab); screenMain(); return; }
@@ -1373,6 +1490,7 @@ document.addEventListener('click', e => {
   const go = t.closest('[data-go]');
   if(go){ e.preventDefault();
     if(go.dataset.go === 'choose') screenChoose();
+    else if(go.dataset.go === 'fortnight'){ UI.tab = 'fortnight'; screenMain(); }
     else if(go.dataset.go === 'logout'){ store.set('code', null); S.club = null; try{ const u = new URL(location.href); u.searchParams.delete('code'); history.replaceState(null, '', u); }catch(x){} screenCode(); }
     else if(go.dataset.go === 'home'){ S.club ? screenMain() : screenCode(); }
     else if(go.dataset.go === 'code'){ screenCode(); }
@@ -1392,7 +1510,7 @@ async function start(){
   if(code){
     try{
       const r = await api.openCode(code.toUpperCase());
-      if(r.ok){ S.code = code; S.club = r.club; store.set('code', code.toUpperCase()); keepCodeInUrl(code.toUpperCase()); S.content = await api.loadContent(r.club.key); S.plan = null; return UI.book && UI.level ? screenMain() : screenChoose(); }
+      if(r.ok){ S.code = code; S.club = r.club; store.set('code', code.toUpperCase()); keepCodeInUrl(code.toUpperCase()); S.content = await api.loadContent(r.club.key); S.plan = null; S.rota = undefined; return UI.book && UI.colour ? screenMain() : screenChoose(); }
       return screenCode(r.reason);
     }catch(e){ console.error(e); }
   }
