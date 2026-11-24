@@ -525,6 +525,17 @@
   .dphoto{flex:0 0 auto;width:74px;height:74px;border-radius:12px;overflow:hidden;border:0;padding:0;background:var(--navy-2);cursor:pointer;}
   .dphoto img{width:100%;height:100%;object-fit:cover;display:block;}
 .home-practice .hp-body{padding:12px 18px 14px}.home-list{list-style:none;margin:0;padding:0;columns:2 260px;column-gap:24px}.home-list li{break-inside:avoid;padding:7px 0 7px 22px;position:relative;border-bottom:1px solid rgba(0,0,0,.06)}.home-list li:before{content:'';position:absolute;left:4px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--teal)}.home-list .flink{font-size:.72em;margin-left:4px}
+@media(min-width:760px){
+  /* laptop: stations as a grid of cards, photo across the top */
+  .rbody{padding:4px 20px 18px}
+  .fstations{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:8px}
+  .piece .fstations{padding:16px 18px;margin:0}
+  .fstation,.fstation:last-child{display:flex;flex-direction:column;background:var(--navy-2);border:1px solid var(--line);border-radius:14px;padding:0 0 14px;overflow:hidden}
+  .fstation>.ftext,.fstation>.flinks,.fstation>.tipbox{margin-left:14px;margin-right:14px}
+  .fstation>.ftext{margin-top:12px;font-weight:600}
+  .fstation>.thumbs{order:-1;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:2px}
+  .fstation>.thumbs .thumb{width:100%;height:170px;border:0;border-radius:0}
+}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
