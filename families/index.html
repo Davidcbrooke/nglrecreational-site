@@ -524,6 +524,7 @@
   .drungs summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--rec);}
   .dphoto{flex:0 0 auto;width:74px;height:74px;border-radius:12px;overflow:hidden;border:0;padding:0;background:var(--navy-2);cursor:pointer;}
   .dphoto img{width:100%;height:100%;object-fit:cover;display:block;}
+.home-practice .hp-body{padding:12px 18px 14px}.home-list{list-style:none;margin:0;padding:0;columns:2 260px;column-gap:24px}.home-list li{break-inside:avoid;padding:7px 0 7px 22px;position:relative;border-bottom:1px solid rgba(0,0,0,.06)}.home-list li:before{content:'';position:absolute;left:4px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--teal)}.home-list .flink{font-size:.72em;margin-left:4px}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -1072,6 +1073,30 @@ function stationBlock(p, col, L){
   }).join('');
 }
 
+// Home practice: safe skills to try at home in each fortnight (from "NGL Homework", Nov 2026). "(Ruby L1)" = that level's skill.
+const HOMEWORK = [
+ ['Bunny hops','High bunny hops','Half turn jump (Ruby L1)','Full turn jump (Teal L11)','Front support','Tuck jump half turn (Teal L11)','Half turn on toes (Ruby L3)','Half spin (Pink L7)','Full spin (Teal L10)','Press ups against a wall','Caterpillar walks (Pink L6 & Teal L9)','Straddle bunny hops (Ruby L4)','Front support walking','Tucked full turn jump (Teal L12)','Stretch jump (Ruby L1)','Landing shape (Ruby L1)'],
+ ['Rocking backward and forward to stand','Sideways bunny hops','Star jump holding the landing (Ruby L2)','Tuck jump, star jump rebound (Pink L8)','Broad jumps (Ruby L2)','Straight jumps','Bunny hops','High knees running (Ruby L1)','Back support','Front support walking through to back support','Walking in a straight line','Stork balance (Ruby L3)','Arabesque (Ruby L4)','Y balance (Teal L10)','Rebound jumping','Front support hold','Lying down leg lifts','Piked sit ups','Press ups'],
+ ['High bunny hops (Ruby L4)','Caterpillar walks (Pink L5 & Pink L6)','Arabesque (Ruby L4)','Standing on 1 leg (Pink L5)','Front support shoulder shrugs (Ruby L4)','Backward arm circle to reach high on a wall (Pink L5)','Front support hold','Press ups against a wall','Shoulder shrugs against a wall','Standing leg kicks forward (Pink L6)','Sit in a tuck shape (Ruby L2)','Shoulder stand','Shoulder stand without hand support (Pink L8)','Dish shape','Bent leg dish','Dish rocks','Arch shape','Arch rocks','Hopscotch (Ruby L2)','Duck jumps (Pink L8)','Hopping (Pink L7)','Long bunny hops','Split jump','Rebound jumps'],
+ ['Single leg bunny hops','Bunny hops','Chassé','Chassé cat leap','Chassé scissor leap','Chassé split leap (Indigo L13)','Half turn cat leap (Indigo L15)','Straddle bunny hops (Ruby L4)','Long straddle bunny hops','Caterpillar walks','Backwards straddle bunny hops','High straddle bunny hops','Elephant lift walking','Stretch jump (Ruby L4)','Cat leap (Pink L6)','Jump prep: bend, on toes, stretch tall (Ruby L2)','Scissor leap (Teal L9)','Tuck jump (Teal L11)','Wolf jump (Teal L9 & Teal L12 & Indigo L14)','Hopping','Hopscotch','Split leap or jump (Indigo L15)','Lie on your back, lift legs in straddle','Jump from 1 foot to 2 feet','Sissone jump (Teal L10)','Half turn tuck jump','Full turn tuck jump','Sit ups'],
+ ['Bunny hops','Front support walks','Needle kick','Front support shoulder shrugs','Stretch jump','Front support shoulder taps','Half turn on toes (Ruby L3)','Crouched half turn (Pink L5)','Balance on toes (Ruby L3)','Tiptoe walking (Pink L8)','Half spin (Pink L7 & Teal L11 & Indigo L13)','Relevé half turn (Pink L8)','Spin prep: step, touch knee to toe, step forward','Full spin (Teal L11 & Indigo L16)','Half spin, half turn (Indigo L14)','Rebound jumps','Sideways bunny hops','Dish hold','Arch hold','Dish hold to arch hold'],
+ ['Show your landing shape (Ruby L1)','Balance on 1 leg','Rebound jumps','Rebound hops','Front support hold','Backward arm circle to reach high on a wall (Pink L5)','Lie on your back holding a straight shape','Stretch jump','Star jump','Tuck jump','Straddle jump','High bunny hops','Caterpillar walks','Sideways front support walking','V-sit hold','Dish rocks']
+];
+const HOMEWORK_ASSESS = ['Standing long jump','Standing backwards long jump','Standing long hops','Walking sideways','Hopscotch','Teddy bear roll (Pink L6)','Jump backwards','Dish hold','Arch hold','Rebound jumps'];
+function homeBlock(b, L){
+  const list = b.assessment ? HOMEWORK_ASSESS : HOMEWORK[(b.n - 1) % HOMEWORK.length];
+  if(!list) return '';
+  const lv = LEVELS[UI.book - 1];
+  const rows = list.map(t => {
+    const m = t.match(/\s*\(([^)]*\bL\d+[^)]*)\)\s*$/), name = m ? t.slice(0, m.index) : t;
+    const refs = m ? m[1].split('&').map(x => x.trim().match(/^(\w+)\s+L(\d+)$/)).filter(Boolean).map(x => +x[2]) : [];
+    const mine = refs.includes(L), book = refs.filter(n => n !== L && Math.ceil(n / 4) === UI.book);
+    return {name, mine, book, rank: mine ? 0 : book.length ? 1 : 2};
+  }).sort((a, b) => a.rank - b.rank);
+  return `<article class="piece home-practice"><div class="piece-h"><h2>At home this fortnight</h2><span class="th">${b.assessment ? 'Keep everything ticking over' : 'Safe to practise at home'}</span></div>
+    <div class="hp-body"><p class="muted" style="margin:0 0 10px">Short and often is best: 10 minutes, a few times a week. Use a clear space on a soft floor, with an adult watching. Leave anything that needs a coach’s support for the gym, and stop if anything hurts.</p>
+    <ul class="home-list">${rows.map(r => `<li>${esc(r.name)}${r.mine ? ` <span class="flink fa" style="--c:${lv.color}">Level ${L} assessment</span>` : ''}${r.book.map(n => ` <span class="flink fb" style="--c:${lv.color}">Level ${n} skill</span>`).join('')}</li>`).join('')}</ul></div></article>`;
+}
 function screenWeek(){
   const lv = LEVELS[UI.book - 1], col = UI.book - 1, L = UI.level;
   S.plan = S.plan || familyPlan();
@@ -1113,6 +1138,7 @@ function screenWeek(){
       </article>`).join('')}
     ${wu && !wu.assess ? `<article class="piece"><div class="piece-h"><h2>Warm-up</h2><span class="th">Physical prep to try at home</span></div>
       <div class="fstations">${['pulse','mob','str'].map(k => (wu.parts[k][col] || []).map(x => `<div class="fstation"><div class="ftext">${esc(x.txt)}</div><div class="flinks">${x.L === L ? `<span class="flink fa" style="--c:${lv.color}">Level ${L} assessment</span>` : `<span class="flink fb" style="--c:${lv.color}">Level ${x.L} skill</span>`}</div></div>`).join('')).join('')}</div></article>` : ''}
+    ${homeBlock(b, L)}
   </section>
 
   <section class="section">
