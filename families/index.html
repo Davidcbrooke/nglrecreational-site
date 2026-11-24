@@ -1297,6 +1297,7 @@ async function screenRotations(){
       <h1 style="margin-top:0">This fortnight</h1>
       <p class="muted">Your club hasn’t shared its class rotations yet, so here is every piece your child will work on this fortnight.</p>
       ${order.map(c => b.pieces.find(p => p.code === c)).filter(Boolean).map(p => `<article class="rcard"><div class="rbar" style="background:${lv.color}"><b>${esc(p.piece)}</b></div><div class="rbody">${piecesHTML(p.code)}</div></article>`).join('')}
+      <div style="margin-top:20px">${homeBlock(b, L)}</div>
       ${moreLink()}`);
     hydrateImages(); return;
   }
@@ -1321,6 +1322,7 @@ async function screenRotations(){
         <div class="rbar" style="background:${lc};color:${lightHex(lc) ? '#1a1a1a' : '#fff'}"><span class="rtime">${fmtT(x.start_min)}</span><b>${esc(label || (code ? (b.pieces.find(p => p.code === code) || {}).piece || loc : loc))}</b>${label ? `<span class="rloc">${esc(loc)}</span>` : ''}${on ? '<span class="rnow">NOW</span>' : ''}<span class="rdur">${x.duration} min</span></div>
         ${body ? `<details class="rbody" ${on || (!isToday && false) ? 'open' : ''}><summary>See the set-up and skills</summary>${body}</details>` : ''}
       </article>`; }).join('')}</div>
+    <div style="margin-top:20px">${homeBlock(b, L)}</div>
     ${moreLink()}`);
   hydrateImages();
 }
