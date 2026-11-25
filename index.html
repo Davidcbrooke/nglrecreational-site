@@ -3985,7 +3985,7 @@ function shopSummary(){
   el.innerHTML = `<h2>Your order</h2>${allow}${goods ? `<div class="table-wrap"><table><tbody>${L.map(l => `<tr><td>${esc(l.desc)}</td><td class="num">${l.qty} × ${gbp(l.unit)}</td><td class="num">${gbp(l.qty * l.unit)}</td></tr>`).join('')}
     <tr><td colspan="2" class="num"><b>Total</b></td><td class="num"><b>${gbp(total)}</b></td></tr></tbody></table></div>` : '<p class="muted">Add quantities above to build your order.</p>'}
     <p class="error" id="shopErr"></p>
-    <button class="btn" data-act="shop-place" ${goods ? '' : 'disabled'}>Place order and get invoice</button>`;
+    <button class="btn" data-act="shop-place" ${goods ? '' : 'disabled'}>Place order: pay by card or bank transfer</button>`;
 }
 function screenOrders(){
   const rows = S.orders.slice().reverse();
@@ -4079,7 +4079,7 @@ function orderModal(kind){
     try{ o = await api.placeOrder(order); }
     catch(err){ console.error(err); sb.disabled = false; sb.textContent = 'Place order'; q('osum').insertAdjacentHTML('beforeend', '<p class="error">Couldn’t place the order. Please try again.</p>'); return; }
     m.querySelector('.modal').innerHTML = `<h2>Order ${esc(o.id)} placed</h2>
-      <p class="muted">${gbp(orderTotal(o))}. Pay by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>.${withLicence ? ' Your programme unlocks as soon as payment is received.' : ''}</p>
+      <p class="muted">${gbp(orderTotal(o))}. Pay now by card using the button below, or by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>.${withLicence ? ' Your programme unlocks as soon as payment is received.' : ''}</p>
       <div class="btn-row"><button class="btn" data-act="invoice" data-order="${esc(o.id)}">View invoice</button><button class="btn ghost" data-close>Done</button></div>
       <p class="note" id="mailNote" style="margin:12px 0 0">${FIREBASE_CONFIG ? 'Emailing your invoice to ' + esc(S.club.email || '') + '…' : 'Preview mode: no email sent.'}</p>`;
     m.querySelector('[data-close]').addEventListener('click', () => show());
@@ -4948,9 +4948,9 @@ document.addEventListener('click', async e => {
     act.disabled = true; act.textContent = 'Placing order…';
     let o;
     try{ o = await api.placeOrder(Object.assign({kind:'supplies', season:S.season, term:currentTermKey(), lines:L, total:L.reduce((a, l) => a + l.qty * l.unit, 0), delivery:SHOP.address.trim()}, al.upgrade ? {upgradeTo:al.target.key} : {})); api.saveDelivery && api.saveDelivery(SHOP.address.trim()).catch(() => {}); }
-    catch(e2){ console.error(e2); act.disabled = false; act.textContent = 'Place order and get invoice'; err.textContent = 'Couldn’t place the order. Please try again.'; return; }
+    catch(e2){ console.error(e2); act.disabled = false; act.textContent = 'Place order: pay by card or bank transfer'; err.textContent = 'Couldn’t place the order. Please try again.'; return; }
     Object.keys(SHOP).forEach(k => { if(k !== 'address') delete SHOP[k]; });
-    const m = modal(`<h2>Order ${esc(o.id)} placed</h2><p class="muted">${gbp(orderTotal(o))}. Pay by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>. We’ll post it to you as soon as payment arrives.</p>
+    const m = modal(`<h2>Order ${esc(o.id)} placed</h2><p class="muted">${gbp(orderTotal(o))}. Pay now by card using the button below, or by bank transfer within ${INVOICE.termsDays} days quoting <b class="mono">${esc(o.id)}</b>. We’ll post it to you as soon as payment arrives.</p>
       <div class="btn-row"><button class="btn" data-act="invoice" data-order="${esc(o.id)}">View invoice</button><button class="btn ghost" data-close>Done</button></div>
       <p class="note" id="mailNote" style="margin:12px 0 0">${FIREBASE_CONFIG ? 'Emailing your invoice to ' + esc(S.club.email || '') + '…' : 'Preview mode: no email sent.'}</p>`);
     m.querySelector('[data-close]').addEventListener('click', () => { tab = 'orders'; show(); });
