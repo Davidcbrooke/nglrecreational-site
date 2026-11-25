@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="NGL Recreational">
 <title>NGL Recreational Hub</title>
+<link rel="stylesheet" href="https://club.nationalgymnasticsleague.co.uk/kit/ngl-hub.css">
 <style>
   :root{
     --navy:#0a1440; --navy-2:#0d1a4f; --navy-3:#152463; --navy-4:#1d2f7a;
@@ -531,6 +532,24 @@
   .drungs summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--rec);}
   .dphoto{flex:0 0 auto;width:74px;height:74px;border-radius:12px;overflow:hidden;border:0;padding:0;background:var(--navy-2);cursor:pointer;}
   .dphoto img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ===== NGL Hub Kit alignment (club.nationalgymnasticsleague.co.uk/kit/DESIGN.md) ===== */
+  :root{--navy:#15123a;--navy-2:#1e1a4c;--navy-3:#28225c;--navy-4:#342d74;--rec:#e8822f;--muted:#c9c6e6}
+  body{background:linear-gradient(180deg,#28225c 0,#1e1a4c 640px,#15123a 100%) #15123a}
+  .topbar-strap{text-transform:uppercase;letter-spacing:.06em}
+  .topbar-in{background:linear-gradient(180deg,#28225c 0%,#1e1a4c 100%)}
+  h1{font-family:'Roboto Condensed',Arial,sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:.005em;line-height:1.02}
+  h2{font-family:'Roboto Condensed',Arial,sans-serif;font-weight:800}
+  .eyebrow{letter-spacing:.12em}
+  /* white content cards, like every NGL hub */
+  .card{background:#fff;color:#1b1840;border:0;border-top:5px solid var(--rec);box-shadow:0 6px 16px rgba(6,10,40,.14);
+    --white:#1b1840;--muted:#5f5b80;--line:#e4e3ee;--navy-2:#eceaf6;--navy-3:#f5f5fa;--navy-4:#e4e3ee;--ok:#1f8a4c;--bad:#c6152e;--warn:#a65a00}
+  .card h2,.card h3{color:#28225c}
+  .card .eyebrow{color:#c25f10}
+  .btn{border-radius:999px}
+  .navtab{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22)}
+  .k-foot{margin-top:24px}
+  .app{min-height:100vh;display:flex;flex-direction:column}.app>.wrap{flex:1;width:100%}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -572,7 +591,8 @@
 
 <div id="print-area"></div>
 <div class="app">
-  <header class="topbar"><div class="topbar-strap">Recreational Awards Scheme · Club Hub</div><div class="topbar-in">
+  <div class="k-bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <header class="topbar"><div class="topbar-strap">NGL Recreational · Club Hub</div><div class="topbar-in">
     <div class="wrap topbar-row">
       <a class="logo" href="#" data-go="home" aria-label="NGL Recreational home"><img src="/icons/rec-logo.png" alt="NGL Recreational"></a>
       <a class="nglhome" href="https://www.nationalgymnasticsleague.co.uk/" target="_top" aria-label="Back to the NGL website home page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>NGL Home</a>
@@ -583,6 +603,11 @@
     <nav class="navtabs" id="navtabs" hidden></nav>
     <main id="view"></main>
   </div>
+  <footer class="k-foot"><div class="in">
+    <img src="https://davidcbrooke.github.io/GYMNASTICS-RESULTS/brand/ngl-logo-full.png" alt="National Gymnastics League">
+    <div class="sp"><small>OFFICIAL SPONSOR</small><img src="https://davidcbrooke.github.io/GYMNASTICS-RESULTS/brand/justgo-logo-white.png" alt="JustGo"></div>
+    <div>Exclusively for British Gymnastics Clubs<br>66 Waveney Road, Harpenden AL5 4QZ · <a href="mailto:admin@nationalgymnasticsleague.co.uk">admin@nationalgymnasticsleague.co.uk</a></div>
+  </div></footer>
 </div>
 
 <script>
