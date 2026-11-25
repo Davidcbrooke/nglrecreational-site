@@ -5128,5 +5128,9 @@ document.addEventListener('click', async e => {
   }, {passive:true});
 })();
 </script>
+<script>/* NGL card payments (kit/card-pay.js) */
+if(FIREBASE_CONFIG) window.NGL_PAY={coll:()=>'recOrders',status:id=>((S.orders||[]).find(o=>o.id===id)||{}).status,uid:()=>S.uid,token:async()=>{const f=await fb();return f.A.currentUser&&f.A.currentUser.getIdToken();}};
+</script>
+<script src="https://club.nationalgymnasticsleague.co.uk/kit/card-pay.js"></script>
 </body>
 </html>
