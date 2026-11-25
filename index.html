@@ -3888,6 +3888,7 @@ function orderFor(o){
   if(n('book')) bits.push(n('book') + ' books'); if(n('medal')) bits.push(n('medal') + ' medals');
   if(n('cert')) bits.push(n('cert') + ' certificates'); if(n('tshirt')) bits.push(n('tshirt') + ' t-shirts');
   if(n('gymnast')) bits.push(n('gymnast') + ' gymnast licences');
+  if(n('gbook')) bits.push(n('gbook') + ' General Skills Books');   // ordered in the NGL Club Hub (pathway:'general')
   if(!bits.length && o.band) bits.push('Club Licence');
   return bits.join(', ') || 'Order';
 }
@@ -4064,7 +4065,7 @@ function invoiceHTML(o, club){
   const issued = toDate(o.createdAt), due = new Date(issued.getTime() + INVOICE.termsDays * 86400000);
   const total = orderTotal(o), paid = o.status === 'paid';
   return `<div class="inv">
-    <div class="inv-top"><div class="inv-brand">National Gymnastics League<small>NGL RECREATIONAL</small></div>
+    <div class="inv-top"><div class="inv-brand">National Gymnastics League<small>${o.pathway === 'general' ? 'NGL GENERAL LEAGUE' : 'NGL RECREATIONAL'}</small></div>
       <div class="inv-title"><div class="inv-h">INVOICE</div><div class="inv-no">${esc(o.id)}</div>${paid ? '<div class="inv-paid">PAID</div>' : ''}</div></div>
     <div class="inv-cols">
       <div><div class="inv-label">From</div><b>${esc(INVOICE.businessName)}</b><br>${INVOICE.addressLines.map(esc).join('<br>')}<br>${esc(INVOICE.email)}${INVOICE.vatNumber ? '<br>VAT no. ' + esc(INVOICE.vatNumber) : ''}</div>
