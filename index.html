@@ -3319,6 +3319,8 @@ const liveApi = {
       const code = await claimSchoolsCode(d.name, S.uid).catch(() => '');
       await fs.setDoc(fs.doc(D, 'clubs', S.uid), {name:d.name, bgNumber:d.bgNumber, contact:d.contact, email:d.email, accessCode:code, source:'recreational', createdAt:fs.serverTimestamp()});
       await loadClubData(S.uid);
+      // New sign-up -> Brevo list 4 (NGL welcome email an hour later). Apps Script relay checks the sign-in token; see ngl-workspace areas/ngl/club-hub-licensing/scripts/brevo-signup.gs
+      cred.user.getIdToken().then(t => fetch('https://script.google.com/macros/s/AKfycbznS0LdsczWgS7poUlevqgDobziGY6CSSU3vjiYk43w0zoX0y_y4tTWeLTZPcQ1aRrA/exec', {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({uid:S.uid, idToken:t})})).catch(e => console.warn('Brevo sign-up not sent', e));
       return {ok:true};
     }catch(e){ return {ok:false, reason:friendlyAuthError(e)}; }
   },
